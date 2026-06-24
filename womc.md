@@ -75,9 +75,9 @@ allowed-tools: Write
   Claude Code를 켜면 **매 세션 자동으로 로드**된다. (예: 한국어로 설명, 코드는 전체 파일로 제공)
 - **SPEC.md** — 이 프로젝트만의 상세 내용(스택, 만들 것, 기능 등). CLAUDE.md 끝에서
   `@SPEC.md` 로 import 되어 **CLAUDE.md에 딸려 함께 로드**된다. 처음엔 빈 템플릿이며 직접 채운다.
-- **.claude/agents/** — 이 프로젝트 전용 서브에이전트를 두는 곳. (지금은 비어 있음)
-- **.claude/skills/** — 이 프로젝트 전용 스킬을 두는 곳. (지금은 비어 있음)
-- **.claude/rules/** — 세부 규칙 문서를 두는 곳. (지금은 비어 있음)
+- **.claude/agents/** — 이 프로젝트 전용 서브에이전트를 두는 곳. (지금은 `README.md` 만 있음)
+- **.claude/skills/** — 이 프로젝트 전용 스킬을 두는 곳. (지금은 `README.md` 만 있음)
+- **.claude/rules/** — 세부 규칙 문서를 두는 곳. (지금은 `README.md` 만 있음)
 - **.gitignore** — git이 무시할 파일 목록(설치물, 비밀키, 빌드 산출물 등).
 
 ## 왜 스택·MCP 같은 건 비워 뒀나
@@ -118,11 +118,32 @@ Thumbs.db
 .idea/
 ```
 
-### 5) 빈 폴더 3개 (`.gitkeep` 으로 추적)
-다음 3개 파일을 만든다. 각 파일 내용은 빈 줄 하나면 된다.
-- `.claude/agents/.gitkeep`
-- `.claude/skills/.gitkeep`
-- `.claude/rules/.gitkeep`
+### 5) `.claude/` 하위 폴더 3개 (`README.md` 로 추적)
+다음 3개 파일을 각각 아래 내용 그대로 만든다. (빈 폴더를 빈 파일로 추적하면 권한 분류기에 걸려 생성이 누락될 수 있으므로, 내용이 있는 `README.md` 로 둔다.)
+
+`.claude/agents/README.md`
+```markdown
+# agents
+이 폴더는 이 프로젝트 전용 서브에이전트를 두는 곳이다.
+조사·검토처럼 무거운 작업을 별도 컨텍스트에서 처리하고 싶을 때 추가한다.
+지금은 비어 있다.
+```
+
+`.claude/skills/README.md`
+```markdown
+# skills
+이 폴더는 이 프로젝트 전용 스킬(반복 절차서)을 두는 곳이다.
+같은 작업을 반복하게 될 때 추가한다.
+지금은 비어 있다.
+```
+
+`.claude/rules/README.md`
+```markdown
+# rules
+이 폴더는 세부 규칙 문서를 두는 곳이다.
+특정 파일을 만질 때만 적용할 규칙이 생기면 추가한다.
+지금은 비어 있다.
+```
 
 ## 생성이 끝나면
 한국어로 짧게 다음 단계를 안내한다. 예시:

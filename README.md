@@ -47,9 +47,9 @@ Invoke-WebRequest `
 ├─ README.md          # 생성된 프로젝트 자체의 구조 설명
 ├─ .gitignore         # node_modules / .env / dist 등
 └─ .claude/
-   ├─ agents/.gitkeep   # 프로젝트 전용 서브에이전트 자리 (비어 있음)
-   ├─ skills/.gitkeep   # 프로젝트 전용 스킬 자리 (비어 있음)
-   └─ rules/.gitkeep    # 세부 규칙 문서 자리 (비어 있음)
+   ├─ agents/README.md   # 프로젝트 전용 서브에이전트 자리 (안내만 있음)
+   ├─ skills/README.md   # 프로젝트 전용 스킬 자리 (안내만 있음)
+   └─ rules/README.md    # 세부 규칙 문서 자리 (안내만 있음)
 ```
 > `.mcp.json` 은 **만들지 않는다.** MCP는 프로젝트마다 다르므로 필요할 때 직접 추가한다.
 
