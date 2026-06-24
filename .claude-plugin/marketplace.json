@@ -1,0 +1,16 @@
+{
+  "name": "works-on-my-claude",
+  "owner": {
+    "name": "yeejh96-bit"
+  },
+  "metadata": {
+    "description": "새 프로젝트 골격을 까는 슬래시 명령 womc 를 배포하는 마켓플레이스"
+  },
+  "plugins": [
+    {
+      "name": "womc",
+      "source": "./",
+      "description": "새 프로젝트의 기본 골격(컨텍스트 엔지니어링 + 하네스)을 까는 슬래시 명령"
+    }
+  ]
+}

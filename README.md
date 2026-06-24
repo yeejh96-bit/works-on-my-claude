@@ -6,28 +6,22 @@ Claude Code에서 `/womc` 한 번으로 새 프로젝트의 기본 골격을 까
 새 프로젝트를 시작할 때마다 `CLAUDE.md`, 명세 파일, `.claude/` 폴더 구조를 **0에서 손으로 만드는 번거로움**을 없앤다. 빈 폴더에서 `/womc` 만 입력하면 매번 똑같은 골격이 깔린다.
 
 ## 설치
-`womc.md` 파일을 Claude Code의 전역 명령 폴더에 넣으면 끝이다.
 
-**Mac / Linux**
-```bash
-mkdir -p ~/.claude/commands
-curl -o ~/.claude/commands/womc.md \
-  https://raw.githubusercontent.com/yeejh96-bit/works-on-my-claude/main/womc.md
+Claude Code 안에서 두 줄이면 끝이다.
+
+```
+/plugin marketplace add yeejh96-bit/works-on-my-claude
+/plugin install womc@works-on-my-claude
 ```
 
-**Windows (PowerShell)**
-```powershell
-New-Item -ItemType Directory -Force "$HOME\.claude\commands" | Out-Null
-Invoke-WebRequest `
-  -Uri "https://raw.githubusercontent.com/yeejh96-bit/works-on-my-claude/main/womc.md" `
-  -OutFile "$HOME\.claude\commands\womc.md"
-```
+설치 후 `/reload-plugins` 를 실행하면 `/womc` 가 바로 잡힌다.
 
-> 직접 받기: 이 레포의 `womc.md` 를 내려받아 아래 위치에 두어도 된다.
-> - Mac / Linux: `~/.claude/commands/womc.md`
-> - Windows: `C:\Users\<사용자명>\.claude\commands\womc.md`
->
-> 특정 프로젝트에서만 쓰려면 `<프로젝트>/.claude/commands/womc.md` 에 둔다.
+### 수동 설치 (플러그인을 쓰지 않을 때)
+이 레포의 `commands/womc.md` 를 내려받아 아래 위치에 두어도 된다.
+- Mac / Linux: `~/.claude/commands/womc.md`
+- Windows: `C:\Users\<사용자명>\.claude\commands\womc.md`
+
+특정 프로젝트에서만 쓰려면 `<프로젝트>/.claude/commands/womc.md` 에 둔다.
 
 ## 사용법
 1. 새(빈) 프로젝트 폴더를 만든다.
