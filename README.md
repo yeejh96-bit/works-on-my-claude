@@ -14,7 +14,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 /plugin install womc@works-on-my-claude
 ```
 
-설치 후 `/reload-plugins` 를 실행하면 `/womc` 가 바로 잡힌다.
+설치 후 Claude Code를 재시작하면 `/womc` 가 잡힌다.
 
 ### 수동 설치 (플러그인을 쓰지 않을 때)
 이 레포의 `commands/womc.md` 를 내려받아 아래 위치에 두어도 된다.

@@ -1,6 +1,6 @@
 ---
 description: 새 프로젝트 폴더에 항상 동일한 기본 골격(컨텍스트 엔지니어링 + 하네스 세팅)을 생성한다
-allowed-tools: Write
+allowed-tools: Write, Read
 ---
 
 너는 지금 현재 작업 폴더에 "프로젝트 기본 골격"을 생성하는 작업만 한다.
