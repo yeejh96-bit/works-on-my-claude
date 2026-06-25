@@ -41,6 +41,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 ├─ README.md          # 생성된 프로젝트 자체의 구조 설명
 ├─ .gitignore         # node_modules / .env / dist 등
 └─ .claude/
+   ├─ settings.json      # 하네스: 안전한 읽기 전용 명령 미리 허용 (허용 프롬프트 줄임)
    ├─ agents/README.md   # 프로젝트 전용 서브에이전트 자리 (안내만 있음)
    ├─ skills/README.md   # 프로젝트 전용 스킬 자리 (안내만 있음)
    └─ rules/README.md    # 세부 규칙 문서 자리 (안내만 있음)

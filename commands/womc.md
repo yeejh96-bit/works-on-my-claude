@@ -1,6 +1,6 @@
 ---
 description: 새 프로젝트 폴더에 항상 동일한 기본 골격(컨텍스트 엔지니어링 + 하네스 세팅)을 생성한다
-allowed-tools: Write
+allowed-tools: Write, Read, Glob
 ---
 
 너는 지금 현재 작업 폴더에 "프로젝트 기본 골격"을 생성하는 작업만 한다.
@@ -11,7 +11,8 @@ allowed-tools: Write
 - 프로젝트마다 달라지는 것(기술 스택, 사용하는 MCP 등)은 채우지 않는다. 빈 틀만 둔다.
 - `.mcp.json` 은 만들지 않는다.
 - SPEC 자동 작성, 코드 구현은 하지 않는다. 구조 생성까지만 한다.
-- 같은 이름 파일이 이미 있으면 덮어쓰지 말고, 어떤 파일이 이미 있었는지 마지막 안내에서 알려준다.
+- 생성하기 전에 먼저 `Glob` 로 현재 폴더에 같은 이름 파일이 이미 있는지 확인한다.
+  이미 있는 파일은 **덮어쓰지 말고 건너뛰며**, 어떤 파일이 이미 있었는지 마지막 안내에서 알려준다.
 
 ## 생성할 파일과 내용
 
@@ -75,6 +76,8 @@ allowed-tools: Write
   Claude Code를 켜면 **매 세션 자동으로 로드**된다. (예: 한국어로 설명, 코드는 전체 파일로 제공)
 - **SPEC.md** — 이 프로젝트만의 상세 내용(스택, 만들 것, 기능 등). CLAUDE.md 끝에서
   `@SPEC.md` 로 import 되어 **CLAUDE.md에 딸려 함께 로드**된다. 처음엔 빈 템플릿이며 직접 채운다.
+- **.claude/settings.json** — 하네스(작업 환경) 기본값. 어디서나 안전한 읽기 전용 명령
+  (`git status`, `git diff`, `git log`, 파일 목록)을 미리 허용해, 매번 허용 프롬프트가 뜨는 걸 줄인다.
 - **.claude/agents/** — 이 프로젝트 전용 서브에이전트를 두는 곳. (지금은 `README.md` 만 있음)
 - **.claude/skills/** — 이 프로젝트 전용 스킬을 두는 곳. (지금은 `README.md` 만 있음)
 - **.claude/rules/** — 세부 규칙 문서를 두는 곳. (지금은 `README.md` 만 있음)
@@ -143,6 +146,28 @@ Thumbs.db
 이 폴더는 세부 규칙 문서를 두는 곳이다.
 특정 파일을 만질 때만 적용할 규칙이 생기면 추가한다.
 지금은 비어 있다.
+```
+
+### 6) `.claude/settings.json` (하네스 — 권한 기본값)
+아래 내용을 그대로 쓴다. 어느 프로젝트에서나 안전한 **읽기 전용 명령**만 미리 허용해 둔다.
+(입문자가 `git status` 한 번 돌릴 때마다 허용 프롬프트에 시달리지 않도록 하는 게 목적이다.
+`push`·`reset` 같이 되돌리기 어려운 명령은 일부러 넣지 않는다 — 그건 매번 확인받는 게 맞다.)
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(ls:*)",
+      "PowerShell(git status*)",
+      "PowerShell(git diff*)",
+      "PowerShell(git log*)",
+      "PowerShell(Get-ChildItem*)"
+    ]
+  }
+}
 ```
 
 ## 생성이 끝나면
