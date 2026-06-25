@@ -128,6 +128,9 @@ out/
 Thumbs.db
 .vscode/
 .idea/
+
+# Claude Code 개인용 로컬 설정 (공유 안 함)
+.claude/settings.local.json
 ```
 
 ### 5) `.claude/` 하위 폴더와 하네스 파일들
