@@ -1,6 +1,6 @@
 {
   "name": "womc",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "새 프로젝트의 기본 골격(컨텍스트 엔지니어링 + 하네스)을 까는 슬래시 명령",
   "author": {
     "name": "yeejh96-bit"

@@ -36,8 +36,9 @@ Claude Code 안에서 두 줄이면 끝이다.
 ## 생성되는 구조
 ```
 현재폴더/
-├─ CLAUDE.md          # 항상 적용되는 불변 작업 규칙 (끝에서 @SPEC.md import)
+├─ CLAUDE.md          # 항상 적용되는 불변 작업 규칙 (끝에서 @SPEC.md, @TASKS.md import)
 ├─ SPEC.md            # 프로젝트 명세 빈 템플릿 (헤더 6개만)
+├─ TASKS.md           # 작업을 작은 task로 쪼개 하나씩 처리하는 진행 목록
 ├─ README.md          # 생성된 프로젝트 자체의 구조 설명
 ├─ .gitignore         # node_modules / .env / dist 등
 └─ .claude/
@@ -58,8 +59,19 @@ Claude Code 안에서 두 줄이면 끝이다.
 ## 파일 로드 방식
 - **CLAUDE.md** 는 Claude Code가 켜질 때 **매 세션 자동으로 로드**된다.
 - **SPEC.md** 는 CLAUDE.md 맨 끝의 `@SPEC.md` 줄을 통해 **import 되어 함께 딸려 로드**된다.
+- **TASKS.md** 도 CLAUDE.md 맨 끝의 `@TASKS.md` 줄을 통해 **import 되어 함께 로드**된다.
 
-즉 불변 규칙(CLAUDE.md)과 프로젝트 명세(SPEC.md)가 매 세션 한 묶음으로 Claude에게 전달된다.
+즉 불변 규칙(CLAUDE.md) · 프로젝트 명세(SPEC.md) · 현재 진행 상황(TASKS.md)이 매 세션 한 묶음으로 Claude에게 전달된다.
+
+## 한 번에 다 짜지 않는다 (task 단위 진행)
+womc로 만든 프로젝트는 큰 요청이 와도 곧바로 전부 구현하지 않는다. `CLAUDE.md` 에 다음 규칙이 박혀 있다.
+
+1. 코드부터 짜지 말고, 요청을 작은 단위(task)로 쪼개 `TASKS.md` 에 적고 먼저 보여준다.
+2. 구현 시작 전에 **진행 방식을 사용자에게 묻는다** — (A) 끝까지 한 번에 / (B) task 하나씩 확인받으며.
+3. 어느 방식이든 한 번에 **딱 하나의 task**만 구현한다.
+4. (B)를 골랐다면 task 하나가 끝날 때마다 멈추고 `TASKS.md` 에 기록한 뒤 **다음으로 넘어갈지 확인**받는다. (A)라면 끝까지 이어서 진행한다.
+
+진행 상황이 파일(`TASKS.md`)에 남고 매 세션 자동 로드되므로, 세션이 끊기거나 길어져도 "어디까지 했는지"가 보존된다.
 
 ## 이름 유래
 "It works on my machine"(내 컴퓨터에선 되는데…) 밈을 비튼 이름 — 여기선 **내 Claude에선 잘 된다**.
