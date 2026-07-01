@@ -1,6 +1,6 @@
 {
   "name": "womc",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "새 프로젝트에 최소 운영체계(컨텍스트 엔지니어링 + 하네스 + 운영 절차)를 까는 슬래시 명령",
   "author": {
     "name": "yeejh96-bit"
