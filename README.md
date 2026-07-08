@@ -48,20 +48,19 @@ Claude Code 안에서 두 줄이면 끝이다.
    /plugin install womc@works-on-my-claude
    ```
    (마켓플레이스 정보를 새로고침한 뒤 다시 설치하면 최신 버전이 잡힌다. `/reload-plugins` 까지 하면 확실하다.)
-2. 그 프로젝트에서 **불변 골격 파일만** 지운다 — `CLAUDE.md`, `.claude/settings.json`, `.claude/agents/`, `.claude/skills/plan-feature/`, `.claude/skills/make-rule/`.
-   (`SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` 는 직접 채운 내용이므로 **지우면 안 된다.**
-   `settings.json` 에 직접 추가한 허용 항목이 있다면 지우기 전에 따로 적어 뒀다가 다시 넣는다.)
-3. `/womc` 를 다시 실행한다 — 지운 파일만 새 버전으로 다시 생긴다.
+2. 그 프로젝트에서 `/womc update` 를 실행한다 — **불변 골격만** 최신으로 교체되고,
+   직접 채운 파일(`SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` · `.gitignore`)과
+   `settings.json` 에 직접 추가한 허용 항목은 그대로 보존된다. 파일을 손으로 지울 필요가 없다.
 
 ## 생성되는 구조
 ```
 현재폴더/
 ├─ CLAUDE.md          # 항상 적용되는 불변 작업 규칙 (끝에서 @SPEC.md import)
 ├─ SPEC.md            # 프로젝트 명세 빈 템플릿 (헤더 6개만)
-├─ README.md          # 생성된 프로젝트 자체의 구조 설명
-├─ .gitignore         # node_modules / .env / dist 등
+├─ HARNESS.md         # 사람이 읽는 구조 안내서 (Claude가 자동으로 읽지 않음 — 토큰 0)
+├─ .gitignore         # node_modules / .env / dist 등 (견본 .env.example 은 예외)
 └─ .claude/
-   ├─ settings.json      # 하네스: .env 읽기 차단(deny) + PowerShell 읽기 전용 명령 허용
+   ├─ settings.json      # 하네스: 비밀 .env 읽기 차단(deny, 견본 .env.example 은 읽힘) + PowerShell 읽기 전용 명령 허용
    ├─ agents/
    │  ├─ explore.md      # 코드 조사 전용 서브에이전트 — 조사를 별도 컨텍스트로 빼 긴 세션에서 절약
    │  └─ verify.md       # 동작 검증 전용 서브에이전트 — 테스트·실행을 별도 컨텍스트에서, 통과/실패만 보고
@@ -98,7 +97,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 - **`verify` 서브에이전트** — 테스트·실행 검증을 별도 컨텍스트에서 끝내고 **통과/실패만** 가져온다. 긴 실행 로그가 본 대화에 쌓이지 않는다. explore·verify 둘 다 더 싸고 빠른 모델(haiku)로 돌게 지정돼 있어 **비용도 아낀다.**
 - **`plan-feature` 스킬** — 큰 작업을 한꺼번에 벌이지 않고 작은 단계로 쪼개 하나씩 진행하게 해, 한 세션에 컨텍스트가 터지는 걸 막는다. 스킬은 **필요할 때만 로드**돼 평소 컨텍스트를 차지하지 않는다.
 - **CLAUDE.md의 "컨텍스트·토큰 아끼기" 규칙** — 위 습관(무거운 조사·검증은 위임, 한 번에 한 기능, 기능이 끝나면 새 세션)을 매 세션 Claude에게 상기시킨다.
-- **settings.json** — 비밀키 파일(`.env`) 읽기를 하위 폴더 것까지 차단해 입문자를 보호하고, Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령을 미리 허용한다. (Bash의 `git status` 등 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하고, Mac/Linux에선 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 중요한 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.)
+- **settings.json** — 비밀키 파일(`.env` 와 그 변형) 읽기를 하위 폴더 것까지 차단해 입문자를 보호하되, 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있게 **비밀이 들어가는 이름만 골라** 막는다(Claude가 "어떤 설정값이 필요한지" 견본에서 파악할 수 있게). Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령도 미리 허용한다. (Bash의 `git status` 등 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하고, Mac/Linux에선 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 중요한 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.)
 
 ## 설계 원리
 **변하지 않는 것만 내용을 채우고, 프로젝트마다 달라지는 것은 빈 칸으로 두거나 아예 만들지 않는다.**
