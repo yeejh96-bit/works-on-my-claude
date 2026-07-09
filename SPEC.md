@@ -18,8 +18,8 @@
 ## 3. 핵심 기능 (3~5개)
 1. `/womc` — 빈 폴더에 고정 골격 생성(이미 있는 파일은 덮어쓰지 않고 건너뜀). `/womc update` 는 불변 골격만 최신으로 교체(사용자가 채운 파일은 보존).
 2. 항상 로드되는 규칙(CLAUDE.md) + 프로젝트 명세(SPEC.md, `@import`)만 always-on으로 유지.
-3. 위임용 서브에이전트 2종: `explore`(조사) · `verify`(검증) — 무거운 작업을 별도 컨텍스트로 빼 토큰 절약.
-4. 운영 스킬 2종: `plan-feature`(쪼개기·PLAN/TASKS 관리·검증) · `make-rule`(규칙 자동 생성).
+3. 오케스트레이션 서브에이전트 5종: `explore`(조사·haiku) · `plan`(설계·opus) · `implement`(구현·sonnet, 유일하게 파일 직접 수정) · `verify`(검증·sonnet) · `review`(검토·sonnet). 메인은 지휘자로 얇게 유지하고 무거운 일을 병렬 위임. 서브에이전트는 CLAUDE.md 를 못 물려받으므로 각 파일에 자체 하네스(역할·입력계약·작업규칙·출력계약)를 심는다.
+4. 운영 스킬 2종: `plan-feature`(쪼개기·PLAN/TASKS 관리·조사→설계→구현→검증→검토 위임) · `make-rule`(규칙 자동 생성).
 5. 안전 기본값(settings.json): 비밀 `.env` 읽기 차단(견본 `.env.example` 은 읽힘) + 자주 쓰는 읽기 전용 명령 허용.
 
 ## 4. 화면 흐름
