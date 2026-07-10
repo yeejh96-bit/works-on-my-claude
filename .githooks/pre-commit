@@ -1,0 +1,24 @@
+#!/bin/sh
+# womc 정합성 검사 — 어긋나면 커밋을 멈춘다.
+# (scripts/check-sync.py: womc.md 원본↔라이브 파일, README 버전↔plugin.json 버전)
+# 이 훅을 켜려면 저장소에서 한 번:  git config core.hooksPath .githooks
+
+if command -v py >/dev/null 2>&1; then
+  PY=py
+elif command -v python3 >/dev/null 2>&1; then
+  PY=python3
+elif command -v python >/dev/null 2>&1; then
+  PY=python
+else
+  echo "[pre-commit] python 을 찾을 수 없어 정합성 검사를 건너뜁니다."
+  exit 0
+fi
+
+"$PY" scripts/check-sync.py
+status=$?
+if [ $status -ne 0 ]; then
+  echo ""
+  echo "[pre-commit] 정합성 검사 실패 — 커밋을 멈춥니다. 위 DRIFT 항목을 맞춘 뒤 다시 커밋하세요."
+  echo "             (정말 그냥 넘기려면:  git commit --no-verify)"
+fi
+exit $status
