@@ -10,6 +10,7 @@
 - **SPEC.md** — 이 프로젝트만의 상세 내용(스택, 만들 것, 기능 등). CLAUDE.md 끝에서
   `@SPEC.md` 로 import 되어 **CLAUDE.md에 딸려 함께 로드**된다.
   신규 프로젝트면 빈 템플릿을 직접 채우고, 기존 프로젝트면 `/womc` 가 코드를 훑어 채운 초안을 검토·수정한다.
+  (기존 프로젝트면 이미 있던 `CLAUDE.md`·설정에 womc 규칙을 덧붙여 병합하고, 코드 관례를 `.claude/rules/` 로 캡처하며, 구조 정리는 `plan-feature` 로 넘기도록 제안한다.)
 - **.claude/settings.json** — 하네스(작업 환경) 기본값. 비밀키 파일(`.env` 와 그 변형)을 하위 폴더 것까지
   Claude가 읽지 못하게 막고(`deny`), 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있게 둔다.
   Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령도 미리 허용해 둔다.
