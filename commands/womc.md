@@ -1,7 +1,7 @@
 ---
 description: 새 프로젝트 폴더에 항상 동일한 기본 골격(컨텍스트 엔지니어링 + 하네스 세팅)을 생성한다. `update` 인자를 주면 불변 골격만 최신 버전으로 갱신한다.
 argument-hint: [update]
-allowed-tools: Write, Read, Glob, Task
+allowed-tools: Write, Edit, Read, Glob, Task
 ---
 
 사용자 인자: $ARGUMENTS
@@ -521,7 +521,7 @@ paths:
 
 ### 2) 기존 `CLAUDE.md`·설정 조율 (이미 있을 때만)
 프로젝트에 이미 **비-womc `CLAUDE.md`** 가 있으면(첫 줄이 골격의 `# 작업 규칙 (모든 프로젝트 공통 · 불변)` 이 아니면) 건너뛰지 말고 조율한다:
-- 기존 파일을 읽고 **맨 끝에** 아래처럼 표시된 구획을 덧붙인다 — 사용자 내용은 한 줄도 바꾸지 않는다. 이미 `@SPEC.md` import 나 `womc:` 구획이 있으면 다시 넣지 않는다.
+- 기존 파일을 읽고 **`Edit` 으로 맨 끝에만** 아래처럼 표시된 구획을 덧붙인다(파일을 통째로 다시 쓰지 말 것 — 사용자 내용을 실수로 바꾸는 걸 막는다). 사용자 내용은 한 줄도 바꾸지 않는다. 이미 `@SPEC.md` import 나 `womc:` 구획이 있으면 다시 넣지 않는다.
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
