@@ -1,4 +1,4 @@
-# works-on-my-claude v1.8.1
+# works-on-my-claude v1.9.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
@@ -56,7 +56,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 ```
 현재폴더/
 ├─ CLAUDE.md          # 항상 적용되는 불변 작업 규칙 (끝에서 @SPEC.md import)
-├─ SPEC.md            # 프로젝트 명세 빈 템플릿 (헤더 6개만)
+├─ SPEC.md            # 프로젝트 명세 빈 템플릿 (헤더 7개만)
 ├─ HARNESS.md         # 사람이 읽는 구조 안내서 (Claude가 자동으로 읽지 않음 — 토큰 0)
 ├─ .gitignore         # node_modules / .env / dist 등 (견본 .env.example 은 예외)
 └─ .claude/
