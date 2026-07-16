@@ -127,6 +127,8 @@ allowed-tools: Write, Edit, Read, Glob, Task
   Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령도 미리 허용해 둔다.
   (`git status` 같은 Bash 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하므로 따로 적지 않는다.
   Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.)
+- **.claude/statusline.js** — 터미널 하단 상태줄 스크립트(Node). 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 보여준다.
+  `.claude/settings.json` 의 `statusLine` 항목이 이 파일을 실행한다. Node.js 가 설치돼 있어야 동작하며, 없어도 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
 - **.claude/agents/** — 무거운 일을 별도 컨텍스트에서 처리하는 전문 서브에이전트 5종. 메인(지휘자)이 조사·설계·구현·검증·검토를
   이들에게 맡기고 결론만 받아 조립하므로, 파일 내용·로그가 메인 대화에 쌓이지 않는다. 독립적인 일은 여러 개를 병렬로 돌린다.
   `explore`(조사·빠른 haiku) · `plan`(설계·품질 위주 opus) · `implement`(구현·유일하게 파일을 직접 고침) ·
@@ -504,7 +506,7 @@ paths:
 예: "디자인 규칙을 만들었어요. 스타일을 손볼 때만 자동으로 적용되고, 다른 작업엔 영향 없습니다."
 ```
 
-### 6) `.claude/settings.json` (하네스 — 권한 기본값)
+### 6) `.claude/settings.json` (하네스 — 권한 기본값 + 상태줄)
 아래 내용을 그대로 쓴다.
 - `deny` 로 비밀키 파일(`.env` 와 그 변형)을 **하위 폴더 것까지**(`**/.env`) Claude가 읽지 못하게 막는다. (.gitignore 의 비밀키 제외와 같은 정책)
   단, 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있어야 하므로 — Claude가 "어떤 설정값이 필요한지" 파악하는 데 쓴다 —
@@ -514,9 +516,14 @@ paths:
 - `git status` 같은 Bash 읽기 전용 명령은 Claude Code 가 **기본으로 프롬프트 없이 허용**하므로 적지 않는다.
   Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령만 미리 허용해 둔다. (Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다 — 해는 없다.)
 - `push`·`reset` 같이 되돌리기 어려운 명령은 일부러 넣지 않는다 — 그건 매번 확인받는 게 맞다.
+- `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(프로젝트 루트 기준 상대 경로, 7번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
 
 ```json
 {
+  "statusLine": {
+    "type": "command",
+    "command": "node .claude/statusline.js"
+  },
   "permissions": {
     "allow": [
       "PowerShell(git status:*)",
@@ -535,6 +542,84 @@ paths:
     ]
   }
 }
+```
+
+### 7) `.claude/statusline.js` (하네스 — 상태줄, Node 필요)
+아래 내용을 그대로, 한 글자도 바꾸지 않고 쓴다. Node.js 내장 모듈만 쓰고 하드코딩된 경로가 없어 어떤 프로젝트에도 그대로 쓸 수 있다.
+stdin 으로 들어오는 JSON 을 읽어 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 한 줄로 만들어 출력한다.
+Node.js 가 설치돼 있어야 동작한다 — 없으면 이 파일은 그냥 아무것도 안 찍고, 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
+
+```javascript
+#!/usr/bin/env node
+// Claude Code statusline (jq-free, Node-based)
+// Format: <model> │ <used>k/<ctx>k │ S:<5h>% W:<week>%
+
+let raw = "";
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (c) => (raw += c));
+process.stdin.on("end", () => {
+  let d = {};
+  try {
+    d = JSON.parse(raw);
+  } catch (e) {
+    // If JSON can't be parsed, dump for inspection and exit quietly.
+    try {
+      require("fs").writeFileSync(
+        require("os").homedir() + "/.claude/statusline-debug.json",
+        raw
+      );
+    } catch (_) {}
+    process.stdout.write("statusline: invalid input");
+    return;
+  }
+
+  const model =
+    (d.model && (d.model.display_name || d.model.id)) || "Unknown";
+
+  // Current root folder name (basename of the working directory)
+  const dir =
+    (d.workspace && (d.workspace.current_dir || d.workspace.project_dir)) ||
+    d.cwd ||
+    "";
+  const folder = dir
+    ? dir.replace(/[\\/]+$/, "").split(/[\\/]/).pop()
+    : "";
+
+  const cw = d.context_window || {};
+  const usedK = Math.round((cw.total_input_tokens || 0) / 1000);
+  const ctxK = Math.round((cw.context_window_size || 0) / 1000);
+
+  const rl = d.rate_limits || {};
+  const five =
+    rl.five_hour && rl.five_hour.used_percentage != null
+      ? Math.round(rl.five_hour.used_percentage)
+      : null;
+  const week =
+    rl.seven_day && rl.seven_day.used_percentage != null
+      ? Math.round(rl.seven_day.used_percentage)
+      : null;
+
+  // If rate_limits is entirely absent, dump JSON so keys can be inspected.
+  if (five === null && week === null && !d.rate_limits) {
+    try {
+      require("fs").writeFileSync(
+        require("os").homedir() + "/.claude/statusline-debug.json",
+        raw
+      );
+    } catch (_) {}
+  }
+
+  // green < 50, yellow < 80, red >= 80
+  const colorPct = (label, val) => {
+    if (val === null) return `${label}:--`;
+    const code = val < 50 ? 32 : val < 80 ? 33 : 31;
+    return `\x1b[${code}m${label}:${val}%\x1b[0m`;
+  };
+
+  let line = `${model} │ ${usedK}k/${ctxK}k │ ${colorPct("S", five)} ${colorPct("W", week)}`;
+  if (folder) line += ` │ \x1b[36m${folder}\x1b[0m`;
+  process.stdout.write(line);
+});
 ```
 
 ## 기존 프로젝트 온보딩 (해당할 때만)
@@ -560,6 +645,7 @@ paths:
 <!-- womc:end -->
 ~~~
 - 기존 `.claude/settings.json` 이 있으면 통째로 덮지 말고 **갱신 모드와 같은 방식**(사용자 항목 보존 + 이 문서의 기본 allow/deny 만 추가)으로 병합한다.
+  이미 `statusLine` 항목이 있으면 그대로 두고 건드리지 않는다 — 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 추가한다.
 - 사용자의 기존 CLAUDE.md 가 언어·수정 방식 등 같은 주제를 이미 정해 뒀으면, 겹치는 부분을 마지막 안내에서 한 줄로 짚어 주되 사용자 문장은 지우지 않는다.
 - 무엇을 병합했는지 마지막 안내에서 한 줄로 알린다.
 
@@ -602,6 +688,7 @@ paths:
 > ※ PLAN.md·TASKS.md 는 지금 만들지 않습니다. 필요한 순간에만 생겨 평소 컨텍스트를 가볍게 둡니다.
 > ※ 기존 프로젝트에 깐 경우, 구조가 어질러져 보이면 "구조 정리해줘"라고 하세요 — `plan-feature` 가 단계별로, 되돌릴 수 있게(커밋) 정리합니다.
 > ※ MCP가 필요한 프로젝트라면 그때 `.mcp.json` 을 직접 추가하세요.
+> ※ 터미널 하단 상태줄(모델명·토큰·5시간/주간 한도·폴더명 표시)은 Node.js 가 설치돼 있어야 보여요. 없어도 다른 기능엔 지장 없습니다.
 
 (코드를 짜지 말 것. SPEC 도 대신 채우지 않는다 — 단, 기존 프로젝트면 위의 '기존 프로젝트 온보딩'까지는 한다. 코드 구조를 직접 옮기지도 않는다 — 필요하면 제안만 하고 멈춘다.)
 
@@ -613,9 +700,11 @@ paths:
    - `HARNESS.md`
    - `.claude/agents/explore.md` · `.claude/agents/plan.md` · `.claude/agents/implement.md` · `.claude/agents/verify.md` · `.claude/agents/review.md`
    - `.claude/skills/plan-feature/SKILL.md` · `.claude/skills/make-rule/SKILL.md`
+   - `.claude/statusline.js` — 코드 자체는 항상 최신으로 덮어쓴다(사용자가 직접 고칠 일이 없는 스크립트라서). 단, `settings.json` 의 `statusLine` 키를 켜고 끄는 건 아래 2번을 따른다.
 2. `.claude/settings.json` 은 통째로 덮어쓰지 않는다. 기존 파일을 먼저 읽고,
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.)
+   `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
 3. 다음은 **절대 덮어쓰지도 지우지도 않는다**: `SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` 전체 · `.gitignore` ·
    그 외 이 문서에 없는 모든 파일. (`.gitignore` 는 사용자가 항목을 추가했을 수 있어 갱신 대상에서 뺀다.)
 4. 예전 버전이 만든 `README.md` 가 있으면(첫 줄이 `# 프로젝트 구조 안내` 인 경우) 지우지 말고,

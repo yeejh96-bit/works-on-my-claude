@@ -7,8 +7,8 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 
 검사 두 가지:
 1) commands/womc.md 안에 박힌 "원본" 텍스트와, 이 저장소가 실제로 dogfood 하는
-   라이브 파일(.claude/agents/*, .claude/skills/*, CLAUDE.md, HARNESS.md, settings.json)이
-   글자 그대로 일치하는지. (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
+   라이브 파일(.claude/agents/*, .claude/skills/*, CLAUDE.md, HARNESS.md, settings.json,
+   statusline.js)이 글자 그대로 일치하는지. (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
 2) README.md 제목 끝의 버전과 .claude-plugin/plugin.json 의 version 이 같은지.
 
 하나라도 어긋나면 종료코드 1 로 끝난다.
@@ -37,6 +37,7 @@ EMBEDDED_FILES = [
     ".claude/skills/plan-feature/SKILL.md",
     ".claude/skills/make-rule/SKILL.md",
     ".claude/settings.json",
+    ".claude/statusline.js",
 ]
 
 problems = []

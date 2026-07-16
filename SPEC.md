@@ -16,7 +16,7 @@
 코딩을 모르는 사용자도 Claude Code가 꾸준히 잘 일하게 만드는 것이 목표.
 
 ## 3. 핵심 기능 (3~5개)
-1. `/womc` — 고정 골격 생성(이미 있는 파일은 덮어쓰지 않고 건너뜀). 신규 빈 폴더면 빈 SPEC 템플릿, **기존 코드가 있는 폴더면 온보딩**: `explore` 로 훑어 SPEC 초안을 채우고, 이미 있는 `CLAUDE.md`·`.claude/settings.json` 은 건너뛰지 않고 womc 규칙을 **덧붙여 병합**(사용자 내용 보존, `<!-- womc:begin/end -->` 구획), 코드 관례를 `.claude/rules/` 로 **캡처**(제안 후), 구조 정리가 필요해 보이면 `plan-feature` 리팩터를 **제안**한다(womc 자체는 코드를 옮기지 않음). `/womc update` 는 불변 골격만 최신으로 교체(사용자가 채운 파일은 보존).
+1. `/womc` — 고정 골격 생성(이미 있는 파일은 덮어쓰지 않고 건너뜀). 신규 빈 폴더면 빈 SPEC 템플릿, **기존 코드가 있는 폴더면 온보딩**: `explore` 로 훑어 SPEC 초안을 채우고, 이미 있는 `CLAUDE.md`·`.claude/settings.json` 은 건너뛰지 않고 womc 규칙을 **덧붙여 병합**(사용자 내용 보존, `<!-- womc:begin/end -->` 구획), 코드 관례를 `.claude/rules/` 로 **캡처**(제안 후), 구조 정리가 필요해 보이면 `plan-feature` 리팩터를 **제안**한다(womc 자체는 코드를 옮기지 않음). 골격에는 `.claude/statusline.js`(터미널 하단 상태줄 — 모델명·토큰·5시간/주간 한도·폴더명, Node.js 필요)도 포함되며 `settings.json` 의 `statusLine` 이 실행한다. `/womc update` 는 불변 골격만 최신으로 교체(사용자가 채운 파일은 보존).
 2. 항상 로드되는 규칙(CLAUDE.md) + 프로젝트 명세(SPEC.md, `@import`)만 always-on으로 유지.
 3. 오케스트레이션 서브에이전트 5종: `explore`(조사·haiku) · `plan`(설계·opus) · `implement`(구현·sonnet, 유일하게 파일 직접 수정) · `verify`(검증·sonnet) · `review`(검토·sonnet). 메인은 지휘자로 얇게 유지하고 무거운 일을 병렬 위임. 서브에이전트는 CLAUDE.md 를 못 물려받으므로 각 파일에 자체 하네스(역할·입력계약·작업규칙·출력계약)를 심는다.
 4. 운영 스킬 2종: `plan-feature`(기능 추가·수정 겸용 — 큰 작업은 쪼개 PLAN/TASKS 관리, 작은 변경·버그수정·리팩터는 가벼운 경로, 조사→설계→구현→검증→검토 위임. 세션이 바뀌어도 이어지도록 각 작업 항목에 손댈 파일·이어 쓸 것·완료 조건·확인 방법을 남긴다) · `make-rule`(규칙 자동 생성).
