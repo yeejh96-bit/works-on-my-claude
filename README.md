@@ -1,4 +1,4 @@
-# works-on-my-claude v1.12.0
+# works-on-my-claude v1.13.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
@@ -48,9 +48,11 @@ Claude Code 안에서 두 줄이면 끝이다.
    /plugin install womc@works-on-my-claude
    ```
    (마켓플레이스 정보를 새로고침한 뒤 다시 설치하면 최신 버전이 잡힌다. `/reload-plugins` 까지 하면 확실하다.)
-2. 그 프로젝트에서 `/womc update` 를 실행한다 — **불변 골격만** 최신으로 교체되고,
+2. **Claude Code를 껐다 켠다.** 세션 도중에 플러그인만 업데이트하고 재시작하지 않으면, 그 세션은 여전히 업데이트 전에 불러온 옛 명령 파일을 쓴다 — `/womc update` 가 옛 골격을 그대로 다시 깔아버리는 원인이라 새 세션에서만 실행한다.
+3. 그 프로젝트에서 `/womc update` 를 실행한다 — **불변 골격만** 최신으로 교체되고,
    직접 채운 파일(`SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` · `.gitignore`)과
    `settings.json` 에 직접 추가한 허용 항목은 그대로 보존된다. 파일을 손으로 지울 필요가 없다.
+   (옛 버전 골격으로 실행 중이면 `/womc update` 가 갱신을 하지 않고 위 1~2번부터 다시 하라고 안내한다 — 최신 버전인지 스스로 확인한다.)
 
 ## 생성되는 구조
 ```
@@ -60,7 +62,8 @@ Claude Code 안에서 두 줄이면 끝이다.
 ├─ HARNESS.md         # 사람이 읽는 구조 안내서 (Claude가 자동으로 읽지 않음 — 토큰 0)
 ├─ .gitignore         # node_modules / .env / dist 등 (견본 .env.example 은 예외)
 └─ .claude/
-   ├─ settings.json      # 하네스: 비밀 .env 읽기 차단(deny, 견본 .env.example 은 읽힘) + PowerShell 읽기 전용 명령 허용
+   ├─ settings.json      # 하네스: 비밀 .env 읽기 차단(deny, 견본 .env.example 은 읽힘) + PowerShell 읽기 전용 명령 허용 + 답변 말투 훅 등록
+   ├─ answer-style.js    # 매 입력마다 답변 말투(짧게 말하기) 강도를 다시 알려주는 훅 (Node 필요, hooks.UserPromptSubmit 이 실행)
    ├─ agents/
    │  ├─ explore.md      # 코드 조사 전용 서브에이전트 — 조사를 별도 컨텍스트로 빼 긴 세션에서 절약
    │  └─ verify.md       # 동작 검증 전용 서브에이전트 — 테스트·실행을 별도 컨텍스트에서, 통과/실패만 보고

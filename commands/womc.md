@@ -1,8 +1,11 @@
 ---
 description: 새 프로젝트 폴더에 항상 동일한 기본 골격(컨텍스트 엔지니어링 + 하네스 세팅)을 생성한다. `update` 인자를 주면 불변 골격만 최신 버전으로 갱신한다.
 argument-hint: [update]
-allowed-tools: Write, Edit, Read, Glob, Task
+allowed-tools: Write, Edit, Read, Glob, Task, WebFetch, Bash
 ---
+
+<!-- womc:skeleton-version=1.13.0 -->
+> 버전을 올릴 때는 이 표식과 `.claude-plugin/plugin.json` 의 `version` 을 **함께** 고친다.
 
 사용자 인자: $ARGUMENTS
 
@@ -43,10 +46,16 @@ allowed-tools: Write, Edit, Read, Glob, Task
 ## 설명 방식
 - 모든 설명은 한국어로 한다.
 - 짧게 말한다(대화 답변에만 — 파일에 쓰는 문서·주석은 종전대로). 아래 강도에 맞춰, 뜻이 바뀌지 않는 말을 지운다. <!-- womc:brevity=케이브맨 -->
+- **이 말투는 매 답변에 적용한다.** 답변의 첫 글자를 쓰기 전에 지금 강도를 확인하고, 다 쓴 뒤 강도에 어긋난 문장이 있으면 고쳐서 내보낸다. 대화가 길어져도 강도를 잊지 않는다 — `.claude/answer-style.js` 훅이 매 입력마다 현재 강도를 다시 알려준다(훅이 없거나 Node.js 가 없어도 이 절만으로 지킨다).
   - `약하게` — 인사말·사과·칭찬, "~하겠습니다" 같은 예고, 방금 한 말 되풀이를 지운다. 문장은 평소처럼.
   - `보통` — 위에 더해, 서론·맺음말을 지우고 결론부터 불릿으로 쪼갠 뒤 종결어미를 뗀다(명사형).
   - `최소` — 위에 더해, 조사·수식어까지 지우고 핵심 단어·경로·숫자만 나열한다.
   - `케이브맨` (기본) — `보통` 까지의 삭제는 그대로 하고, `최소` 의 키워드 나열 대신 원시인처럼 말한다. 한 줄에 한 뜻, 2~5 단어 단문으로 끊는다. 나는 "나", 사용자는 "너". 동사는 "고침"·"됨"·"망가짐"처럼 기본형으로 끝낸다. 경어·접속사·비유는 쓰지 않는다.
+- `케이브맨` 견본 — 왼쪽처럼 쓰지 말고 오른쪽처럼 쓴다:
+  - ✗ 「확인해 보니 플러그인 캐시가 오늘 17:14에 갱신돼 있었습니다」 → ✓ 「캐시 갱신됨. 오늘 17:14.」
+  - ✗ 「그 전에는 옛 버전 캐시가 쓰이고 있었음」 → ✓ 「전에 옛 캐시 씀.」
+  - ✗ 「다른 폴더의 CLAUDE.md 는 오늘 바뀌지 않았음」 → ✓ 「다른 폴더 CLAUDE.md. 안 바뀜.」
+  - 한 문장이 6단어를 넘으면 끊어서 다시 쓴다.
 - 어느 강도에서도 지우지 않는 것: 파일 경로와 `경로:줄번호`, 다음에 할 일 한 줄, 되묻는 질문, 위험·주의 경고, 사용자가 골라야 하는 선택지. 경로·명령어·숫자는 원문 그대로 적는다(말투로 바꾸지 않는다).
 - `케이브맨` 일 때도 위 항목은 말투보다 정확함이 우선이다 — 뜻이 흐려질 것 같으면 그 문장만 말투를 풀어 평소처럼 정확히 적는다.
 - 사용자가 "자세히"·"설명해줘"·"왜?"라고 하면 그 답만 평소 길이로 풀어서 말한다.
@@ -138,6 +147,7 @@ allowed-tools: Write, Edit, Read, Glob, Task
   Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.)
 - **.claude/statusline.js** — 터미널 하단 상태줄 스크립트(Node). 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 보여준다.
   `.claude/settings.json` 의 `statusLine` 항목이 이 파일을 실행한다. Node.js 가 설치돼 있어야 동작하며, 없어도 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
+- **.claude/answer-style.js** — 답변 말투(짧게 말하기) 강도를 매 입력마다 다시 알려주는 훅 스크립트(Node). settings.json 의 hooks 가 실행한다.
 - **.claude/agents/** — 무거운 일을 별도 컨텍스트에서 처리하는 전문 서브에이전트 5종. 메인(지휘자)이 조사·설계·구현·검증·검토를
   이들에게 맡기고 결론만 받아 조립하므로, 파일 내용·로그가 메인 대화에 쌓이지 않는다. 독립적인 일은 여러 개를 병렬로 돌린다.
   `explore`(조사·빠른 haiku) · `plan`(설계·품질 위주 opus) · `implement`(구현·유일하게 파일을 직접 고침) ·
@@ -168,8 +178,8 @@ allowed-tools: Write, Edit, Read, Glob, Task
 3. 한 기능이 동작하는 걸 확인하면 커밋해 되돌릴 지점을 남긴다 — "저장(커밋)해 둘까요?"라고 물으면 Claude가 대신 `git add`·`git commit` 해 준다(`push` 는 자동으로 하지 않는다).
 
 > PLAN.md·TASKS.md 는 처음엔 없다. 필요한 순간에만 생겨 평소 컨텍스트를 가볍게 둔다.
-> 나중에 womc 플러그인의 새 버전이 나오면, **먼저 `/plugin` 에서 womc 플러그인을 업데이트한 뒤** `/womc update` 를 실행해 골격만 갱신한다(직접 채운 파일은 보존된다).
-> 플러그인을 업데이트하지 않고 `/womc update` 만 실행하면, 설치돼 있던 옛 버전 골격이 그대로 다시 깔린다.
+> 나중에 womc 플러그인의 새 버전이 나오면, **먼저 `/plugin` 에서 womc 플러그인을 업데이트한 뒤, Claude Code 를 껐다 켜고** `/womc update` 를 실행해 골격만 갱신한다(직접 채운 파일은 보존된다).
+> 플러그인을 업데이트하지 않고 `/womc update` 만 실행하면, 설치돼 있던 옛 버전 골격이 그대로 다시 깔린다. **재시작 없이 같은 세션에서 바로 실행해도 마찬가지다** — 그 세션은 업데이트 전에 불러온 옛 명령 파일을 계속 쓴다.
 ```
 
 ### 4) `.gitignore`
@@ -534,9 +544,19 @@ paths:
   Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령만 미리 허용해 둔다. (Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다 — 해는 없다.)
 - `push`·`reset` 같이 되돌리기 어려운 명령은 일부러 넣지 않는다 — 그건 매번 확인받는 게 맞다.
 - `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(프로젝트 루트 기준 상대 경로, 7번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
+- `hooks.UserPromptSubmit` 은 매 입력마다 `.claude/answer-style.js` 를 실행해 지금의 답변 말투 강도를 다시 알려준다(8번 참고). Node.js 가 없으면 이 훅만 조용히 빠질 뿐 다른 기능엔 지장 없다.
 
 ```json
 {
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/answer-style.js" }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "node .claude/statusline.js"
@@ -639,6 +659,50 @@ process.stdin.on("end", () => {
 });
 ```
 
+### 8) `.claude/answer-style.js` (하네스 — 답변 말투 주입 훅, Node 필요)
+아래 내용을 그대로, 한 글자도 바꾸지 않고 쓴다. Node.js 내장 모듈만 쓰고 하드코딩된 경로가 없어 어떤 프로젝트에도 그대로 쓸 수 있다.
+`.claude/settings.json` 의 `hooks.UserPromptSubmit` 이 매 입력마다 이 파일을 실행해, `CLAUDE.md` 의 `womc:brevity=` 값을 읽고 지금 지켜야 할 말투 규칙을 다시 알려준다.
+Node.js 가 설치돼 있어야 동작한다 — 없으면 이 훅만 조용히 빠질 뿐 다른 기능엔 지장 없다.
+
+```javascript
+#!/usr/bin/env node
+/**
+ * womc — 답변 말투(짧게 말하기) 강제 훅.
+ * UserPromptSubmit 에서 실행되어, CLAUDE.md 의 `womc:brevity=` 값을 읽고
+ * 지금 지켜야 할 말투 규칙을 매 입력마다 다시 알려준다.
+ * Node.js 내장 모듈만 쓴다. Node 가 없으면 이 훅만 빠질 뿐 다른 기능엔 지장 없다.
+ */
+const fs = require('fs');
+const path = require('path');
+
+const RULES = {
+  '약하게': '인사말·사과·칭찬, "~하겠습니다" 같은 예고, 방금 한 말 되풀이를 지운다. 문장은 평소처럼.',
+  '보통': '위에 더해 서론·맺음말을 지우고, 결론부터 불릿으로 쪼갠 뒤 종결어미를 뗀다(명사형).',
+  '최소': '위에 더해 조사·수식어까지 지우고, 핵심 단어·경로·숫자만 나열한다.',
+  '케이브맨': '원시인처럼 말한다. 한 줄에 한 뜻, 2~5 단어 단문. 나는 "나", 사용자는 "너". 동사는 "고침"·"됨"·"망가짐"처럼 기본형. 경어·접속사·비유 금지. 한 문장이 6단어를 넘으면 끊는다.',
+};
+const DEFAULT_LEVEL = '케이브맨';
+
+function readLevel() {
+  const dir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  try {
+    const md = fs.readFileSync(path.join(dir, 'CLAUDE.md'), 'utf8');
+    const m = md.match(/womc:brevity\s*=\s*([^\s\->]+)/);
+    if (m && RULES[m[1]]) return m[1];
+  } catch (e) { /* CLAUDE.md 가 없으면 기본값을 쓴다 */ }
+  return DEFAULT_LEVEL;
+}
+
+const level = readLevel();
+process.stdout.write([
+  '[womc 답변 형식 — 지금 강도: ' + level + ']',
+  RULES[level],
+  '이 규칙은 사용자에게 보내는 대화 답변에만 적용한다(파일에 쓰는 문서·주석·커밋 메시지는 제외).',
+  '어느 강도에서도 지우지 않는 것: 파일 경로와 경로:줄번호, 다음에 할 일 한 줄, 되묻는 질문, 위험·주의 경고, 사용자가 골라야 하는 선택지. 경로·명령어·숫자는 원문 그대로.',
+  '사용자가 "자세히"·"설명해줘"·"왜?"라고 하면 그 답만 평소 길이로 푼다.',
+].join('\n') + '\n');
+```
+
 ## 기존 프로젝트 온보딩 (해당할 때만)
 파일 생성을 마친 뒤, **폴더에 기존 코드가 있거나 이미 사용자가 쓴 `CLAUDE.md`·`.claude/settings.json` 이 있으면** 아래 온보딩을 진행한다. (신규 빈 폴더면 이 절 전체를 건너뛴다.)
 아래 각 단계는 **자기 조건이 맞을 때만** 켜진다 — SPEC 초안·관례 캡처·구조 제안은 *기존 코드가 있을 때*, CLAUDE.md·설정 조율은 *그 파일이 이미 있을 때*(코드가 거의 없어도).
@@ -705,12 +769,27 @@ process.stdin.on("end", () => {
 > ※ PLAN.md·TASKS.md 는 지금 만들지 않습니다. 필요한 순간에만 생겨 평소 컨텍스트를 가볍게 둡니다.
 > ※ 기존 프로젝트에 깐 경우, 구조가 어질러져 보이면 "구조 정리해줘"라고 하세요 — `plan-feature` 가 단계별로, 되돌릴 수 있게(커밋) 정리합니다.
 > ※ MCP가 필요한 프로젝트라면 그때 `.mcp.json` 을 직접 추가하세요.
-> ※ 터미널 하단 상태줄(모델명·토큰·5시간/주간 한도·폴더명 표시)은 Node.js 가 설치돼 있어야 보여요. 없어도 다른 기능엔 지장 없습니다.
+> ※ 터미널 하단 상태줄(모델명·토큰·5시간/주간 한도·폴더명 표시)은 Node.js 가 설치돼 있어야 보여요. 없어도 다른 기능엔 지장 없습니다. 답변 말투를 매 입력마다 다시 알려주는 훅(`.claude/answer-style.js`)도 마찬가지로 Node.js 가 필요해요.
 
 (코드를 짜지 말 것. SPEC 도 대신 채우지 않는다 — 단, 기존 프로젝트면 위의 '기존 프로젝트 온보딩'까지는 한다. 코드 구조를 직접 옮기지도 않는다 — 필요하면 제안만 하고 멈춘다.)
 
 ## 갱신 모드 (`/womc update`)
 인자에 `update` 가 있을 때만 이 절차를 수행한다. 원칙: **사용자가 채운 내용은 절대 건드리지 않고, 불변 골격만 이 문서의 최신 내용으로 교체한다.**
+
+0. **먼저 지금 실행 중인 골격이 최신인지 확인한다. 옛 캐시면 아무것도 고치지 말고 멈춘다.**
+   - 지금 실행 중인 이 문서 맨 위의 `womc:skeleton-version=` 값이 "실행 중 버전"이다. 이 값을 먼저 읽는다.
+     **이 표식이 아예 없으면 1.12.0 이하의 옛 캐시로 실행 중인 것이다 — 최신 버전을 조회할 것도 없이 곧바로 아래 안내를 하고 멈춘다.**
+   - "최신 버전"을 다음 순서로 알아낸다. 하나라도 성공하면 거기서 멈춘다.
+     ⓐ `https://raw.githubusercontent.com/yeejh96-bit/works-on-my-claude/main/.claude-plugin/plugin.json` 을 받아 `version` 을 읽는다(WebFetch 또는 `curl -s`).
+     ⓑ 안 되면 로컬 마켓플레이스 클론에서 읽는다 — Windows `C:\Users\<사용자>\.claude\plugins\marketplaces\works-on-my-claude\.claude-plugin\plugin.json`, mac/linux `~/.claude/plugins/marketplaces/works-on-my-claude/.claude-plugin/plugin.json`.
+     ⓒ 둘 다 안 되면 확인을 건너뛰고, 사용자에게 "최신 버전을 확인하지 못했다"고 한 줄 알린 뒤 진행한다.
+   - **실행 중 버전 < 최신 버전이면 갱신을 하지 않고 멈춘다.** 대신 사용자에게 이렇게 안내한다:
+     1) `/plugin` 에서 works-on-my-claude → womc 업데이트
+     2) **Claude Code 를 껐다 켠다** (세션 도중 업데이트해도 그 세션은 옛 명령 파일을 계속 쓴다 — 이게 옛 골격이 다시 깔리는 진짜 원인이다)
+     3) 새 세션에서 `/womc update` 를 다시 실행
+     이때 실행 중 버전과 최신 버전을 숫자로 함께 보여준다. 예: "지금 실행 중 1.10.0 · 최신 1.13.0".
+   - 실행 중 버전 == 최신 버전이면 그대로 진행하고, 5번 완료 보고에 "골격 버전 <값> (최신)"을 함께 적는다.
+   - 참고: 설치된 캐시 버전은 `~/.claude/plugins/installed_plugins.json` 의 `womc@works-on-my-claude` 항목(`version`·`lastUpdated`)에서도 볼 수 있다 — 사용자가 "업데이트했는데 왜 옛날 거냐"고 하면 이걸 보여주며 설명한다.
 
 1. 아래 불변 골격 파일들을 이 문서에 적힌 내용 그대로 **덮어쓴다**(없으면 새로 만든다):
    - `CLAUDE.md` — 세 경우로 나뉜다: ⓐ 첫 줄이 골격 그대로(`# 작업 규칙 (모든 프로젝트 공통 · 불변)`)면 통째로 덮어쓴다. ⓑ **온보딩으로 사용자 파일에 병합된 형태(`<!-- womc:begin -->`…`<!-- womc:end -->` 구획이 있는 경우)면 그 구획 안만 최신 내용으로 교체**하고 나머지 사용자 내용은 그대로 둔다. ⓒ 둘 다 아니면(사용자가 쓴 CLAUDE.md 인데 온보딩 병합을 안 거친 경우) **통째로 덮지 말고**, 위 '기존 프로젝트 온보딩'의 CLAUDE.md 병합 절차대로 `womc:begin/end` 구획을 맨 끝에 덧붙인다(사용자 내용 보존).
@@ -719,13 +798,15 @@ process.stdin.on("end", () => {
    - `.claude/agents/explore.md` · `.claude/agents/plan.md` · `.claude/agents/implement.md` · `.claude/agents/verify.md` · `.claude/agents/review.md`
    - `.claude/skills/plan-feature/SKILL.md` · `.claude/skills/make-rule/SKILL.md`
    - `.claude/statusline.js` — 코드 자체는 항상 최신으로 덮어쓴다(사용자가 직접 고칠 일이 없는 스크립트라서). 단, `settings.json` 의 `statusLine` 키를 켜고 끄는 건 아래 2번을 따른다.
+   - `.claude/answer-style.js` — 코드 자체는 `.claude/statusline.js` 와 같은 방식으로 항상 최신으로 덮어쓴다. 단, `settings.json` 의 `hooks` 키를 켜고 끄는 건 아래 2번을 따른다.
 2. `.claude/settings.json` 은 통째로 덮어쓰지 않는다. 기존 파일을 먼저 읽고,
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.)
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
+   `hooks` 도 같은 방식이다 — `hooks` 의 womc 기본 훅(`node .claude/answer-style.js` 를 실행하는 `UserPromptSubmit` 항목)이 없으면 추가하고, 사용자가 직접 넣은 다른 훅은 그대로 둔다.
 3. 다음은 **절대 덮어쓰지도 지우지도 않는다**: `SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` 전체 · `.gitignore` ·
    그 외 이 문서에 없는 모든 파일. (`.gitignore` 는 사용자가 항목을 추가했을 수 있어 갱신 대상에서 뺀다.)
 4. 예전 버전이 만든 `README.md` 가 있으면(첫 줄이 `# 프로젝트 구조 안내` 인 경우) 지우지 말고,
    "예전 안내 파일인데 이제 `HARNESS.md` 로 대체됐어요. 직접 지우거나 프로젝트 소개용으로 바꿔 쓰시면 됩니다"라고 안내만 한다.
    (첫 줄이 다르면 사용자가 만든 README 이므로 아무 말도 하지 않는다.)
-5. 끝나면 생성 모드와 동일하게 WOMC 로고 아트를 맨 앞에 출력한 뒤, 무엇을 교체했고 무엇을 보존했는지 한국어로 짧게 알린다. 짧게 말하기 강도(`womc:brevity`)도 함께 알린다 — 기존 값을 찾았으면 "원래 값을 그대로 유지했다"고, 못 찾아 새로 넣었으면 "기본값 `케이브맨` 으로 설정했다"고 구분해 알린다(말투가 바뀌는 값이라 사용자가 이유를 알아야 한다).
+5. 끝나면 생성 모드와 동일하게 WOMC 로고 아트를 맨 앞에 출력한 뒤, 무엇을 교체했고 무엇을 보존했는지 한국어로 짧게 알린다. **골격 버전(`womc:skeleton-version`)도 함께 적는다.** 짧게 말하기 강도(`womc:brevity`)도 함께 알린다 — 기존 값을 찾았으면 "원래 값을 그대로 유지했다"고, 못 찾아 새로 넣었으면 "기본값 `케이브맨` 으로 설정했다"고 구분해 알린다(말투가 바뀌는 값이라 사용자가 이유를 알아야 한다).
