@@ -1,4 +1,4 @@
-# works-on-my-claude v1.13.0
+# works-on-my-claude v1.14.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
@@ -52,7 +52,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 3. 그 프로젝트에서 `/womc update` 를 실행한다 — **불변 골격만** 최신으로 교체되고,
    직접 채운 파일(`SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` · `.gitignore`)과
    `settings.json` 에 직접 추가한 허용 항목은 그대로 보존된다. 파일을 손으로 지울 필요가 없다.
-   (옛 버전 골격으로 실행 중이면 `/womc update` 가 갱신을 하지 않고 위 1~2번부터 다시 하라고 안내한다 — 최신 버전인지 스스로 확인한다.)
+   (`/womc update` 는 캐시가 옛날이어도 GitHub 에서 최신 골격을 직접 받아 적용한다. 받지 못할 때만 위 1~2번부터 다시 하라고 안내하고 멈춘다.)
 
 ## 생성되는 구조
 ```

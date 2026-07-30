@@ -4,7 +4,7 @@ argument-hint: [update]
 allowed-tools: Write, Edit, Read, Glob, Task, WebFetch, Bash
 ---
 
-<!-- womc:skeleton-version=1.13.0 -->
+<!-- womc:skeleton-version=1.14.0 -->
 > 버전을 올릴 때는 이 표식과 `.claude-plugin/plugin.json` 의 `version` 을 **함께** 고친다.
 
 사용자 인자: $ARGUMENTS
@@ -178,8 +178,8 @@ allowed-tools: Write, Edit, Read, Glob, Task, WebFetch, Bash
 3. 한 기능이 동작하는 걸 확인하면 커밋해 되돌릴 지점을 남긴다 — "저장(커밋)해 둘까요?"라고 물으면 Claude가 대신 `git add`·`git commit` 해 준다(`push` 는 자동으로 하지 않는다).
 
 > PLAN.md·TASKS.md 는 처음엔 없다. 필요한 순간에만 생겨 평소 컨텍스트를 가볍게 둔다.
-> 나중에 womc 플러그인의 새 버전이 나오면, **먼저 `/plugin` 에서 womc 플러그인을 업데이트한 뒤, Claude Code 를 껐다 켜고** `/womc update` 를 실행해 골격만 갱신한다(직접 채운 파일은 보존된다).
-> 플러그인을 업데이트하지 않고 `/womc update` 만 실행하면, 설치돼 있던 옛 버전 골격이 그대로 다시 깔린다. **재시작 없이 같은 세션에서 바로 실행해도 마찬가지다** — 그 세션은 업데이트 전에 불러온 옛 명령 파일을 계속 쓴다.
+> 나중에 골격을 갱신하려면 그 프로젝트에서 `/womc update` 를 실행한다(직접 채운 파일은 보존된다).
+> `/womc update` 는 캐시가 옛날이어도 GitHub 에서 최신 골격을 직접 받아 적용한다 — 인터넷이 막혀 받지 못할 때만 `/plugin` 업데이트와 재시작을 안내하고 멈춘다.
 ```
 
 ### 4) `.gitignore`
@@ -776,19 +776,23 @@ process.stdout.write([
 ## 갱신 모드 (`/womc update`)
 인자에 `update` 가 있을 때만 이 절차를 수행한다. 원칙: **사용자가 채운 내용은 절대 건드리지 않고, 불변 골격만 이 문서의 최신 내용으로 교체한다.**
 
-0. **먼저 지금 실행 중인 골격이 최신인지 확인한다. 옛 캐시면 아무것도 고치지 말고 멈춘다.**
-   - 지금 실행 중인 이 문서 맨 위의 `womc:skeleton-version=` 값이 "실행 중 버전"이다. 이 값을 먼저 읽는다.
-     **이 표식이 아예 없으면 1.12.0 이하의 옛 캐시로 실행 중인 것이다 — 최신 버전을 조회할 것도 없이 곧바로 아래 안내를 하고 멈춘다.**
-   - "최신 버전"을 다음 순서로 알아낸다. 하나라도 성공하면 거기서 멈춘다.
-     ⓐ `https://raw.githubusercontent.com/yeejh96-bit/works-on-my-claude/main/.claude-plugin/plugin.json` 을 받아 `version` 을 읽는다(WebFetch 또는 `curl -s`).
-     ⓑ 안 되면 로컬 마켓플레이스 클론에서 읽는다 — Windows `C:\Users\<사용자>\.claude\plugins\marketplaces\works-on-my-claude\.claude-plugin\plugin.json`, mac/linux `~/.claude/plugins/marketplaces/works-on-my-claude/.claude-plugin/plugin.json`.
-     ⓒ 둘 다 안 되면 확인을 건너뛰고, 사용자에게 "최신 버전을 확인하지 못했다"고 한 줄 알린 뒤 진행한다.
-   - **실행 중 버전 < 최신 버전이면 갱신을 하지 않고 멈춘다.** 대신 사용자에게 이렇게 안내한다:
-     1) `/plugin` 에서 works-on-my-claude → womc 업데이트
-     2) **Claude Code 를 껐다 켠다** (세션 도중 업데이트해도 그 세션은 옛 명령 파일을 계속 쓴다 — 이게 옛 골격이 다시 깔리는 진짜 원인이다)
-     3) 새 세션에서 `/womc update` 를 다시 실행
-     이때 실행 중 버전과 최신 버전을 숫자로 함께 보여준다. 예: "지금 실행 중 1.10.0 · 최신 1.13.0".
-   - 실행 중 버전 == 최신 버전이면 그대로 진행하고, 5번 완료 보고에 "골격 버전 <값> (최신)"을 함께 적는다.
+0. **먼저 최신 골격 문서를 직접 받아 온다. 지금 실행 중인 이 문서가 옛 캐시일 수 있기 때문이다.**
+   - 받을 곳(womc 공식 저장소 — 이 URL 을 다른 것으로 바꾸지 않는다):
+     `https://raw.githubusercontent.com/yeejh96-bit/works-on-my-claude/main/commands/womc.md`
+   - 받는 방법: 임시 파일로 저장한 뒤 Read 로 읽는다. (WebFetch 는 내용을 요약·변형할 수 있어 골격 원문에는 쓰지 않는다.)
+     Windows: `curl -fsSL <URL> -o "%TEMP%\womc-latest.md"` / mac·linux: `curl -fsSL <URL> -o /tmp/womc-latest.md`
+   - 받은 문서 맨 위의 `womc:skeleton-version=` 값이 "최신 버전", 지금 실행 중인 이 문서의 값이 "실행 중 버전"이다.
+     (실행 중 문서에 표식이 아예 없으면 1.12.0 이하의 옛 캐시다.)
+   - **최신 버전 > 실행 중 버전이면, 지금 이 문서의 내용은 버리고 받아 온 문서의 갱신 모드 절차와 파일 템플릿을 따른다.**
+     사용자에게 한 줄 알린다. 예: "옛 캐시(1.10.0)로 실행 중이라 GitHub 에서 최신 1.14.0 골격을 받아 적용한다."
+     **받아 온 문서의 0단계는 다시 수행하지 않는다**(이미 최신을 손에 쥐었다 — 또 받으면 끝없이 반복된다). 그 문서의 1번부터 따른다.
+   - 같으면 그대로 이 문서로 진행한다.
+   - 받기에 실패하면(인터넷 차단·curl 없음) 순서대로 물러선다:
+     ⓐ 로컬 마켓플레이스 클론에서 읽어 본다 — Windows `C:\Users\<사용자>\.claude\plugins\marketplaces\works-on-my-claude\commands\womc.md`, mac·linux `~/.claude/plugins/marketplaces/works-on-my-claude/commands/womc.md`
+     ⓑ 그것도 안 되면, 실행 중 버전이 옛 캐시로 의심될 때(표식 없음)만 **아무것도 고치지 말고 멈춘 뒤** 이렇게 안내한다: `/plugin` 에서 works-on-my-claude → womc 업데이트 → **Claude Code 를 껐다 켠 뒤** → `/womc update` 재실행. (세션 도중 업데이트해도 그 세션은 옛 명령 파일을 계속 쓴다.)
+     ⓒ 표식이 있고 최신 확인만 실패한 경우에는 "최신 여부를 확인하지 못했다"고 한 줄 알린 뒤 이 문서로 진행한다.
+   - 임시 파일은 다 쓰고 지운다.
+   - 최신을 받아 썼다면 완료 보고에 이렇게 덧붙인다: 플러그인 자체는 아직 옛 버전이니 편할 때 `/plugin` 에서 한 번 업데이트해 두면 다음부터는 받아 오지 않아도 된다.
    - 참고: 설치된 캐시 버전은 `~/.claude/plugins/installed_plugins.json` 의 `womc@works-on-my-claude` 항목(`version`·`lastUpdated`)에서도 볼 수 있다 — 사용자가 "업데이트했는데 왜 옛날 거냐"고 하면 이걸 보여주며 설명한다.
 
 1. 아래 불변 골격 파일들을 이 문서에 적힌 내용 그대로 **덮어쓴다**(없으면 새로 만든다):
@@ -809,4 +813,4 @@ process.stdout.write([
 4. 예전 버전이 만든 `README.md` 가 있으면(첫 줄이 `# 프로젝트 구조 안내` 인 경우) 지우지 말고,
    "예전 안내 파일인데 이제 `HARNESS.md` 로 대체됐어요. 직접 지우거나 프로젝트 소개용으로 바꿔 쓰시면 됩니다"라고 안내만 한다.
    (첫 줄이 다르면 사용자가 만든 README 이므로 아무 말도 하지 않는다.)
-5. 끝나면 생성 모드와 동일하게 WOMC 로고 아트를 맨 앞에 출력한 뒤, 무엇을 교체했고 무엇을 보존했는지 한국어로 짧게 알린다. **골격 버전(`womc:skeleton-version`)도 함께 적는다.** 짧게 말하기 강도(`womc:brevity`)도 함께 알린다 — 기존 값을 찾았으면 "원래 값을 그대로 유지했다"고, 못 찾아 새로 넣었으면 "기본값 `케이브맨` 으로 설정했다"고 구분해 알린다(말투가 바뀌는 값이라 사용자가 이유를 알아야 한다).
+5. 끝나면 생성 모드와 동일하게 WOMC 로고 아트를 맨 앞에 출력한 뒤, 무엇을 교체했고 무엇을 보존했는지 한국어로 짧게 알린다. **골격 버전(`womc:skeleton-version`)과 그 내용을 어디서 가져왔는지(실행 중 문서 / GitHub 최신 / 로컬 클론)도 함께 적는다.** 짧게 말하기 강도(`womc:brevity`)도 함께 알린다 — 기존 값을 찾았으면 "원래 값을 그대로 유지했다"고, 못 찾아 새로 넣었으면 "기본값 `케이브맨` 으로 설정했다"고 구분해 알린다(말투가 바뀌는 값이라 사용자가 이유를 알아야 한다).
