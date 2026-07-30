@@ -22,7 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def norm(s: str) -> str:
-    return s.replace("\r\n", "\n").strip()
+    s = s.replace("\r\n", "\n").strip()
+    # 짧게 말하기 강도는 사용자가 프로젝트마다 고치는 값 → 원본↔라이브 대조에서 뺀다
+    return re.sub(r"womc:brevity=[^\s>]+", "womc:brevity=?", s)
 
 
 # womc.md 원본에 박혀 있어야 할 라이브 파일들
