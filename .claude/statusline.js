@@ -10,13 +10,6 @@ process.stdin.on("end", () => {
   try {
     d = JSON.parse(raw);
   } catch (e) {
-    // If JSON can't be parsed, dump for inspection and exit quietly.
-    try {
-      require("fs").writeFileSync(
-        require("os").homedir() + "/.claude/statusline-debug.json",
-        raw
-      );
-    } catch (_) {}
     process.stdout.write("statusline: invalid input");
     return;
   }
@@ -46,16 +39,6 @@ process.stdin.on("end", () => {
     rl.seven_day && rl.seven_day.used_percentage != null
       ? Math.round(rl.seven_day.used_percentage)
       : null;
-
-  // If rate_limits is entirely absent, dump JSON so keys can be inspected.
-  if (five === null && week === null && !d.rate_limits) {
-    try {
-      require("fs").writeFileSync(
-        require("os").homedir() + "/.claude/statusline-debug.json",
-        raw
-      );
-    } catch (_) {}
-  }
 
   // green < 50, yellow < 80, red >= 80
   const colorPct = (label, val) => {
