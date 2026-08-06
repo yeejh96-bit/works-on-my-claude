@@ -4,7 +4,7 @@ argument-hint: [update]
 allowed-tools: Write, Edit, Read, Glob, Task, WebFetch, Bash
 ---
 
-<!-- womc:skeleton-version=1.19.0 -->
+<!-- womc:skeleton-version=1.20.0 -->
 > 버전을 올릴 때는 이 표식, 위 1) `CLAUDE.md` 골격 안의 같은 표식, 온보딩 병합 구획 안의 같은 표식,
 > 그리고 `.claude-plugin/plugin.json` 의 `version` 을 **함께** 고친다.
 
@@ -32,7 +32,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, WebFetch, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=1.19.0 -->
+<!-- womc:skeleton-version=1.20.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -438,6 +438,9 @@ description: 기능을 추가하거나 고칠 때(버그수정·리팩터·작�
 ## 끝난 일
 (아직 없음)
 
+> 항목이 5개를 넘으면 오래된 것부터 `docs/CHANGELOG.md` 로 옮긴다(그 파일이 없으면 그때 만든다).
+> 형식은 그대로 두고 위치만 옮긴다 — 옛 결정 이유를 잃지 않으면서 이 파일을 짧게 유지하는 것이 목적이다.
+
 <!-- 끝난 항목은 이렇게 적는다:
 - [x] 항목 이름
   - 남긴 것: 만들어진 파일 경로, 다음 단계가 쓸 함수·설정 이름 (다음 항목의 「이어 쓸 것」에 그대로 옮겨 적는다)
@@ -463,6 +466,7 @@ description: 기능을 추가하거나 고칠 때(버그수정·리팩터·작�
 각 단계를 `implement` 서브에이전트에 맡긴다 — 단계 명세 + 손댈 파일 경로 + 따라야 할 패턴(`파일경로:줄번호`)을 함께 넘긴다.
 서로 다른 파일을 건드리는 독립 단계는 **여러 개를 병렬로** 맡길 수 있다. 같은 파일을 건드리는 단계는 순서대로.
 돌아온 요약으로 `TASKS.md` 를 갱신한다 — 표기를 `[~]` → `[x]` 로 바꾸고, **그 단계가 「남긴 것」(만들어진 파일 경로, 다음 단계가 쓸 함수·설정 이름)을 「끝난 일」에 적은 뒤, 그것을 이어 쓰는 다음 항목의 「이어 쓸 것」 칸에도 옮겨 적는다.** 이 기록은 건너뛰지 않는다 — 다음 세션이 앞 단계의 결과물을 찾는 유일한 단서다. 코드는 implement 가 파일에 직접 쓰고, 메인은 결과를 조립·확인한다.
+「끝난 일」이 5개를 넘으면 오래된 항목부터 `docs/CHANGELOG.md` 로 옮긴다(그 파일이 없으면 그때 만든다) — 형식은 그대로, 위치만 옮긴다. `TASKS.md` 에는 최근 것만 남겨 짧게 유지한다.
 
 ## 5. 검증 (verify 위임)
 구현이 끝나면 확인 방법이 이미 기록돼 있는지 본다(`TASKS.md` 나 `SPEC.md`).
@@ -685,7 +689,7 @@ process.stdout.write(
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=1.19.0 -->
+<!-- womc:skeleton-version=1.20.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
