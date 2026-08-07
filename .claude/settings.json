@@ -1,13 +1,5 @@
 {
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          { "type": "command", "command": "node .claude/answer-style.js" }
-        ]
-      }
-    ]
-  },
+  "outputStyle": "womc-caveman",
   "statusLine": {
     "type": "command",
     "command": "node .claude/statusline.js"
