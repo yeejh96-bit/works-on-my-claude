@@ -55,14 +55,57 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
   「절차 지키기」에 "스킬 목록이 안 보여도 `plan-feature` 로 부른다" 보강.
 - `.claude/settings.json` — `hooks` 블록 삭제, `"outputStyle": "womc-caveman"` 추가. **`deny` 7줄과 `allow` 4줄은 그대로 두었다.**
 
-### 내일 할 일 (2~5단계) — 시작 전에 반드시 알 것
-- **지금 `scripts/check-sync.py` 는 깨져 있다** — `.claude/agents/explore.md` 를 못 찾아 `FileNotFoundError` 로 죽는다.
-  `.githooks/pre-commit` 이 이걸 돌리므로 **지금 상태로는 커밋이 막힌다.** 변경은 `git add` 로 스테이징만 해 뒀다.
-  → **3단계(check-sync 수정)를 먼저 하면 커밋이 풀린다.** 2단계보다 3단계를 먼저 해도 된다(서로 독립).
-- `check-sync.py` 의 `EMBEDDED_FILES` 를 12개 → **4개**(`CLAUDE.md`·`HARNESS.md`·`settings.json`·`statusline.js`)로 줄인다.
-  README 의 "에이전트 5종" 검사도 4종으로. 버전 표식 검사는 `re.search` → `re.findall` 전수 검사로.
-- 2단계에서 `commands/womc.md` 의 임베드 3구획(에이전트 5종·스킬 2종·answer-style)을 지운다.
-  **`CLAUDE.md` 임베드 사본도 같은 단계에서 위 수정과 똑같이 맞춰야 한다** — 안 그러면 `check-sync.py` 가 DRIFT 로 잡는다(지금 이미 DRIFT 상태).
+### 3단계도 끝냈다 (커밋 `7433ad6`)
+1단계를 끝내니 `check-sync.py` 가 지운 파일을 찾다 죽어 커밋이 막혔다. 그래서 3단계를 앞당겨 같이 처리했다.
+- `EMBEDDED_FILES` 12개 → **4개**(`CLAUDE.md`·`HARNESS.md`·`.claude/settings.json`·`.claude/statusline.js`).
+- 버전 표식 검사를 `re.search` → **`re.findall` 전수 검사**로 바꾸고 대상 파일을 `VERSION_MARKER_FILES`
+  (`commands/womc.md`·`CLAUDE.md`)로 뺐다. 예전에는 첫 표식 하나만 봐서 뒤쪽이 옛 버전이어도 통과하는 구멍이 있었다.
+  지금 `commands/womc.md` 에 표식이 3개 있고 전부 검사된다.
+- README 검사 5종 → 4종.
+- **`commands/womc.md` 의 `CLAUDE.md`·`.claude/settings.json` 임베드 사본도 라이브와 똑같이 맞췄다**(안 그러면 DRIFT).
+  → `commands/womc.md` 의 「설명 방식」·「서브에이전트 보고 규약」·「적극 위임」·「절차 지키기」·6번 settings 블록은 **이미 최신이다. 다시 안 고쳐도 된다.**
+- 확인: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK.
+
+**신설 `scripts/bump-version.py` 는 아직 안 만들었다** — 5단계에서 버전을 올릴 때 만들면 된다(표식 6곳 일괄 변경).
+
+### 내일 할 일 (2·4·5단계) — 이 순서대로
+**커밋은 막혀 있지 않다. 검사기는 통과 상태다.** 버전은 아직 `1.20.0` 이다.
+
+- **2단계 — `commands/womc.md` 임베드 삭제 (810줄 → ~440줄)**
+  - 지울 임베드 3구획: 에이전트 5종 · 스킬 2종 · `answer-style.js`. 이제 플러그인이 직접 제공하므로 임베드가 필요 없다.
+    (구획 앞뒤의 「5) `.claude/` 서문」·8번 절 제목 같은 안내문도 같이 정리한다.)
+  - 남길 임베드 6개: `CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`settings.json`·`statusline.js`.
+    (플러그인은 프로젝트 `CLAUDE.md` 와 `.claude/rules/` 를 줄 수 없다 — 그래서 이 6개는 계속 생성해야 한다.)
+  - `allowed-tools` 에서 `WebFetch` 제거(같은 파일이 그 사용을 금지하고 있어 죽은 권한이다).
+  - **사실 정정 2곳** — "서브에이전트는 CLAUDE.md 를 못 물려받는다" → 물려받는다. `commands/womc.md` 의 5번 서문과 HARNESS 임베드 안.
+  - 맨 위 버전 주석의 "4곳" 안내 → 개수를 세지 말고 "버전을 올리면 `py scripts/check-sync.py` 를 돌려라"로 바꾼다.
+  - 마무리 안내에 2줄 추가: ① `.claude/` 는 Protected path 라 `/womc` 가 쓸 때 매번 권한을 묻는다(허용 누르면 된다)
+    ② 말투는 Claude Code 를 껐다 켜야 켜진다.
+  - 갱신 모드 재작성 — 레거시 정리(옛 프로젝트의 `.claude/agents/`·`.claude/skills/`·`answer-style.js` 삭제).
+    **판정은 기존 「덮기 전 공통 확인」 로직을 그대로 재사용한다**: womc 원본이면 지우고 보고, 사용자가 고친 것이면 그대로 둔다.
+    `answer-style.js` 를 지울 때 `settings.json` 의 `hooks` 항목도 함께 뺀다. `outputStyle` 키는 추가한다.
+    **0·0-b(옛 캐시 우회)와 다운그레이드 방지는 손대지 않는다.**
+  - `eject <이름>` 인자 추가 — 플러그인 정의를 프로젝트로 복사. 에이전트는 프로젝트 파일이 플러그인 것을 이기므로 그대로 커스터마이즈가 된다.
+    **스킬은 비대칭이다** — 플러그인 스킬은 항상 `womc:` 네임스페이스라 복사해도 override 가 아니라 둘 다 살아남는다. 이 점을 안내에 적는다.
+  - 확인: `py scripts/check-sync.py` 전 항목 OK.
+
+- **4단계 — 문서 (세 파일 서로 병렬 가능)**
+  - `HARNESS.md`(54→~35): 사실 정정, "이 골격은 womc 플러그인이 필요하다 + 설치 두 줄" 추가,
+    "권한 질문이 잦으면 `/fewer-permission-prompts`" 한 줄, "말투가 이상하면 `/config` 확인" 한 줄.
+  - `README.md`(132→~100): **「수동 설치」 절 삭제**(이제 `commands/womc.md` 만 복사하면 반쪽 골격이라 잘못된 안내다),
+    구조도·에이전트 4종 갱신, 중복 설명 압축.
+  - `SPEC.md` 2·3·4항 정정: 에이전트 5종→4종, 미니 하네스 근거 정정, 말투 관리 방식 변경, 스킬 2종은 유지.
+  - 확인: 세 문서에서 `answer-style`·`review` 언급 0건.
+
+- **5단계 — 버전 2.0.0 + 실사용 검증**
+  - `scripts/bump-version.py` 를 만들어 표식 6곳(`commands/womc.md`×3·`CLAUDE.md`·`plugin.json`·`README.md` 제목)을 한 번에 올린다.
+  - `marketplace.json` 설명문의 "5종"도 고친다. `PLAN.md` 버전 이력 + `TASKS.md` 「끝난 일」을 같은 작업에서 갱신한다.
+  - 통과 조건 넷: ① `check-sync.py` 전 항목 OK, 버전 `2.0.0`
+    ② 빈 폴더에서 `/womc` → 생성 파일이 정확히 6개(`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`.claude/settings.json`·`.claude/statusline.js`)
+    ③ v1.20.0 골격 폴더 사본에서 `/womc update` → 레거시 정리되고 `SPEC.md`·`PLAN.md`·`TASKS.md`·`.claude/rules/`·사용자 추가 allow 는 전부 보존
+    ④ 새 세션에서 메인 답변은 케이브맨, **서브에이전트 보고는 평문 한국어**
+  - **여기서 위 0단계 실측 미확인 2건(플러그인 `subagent_type` 값, `outputStyle` 이 플러그인 스타일 이름을 해석하는지)이 함께 판명된다.**
+    `outputStyle` 이 안 먹으면 폴백 2가지가 위 「0단계 실측 결과」 3번에 적혀 있다.
 
 ## 끝난 일
 
