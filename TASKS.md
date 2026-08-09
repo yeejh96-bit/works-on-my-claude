@@ -11,7 +11,9 @@
 - [~] **v2.0.0·v2.1.0 실사용 검증 4건** — 파일 작업은 전부 끝났고 버전도 `2.1.0` 으로 올라갔다.
   남은 건 **이 저장소 안에서는 할 수 없는 검증**이다. 다른 폴더·새 세션에서 사람이 직접 돌려야 한다.
   - ⚠ **2026-08-10 — 사용자 결정으로 v2.0.0 검증을 미루고 v2.1.0 을 먼저 만들었고, v2.1.0 도 파일 작업이 끝났다.**
-    미확인 2건은 `docs/HARNESS-AUDIT.md` 5번 절에 "실측 필요"로 옮겨져 열려 있다. 확인되면 **그 파일도 함께 고친다.**
+  - ✅ **2026-08-10 (같은 날, `/womc update` 의 자동 하네스 감사) — 미확인 2건이 둘 다 닫혔다.**
+    `docs/HARNESS-AUDIT.md` v2.0.0 기록 5번 절이 「확인됨」으로 고쳐졌고, 새 v2.1.0 감사 기록이 맨 위에 쌓였다.
+    **그중 ②는 실제 버그로 판명됐다** — 아래 「할 일」의 첫 항목이 그것이다. 통과 조건 ④(말투)는 그 버그를 고치기 전에는 반드시 실패한다.
   - **먼저 할 것**: 커밋·push → `/plugin marketplace update works-on-my-claude` → `/plugin install womc@works-on-my-claude` → **Claude Code 재시작.**
     로컬 플러그인 캐시가 아직 v1.20.0 판이라, 이걸 안 하면 옛 골격을 깔면서 "검증 실패"로 보인다.
   - 손댈 파일: 없다(검증만). 문제가 나오면 `commands/womc.md` 나 `.claude/settings.json` 을 고친다.
@@ -27,9 +29,9 @@
       그 결과가 `docs/HARNESS-AUDIT.md` 맨 위에 새 기록으로 쌓이는지 육안 확인.
       스킬 이름이 안 잡히면 `skills/harness-audit/SKILL.md` 의 frontmatter(`name`·`description` 2키)를 먼저 의심한다 —
       `description` 값이 큰따옴표로 시작하면 YAML 파싱이 깨진다(만들 때 한 번 걸렸던 자리다).
-  - **위 ②~⑤ 를 돌리면 미확인 2건도 함께 판명된다.** 그 2건의 내용·폴백은 여기 적지 않는다 —
-    **진실은 `docs/HARNESS-AUDIT.md` 5번 절 한 곳에만 둔다**(두 곳에 적어 두면 한쪽만 고치고 다른 쪽이 "아직 열려 있음"으로 남는다).
-    판명되면 그 파일 5번 절을 「확인됨」으로 고치고 맨 위 인용문의 기준 버전도 올린다.
+  - ~~**위 ②~⑤ 를 돌리면 미확인 2건도 함께 판명된다.**~~ → **2026-08-10 감사에서 먼저 판명됐다.**
+    **진실은 여전히 `docs/HARNESS-AUDIT.md` 한 곳에만 둔다** — 새 「실측 필요」 4건은 그 파일 v2.1.0 기록 5번 절에 있고,
+    아래 「할 일」에는 **무엇을 어떻게 확인하는지만** 적는다(내용을 두 곳에 베끼지 않는다).
   - 확인 방법: ①은 이미 통과 — `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.0`.
 
 > 아래는 v2.0.0 작업 중 기록이다. **검증 4건이 끝나면 이 절(「이번 작업의 근거」~「남은 일」)을 지우고
@@ -149,6 +151,28 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
 
 ## 끝난 일
 
+- [x] 말투가 한 번도 안 켜지던 버그 수정 — A안 (v2.1.1) — **파일 작업 완료, 육안 검증 1건 남음**
+  - 손댈 파일: `.claude/settings.json` · `commands/womc.md`(3자리) · `HARNESS.md` · `README.md` · `PLAN.md` · `TASKS.md` · `.claude-plugin/plugin.json`
+  - **버그의 정체**: 플러그인이 제공하는 출력 스타일은 레지스트리에 **`플러그인이름:스타일이름`**(`womc:womc-caveman`)으로 등록되고,
+    조회는 **키 정확일치**다(정규화가 콜론을 제거하지 않는다). 그런데 골격이 넣던 값은 `"womc-caveman"` 이라 **아무것도 못 찾고 조용히 무시**됐다.
+    경고도 안 뜬다. **v1.20.0 이후 지금까지 케이브맨 말투는 한 번도 켜진 적이 없다.**
+    근거는 `docs/HARNESS-AUDIT.md` v2.1.0 기록 2번(문서 URL + 설치 바이너리 실측 + 이 세션 자체가 원시인 말투가 아니었다는 실측).
+  - 남긴 것:
+    - **값 3자리를 `"womc:womc-caveman"` 으로**: `.claude/settings.json:2` · `commands/womc.md` 5번 절 JSON 임베드 · 그 설명 불릿.
+      **파일명과 frontmatter `name` 은 안 바꿨다** — `output-styles/womc-caveman.md` / `name: womc-caveman` 그대로다. 접두는 **등록 키에만** 붙는다(헷갈리기 쉬운 자리).
+    - **갱신 모드 3번에 자동 교정을 넣은 것이 절반의 핵심이다** (`commands/womc.md` 갱신 모드 3번) —
+      `outputStyle` 값이 **정확히 `"womc-caveman"`** 이면 옛 골격의 깨진 값으로 보고 `"womc:womc-caveman"` 으로 **고친다.**
+      그 둘 말고 다른 값이면 사용자가 고른 말투이므로 **그대로 둔다.** 이 예외가 없으면 이미 깔린 프로젝트가 영영 안 고쳐진다.
+    - `HARNESS.md:47` 안내를 "`/config` 에서 이름 확인" → "**`outputStyle` 값이 `womc:womc-caveman` 인지 확인**"으로 바꿨다.
+      **이 줄은 `commands/womc.md` HARNESS 임베드 사본과 글자 그대로 같아야 한다**(어긋나면 `check-sync.py` 가 DRIFT 로 잡는다).
+    - 버전은 `py scripts/bump-version.py 2.1.1` 한 줄로 6곳을 올렸다.
+    - **A안을 고른 이유**: B안(`force-for-plugin: true`)은 womc 가 켜진 **모든** 프로젝트에 말투를 강제하고 사용자의 `outputStyle` 을 덮어써서
+      "프로젝트별로 켠다"는 설계 결정과 어긋난다. C안(프로젝트로 복사)은 "말투 규칙은 한 곳에만" 원칙과 어긋난다.
+      B안은 「할 일」에 보류 항목으로 남겨 뒀다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.1`.
+    **말투가 실제로 켜지는지는 스크립트로 못 잡는다** — 커밋·push → 플러그인 재설치 → **Claude Code 재시작** 후
+    메인 답변이 원시인 말투인지 육안 확인해야 한다(위 「지금 하는 일」의 통과 조건 ④).
+
 - [x] 하네스 감사 절차를 골격에 심음 (v2.1.0) — **파일 작업 완료, 실사용 검증 1건은 위 「지금 하는 일」에 남아 있다**
   - 손댈 파일: `skills/harness-audit/SKILL.md`(신설) · `docs/HARNESS-AUDIT.md`(신설) ·
     `HARNESS.md` · `commands/womc.md` · `README.md` · `SPEC.md` · `.claude-plugin/plugin.json` · `PLAN.md` · `TASKS.md`
@@ -260,14 +284,25 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
     추가로 `node .claude/answer-style.js`·`node .claude/statusline.js` 직접 실행해 정상 출력 확인,
     `~/.claude/statusline-debug.json` 의 mtime 이 실행 시각보다 앞선 것으로 재기록 안 됨을 확인.
 
-- [x] v1.19.0 커밋 + `PLAN.md`·`TASKS.md` 를 git 에 포함
-  - 남긴 것: 커밋 `82bc25b`(v1.19.0 수정 9개), 커밋 `ac8f105`(`PLAN.md`·`TASKS.md` 추적 시작).
-    이전 판에는 "이 두 파일은 git 미포함 유지"라고 적혀 있었으나 **방침이 바뀌어 git 에 포함한다** — 앞으로 커밋에 함께 넣는다.
-  - 확인 방법: `git status --short` 가 비어 있고, `git ls-files PLAN.md TASKS.md` 에 두 파일이 나온다.
-
 ## 할 일
 
-(비어 있음 — 위 「지금 하는 일」의 실사용 검증 4건이 끝나야 다음 기능을 잡는다.)
+> 아래 4건은 2026-08-10 하네스 감사(`/womc update` 자동 실행)가 남긴 것이다.
+> **각 항목의 배경·근거 URL·선택지는 `docs/HARNESS-AUDIT.md` 의 v2.1.0 기록 5번 절에 있다** — 여기엔 확인 방법만 적는다.
+
+- [ ] ~~**`force-for-plugin: true` 가 이 판에서 실제로 먹는지 확인 (감사 5번②)**~~ — **보류.**
+  A안으로 고쳤으므로 지금은 필요 없다. 나중에 "프로젝트마다 `outputStyle` 을 박지 않게" 하고 싶어질 때만 다시 꺼낸다.
+  - 확인 방법: `output-styles/womc-caveman.md` frontmatter 에 넣고 플러그인 재설치 → 재시작 → **settings.json 에 `outputStyle` 이
+    아예 없는 폴더**에서 메인 답변이 원시인 말투로 나오는지 본다.
+
+- [ ] **`permissions.allow` 의 PowerShell 4줄이 정말 필요한지 확인 (감사 5번③)**
+  - 문서는 내장 read-only 자동 허용을 **Bash 만** 명시하고 PowerShell 은 언급이 없다. 필요 없으면 골격에서 4줄을 뺄 수 있다.
+  - 확인 방법: Windows 에서 임시 폴더에 골격을 깔고 `.claude/settings.json` 의 `allow` 4줄을 지운 뒤,
+    `git status` 를 시켜 **권한 프롬프트가 뜨는지** 본다. 안 뜨면 뺄 수 있다(그러면 `commands/womc.md` 5번 절도 같이 고친다).
+
+- [ ] **`/fewer-permission-prompts` 로 allow 목록을 대체할 수 있는지 확인 (감사 5번④)**
+  - 위 항목이 "필요하다"로 나올 때만 의미가 있다. 골격에 4줄을 박는 대신 이 번들 스킬에 맡겨도 되는지 판단한다.
+  - 확인 방법: 골격을 깐 폴더에서 `/fewer-permission-prompts` 를 한 번 돌리고, `.claude/settings.json` 의 `allow` 에
+    PowerShell 읽기 전용 명령이 실제로 추가되는지 본다.
 
 <!-- 끝난 항목은 이렇게 적는다:
 - [x] 항목 이름

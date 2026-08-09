@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.1.0 -->
+<!-- womc:skeleton-version=2.1.1 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.1.0 -->
+<!-- womc:skeleton-version=2.1.1 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -172,7 +172,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
   `make-rule` 은 "앞으로 ○○하게 해줘"라고 하면 적용 범위를 알아서 판단해 `.claude/rules/` 에 규칙 파일을 만든다.
   `harness-audit` 은 Claude Code 가 업데이트됐을 때 골격에서 뺄 수 있는 것을 가려내 `docs/HARNESS-AUDIT.md` 에 기록한다. `/womc update` 를 돌리면 이 감사가 자동으로 이어진다.
 - **답변 말투** — 원시인 말투 출력 스타일(`womc-caveman`). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
-  말투가 이상하면 `/config` 의 Output style 이 `womc-caveman` 인지 확인한다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
+  말투가 안 켜지면 `.claude/settings.json` 의 `outputStyle` 값이 `womc:womc-caveman` 인지 확인한다 — 플러그인이 주는 스타일이라 앞에 `womc:` 가 꼭 붙고, 빼면 조용히 무시된다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
 - 이 셋 중 무엇이든 이 프로젝트에서만 고쳐 쓰고 싶으면 `/womc eject <이름>` 으로 프로젝트 안에 꺼내 놓고 편집한다.
 
 ## 왜 스택·MCP 같은 건 비워 뒀나
@@ -237,13 +237,15 @@ Thumbs.db
   Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령만 미리 허용해 둔다. (Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다 — 해는 없다.)
 - `push`·`reset` 같이 되돌리기 어려운 명령은 일부러 넣지 않는다 — 그건 매번 확인받는 게 맞다.
 - `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(프로젝트 루트 기준 상대 경로, 6번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
-- `outputStyle` 은 womc 플러그인이 제공하는 답변 말투(`womc-caveman`)를 이 프로젝트에서만 켠다. 다른 폴더에서는 평소 말투 그대로다.
+- `outputStyle` 은 womc 플러그인이 제공하는 답변 말투를 이 프로젝트에서만 켠다. 다른 폴더에서는 평소 말투 그대로다.
+  **값은 반드시 `womc:womc-caveman` 이다** — 플러그인이 주는 출력 스타일은 `플러그인이름:스타일이름` 으로 등록되고 이름을 정확일치로 찾기 때문에,
+  접두 `womc:` 를 빼면 **경고 한 줄 없이 조용히 무시된다**(v2.1.1 에서 고친 버그다. 파일 이름 `output-styles/womc-caveman.md` 자체는 접두가 없다 — 헷갈리지 말 것).
   **바뀐 말투는 Claude Code 를 껐다 켜거나 `/clear` 한 뒤에 적용된다** — 출력 스타일은 세션이 시작될 때 한 번만 읽히기 때문이다.
-  스타일이 안 먹으면 `/config` 의 Output style 에서 `womc-caveman` 을 골라도 된다.
+  스타일이 안 먹으면 `/config` 의 Output style 목록에서 womc 의 원시인 말투를 직접 골라도 된다.
 
 ```json
 {
-  "outputStyle": "womc-caveman",
+  "outputStyle": "womc:womc-caveman",
   "statusLine": {
     "type": "command",
     "command": "node .claude/statusline.js"
@@ -347,7 +349,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.1.0 -->
+<!-- womc:skeleton-version=2.1.1 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -464,7 +466,7 @@ process.stdin.on("end", () => {
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.)
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
-   `outputStyle` 키가 없으면 `"womc-caveman"` 으로 추가한다. 이미 다른 값이 들어 있으면 **덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 완료 보고에 한 줄만 알린다.
+   `outputStyle` 키가 없으면 `"womc:womc-caveman"` 으로 추가한다. **값이 정확히 `"womc-caveman"`(접두 `womc:` 가 빠진 옛 골격의 값)이면 `"womc:womc-caveman"` 으로 고친다** — 그 값은 어떤 스타일과도 매칭되지 않아 말투가 조용히 안 켜지던 버그이므로, 사용자가 고른 말투로 보지 않는다(v2.1.1 에서 고쳤다). 그 둘 말고 **다른 값이 들어 있으면 덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 어느 쪽이었는지 완료 보고에 한 줄만 알린다.
    `hooks` 는 이렇게 다룬다 — 위 2번에서 `answer-style.js` 를 지웠으면 `node .claude/answer-style.js` 를 실행하는 `UserPromptSubmit` 항목도 함께 뺀다(스크립트가 없는데 훅만 남으면 매 입력마다 실패한다). 그 결과 `hooks` 가 비면 키째 지운다. 사용자가 직접 넣은 다른 훅은 건드리지 않는다.
 4. 다음은 **절대 덮어쓰지도 지우지도 않는다**: `SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` 전체 · `.gitignore` ·
    그 외 이 문서에 없는 모든 파일. (`.gitignore` 는 사용자가 항목을 추가했을 수 있어 갱신 대상에서 뺀다.)

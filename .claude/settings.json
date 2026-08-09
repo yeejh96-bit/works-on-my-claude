@@ -1,5 +1,5 @@
 {
-  "outputStyle": "womc-caveman",
+  "outputStyle": "womc:womc-caveman",
   "statusLine": {
     "type": "command",
     "command": "node .claude/statusline.js"

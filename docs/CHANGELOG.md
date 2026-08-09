@@ -5,6 +5,12 @@
 > 각 항목의 형식은 `TASKS.md` 와 같다 — 손댈 파일 · 남긴 것 · 확인 방법.
 > 한 줄 요약만 필요하면 `PLAN.md` 의 「만든 것(버전 이력)」을 본다.
 
+## v1.19.0 커밋 + `PLAN.md`·`TASKS.md` 를 git 에 포함
+
+- 남긴 것: 커밋 `82bc25b`(v1.19.0 수정 9개), 커밋 `ac8f105`(`PLAN.md`·`TASKS.md` 추적 시작).
+  이전 판에는 "이 두 파일은 git 미포함 유지"라고 적혀 있었으나 **방침이 바뀌어 git 에 포함한다** — 앞으로 커밋에 함께 넣는다.
+- 확인 방법: `git status --short` 가 비어 있고, `git ls-files PLAN.md TASKS.md` 에 두 파일이 나온다.
+
 ## v1.18.0 — 버전 올릴 때 PLAN/TASKS 동반 갱신 규칙 + 답변에서 줄번호 표기 폐지
 
 - 손댈 파일: `CLAUDE.md`, `commands/womc.md`, `.claude/answer-style.js`,
