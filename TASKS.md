@@ -5,10 +5,34 @@
 > 표기: `[ ]` 안 함 · `[~]` 하는 중 · `[x]` 끝남
 
 ## 지금 하는 일
-**v2.0.0 — Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화. 0·1·2·3단계 끝, 4단계 일부(HARNESS.md) 끝. 남은 것은 4단계(README·SPEC)와 5단계.**
-전체 계획은 `C:\Users\s2\.claude\plans\glistening-squishing-nest.md` 에 있다. **내일 이어서 할 때 그 파일부터 읽는다.**
 (이 파일과 `PLAN.md` 는 기록용으로 남겨 두며 지우지 않는다. **git 에 올린다** — 다른 PC 에서 이어 작업할 때
 진행 상태와 「끝난 일」의 결정 이유를 그대로 볼 수 있어야 하기 때문이다. 커밋할 때 이 두 파일도 함께 넣는다.)
+
+- [~] **v2.0.0 실사용 검증 3건** — 파일 작업(0~5단계)은 전부 끝났고 버전도 `2.0.0` 으로 올라갔다.
+  남은 건 **이 저장소 안에서는 할 수 없는 검증**이다. 다른 폴더·새 세션에서 사람이 직접 돌려야 한다.
+  - ⚠ **2026-08-10 — 사용자 결정으로 이 검증을 미루고 v2.1.0 작업을 먼저 시작했다.** 권유는 했고 사용자가 그래도 진행하기로 했다.
+    검증이 안 끝난 채로 v2.1.0 이 진행되므로, **`docs/HARNESS-AUDIT.md` 첫 기록의 미확인 2건은 "실측 필요"로 남겨 둔다**(아래 참조).
+    v2.1.0 이 끝나면 이 항목으로 돌아온다.
+  - **먼저 할 것**: 커밋·push → `/plugin marketplace update works-on-my-claude` → `/plugin install womc@works-on-my-claude` → **Claude Code 재시작.**
+    로컬 플러그인 캐시가 아직 v1.20.0 판이라, 이걸 안 하면 옛 골격을 깔면서 "검증 실패"로 보인다.
+  - 손댈 파일: 없다(검증만). 문제가 나오면 `commands/womc.md` 나 `.claude/settings.json` 을 고친다.
+  - 끝난 것으로 보는 조건 3가지:
+    - ② **빈 폴더에서 `/womc`** → 생성 파일이 정확히 6개
+      (`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`.claude/settings.json`·`.claude/statusline.js`).
+      `.claude/agents/`·`.claude/skills/`·`answer-style.js` 가 생기면 옛 캐시를 쓰고 있는 것이다.
+    - ③ **v1.20.0 골격 폴더 사본에서 `/womc update`** → 레거시(`.claude/agents/`·`.claude/skills/`·`answer-style.js`)가 지워지고,
+      `SPEC.md`·`PLAN.md`·`TASKS.md`·`.claude/rules/`·`settings.json` 에 사용자가 추가한 allow 는 전부 남아 있어야 한다.
+    - ④ **새 세션에서 말투** — 메인 답변은 케이브맨, **서브에이전트 보고는 평문 한국어**.
+  - **여기서 미확인 2건이 함께 판명된다** (아래 「끝난 일」 v2.0.0 의 실측 1·3번):
+    플러그인 서브에이전트를 부를 때 `subagent_type` 이 `explore` 인지 `womc:explore` 인지 /
+    프로젝트 `settings.json` 의 `outputStyle` 이 **플러그인이 준** 스타일 이름을 해석하는지.
+    `outputStyle` 이 안 먹으면 폴백 둘: ① `output-styles/womc-caveman.md` 에 `force-for-plugin: true` 추가
+    (단 "항상 켜짐"이 되어 사용자 결정과 어긋나므로 **다시 물어야 한다**) ② `/config` 에서 직접 고르게 안내.
+  - 확인 방법: ①은 이미 통과 — `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.0.0`.
+
+> 아래는 v2.0.0 작업 중 기록이다. **검증 3건이 끝나면 이 절(「이번 작업의 근거」~「남은 일」)을 지우고
+> 「끝난 일」의 v2.0.0 항목만 남긴다.** 지금은 검증에서 문제가 났을 때 어디를 봐야 하는지 알려 주므로 남겨 둔다.
+> 전체 계획 원본은 `C:\Users\s2\.claude\plans\glistening-squishing-nest.md`.
 
 ### 이번 작업의 근거 — 뒤집힌 전제 (가장 중요)
 v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물려받는 게 맞음"으로 확인해 기록했었다(아래 v1.19.0 항목).
@@ -90,30 +114,72 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
   **HARNESS.md 를 다시 고칠 일이 생기면 `commands/womc.md` 임베드와 같이 고쳐야 한다.**
 - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK (버전은 아직 `1.20.0`).
 
-### 남은 일 (4단계 나머지·5단계) — 이 순서대로
-**커밋은 막혀 있지 않다. 검사기는 통과 상태다.** 버전은 아직 `1.20.0` 이다.
+### 4단계에서 남긴 것 (5단계가 이어 쓴다)
+**문서 3종이 모두 새 구조에 맞춰졌다. 남은 것은 5단계뿐이다.**
 
-- **4단계 — 문서 (두 파일 서로 병렬 가능. `HARNESS.md` 는 위에서 이미 끝냈다)**
-  - `README.md`(132→~100): **「수동 설치」 절 삭제**(이제 `commands/womc.md` 만 복사하면 반쪽 골격이라 잘못된 안내다),
-    구조도·에이전트 4종 갱신, 중복 설명 압축.
-  - `SPEC.md` 2·3·4항 정정: 에이전트 5종→4종, 미니 하네스 근거 정정, 말투 관리 방식 변경, 스킬 2종은 유지.
-    `/womc eject` 도 3항 1번에 한 줄 넣는다(2단계에서 새로 생긴 기능이라 SPEC 에 없다).
-  - 확인: 두 문서에서 `answer-style`·`review` 언급 0건.
+- **`README.md` 132줄 → 87줄.**
+  - 「수동 설치」 절 **삭제**(`commands/womc.md` 만 복사하면 반쪽 골격이라 잘못된 안내였다).
+  - 구조도에서 `.claude/agents/`·`.claude/skills/`·`answer-style.js` 를 뺐다 — 생성물은 6개뿐이다.
+  - **「플러그인이 주는 것」 절 신설** — 에이전트 4종·스킬 2종·`womc-caveman`·`/womc eject <이름>`.
+  - 표·토큰 절약 절의 "5종"·`review` 언급을 전부 4종으로. 말투 설명을 CLAUDE.md 「설명 방식」 → **출력 스타일**로 정정.
+  - 갱신 안내를 3단계 나열에서 "`/womc update` 한 줄 + 안 될 때만 수동" 으로 압축.
+  - **제목 버전은 아직 `1.20.0` 이다** — 5단계 `bump-version.py` 가 올릴 자리다.
+- **`SPEC.md` 2·3·4·5항 정정** (1항에도 플러그인 루트 `agents/`·`skills/`·`output-styles/` 한 줄 추가).
+  - 3항 1번에 `/womc eject` 한 줄, 2번의 `answer-style.js` → `outputStyle`+출력 스타일 파일,
+    3번은 **4종 + "서브에이전트도 CLAUDE.md 를 물려받는다"** 로 사실 정정, 4번은 검토를 `/code-review` 권유로.
+  - 5항 산출물 목록에 `agents/`·`skills/`·`output-styles/` 추가.
+  - **SPEC.md 는 CLAUDE.md 에 `@import` 되므로 매 세션 로드된다** — 늘리지 말 것(32줄 유지).
+- 확인: 두 문서에서 `answer-style` 0건, `review` 는 `/code-review` 2건만 남음.
+  `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK.
 
-- **5단계 — 버전 2.0.0 + 실사용 검증**
-  - `scripts/bump-version.py` 를 만들어 표식 6곳(`commands/womc.md`×3·`CLAUDE.md`·`plugin.json`·`README.md` 제목)을 한 번에 올린다.
-  - `marketplace.json` 설명문의 "5종"도 고친다. `PLAN.md` 버전 이력 + `TASKS.md` 「끝난 일」을 같은 작업에서 갱신한다.
-  - 통과 조건 넷: ① `check-sync.py` 전 항목 OK, 버전 `2.0.0`
-    ② 빈 폴더에서 `/womc` → 생성 파일이 정확히 6개(`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`.claude/settings.json`·`.claude/statusline.js`)
-    ③ v1.20.0 골격 폴더 사본에서 `/womc update` → 레거시 정리되고 `SPEC.md`·`PLAN.md`·`TASKS.md`·`.claude/rules/`·사용자 추가 allow 는 전부 보존
-    ④ 새 세션에서 메인 답변은 케이브맨, **서브에이전트 보고는 평문 한국어**
-  - **여기서 위 0단계 실측 미확인 2건(플러그인 `subagent_type` 값, `outputStyle` 이 플러그인 스타일 이름을 해석하는지)이 함께 판명된다.**
-    `outputStyle` 이 안 먹으면 폴백 2가지가 위 「0단계 실측 결과」 3번에 적혀 있다.
+### 5단계에서 남긴 것 (검증만 남았다)
+- **신설 `scripts/bump-version.py`** — `py scripts/bump-version.py <새버전>` 한 줄로 표식 6곳을 한꺼번에 올린다
+  (`plugin.json` version · `README.md` 제목 · `womc:skeleton-version` 표식 4개 = `commands/womc.md`×3 + `CLAUDE.md`).
+  - `--dry-run` 을 주면 어디를 몇 곳 고칠지 보여주기만 한다. **버전을 내리는 건 막아 뒀다**(손으로 해야 한다).
+  - 표식 파일 목록 `VERSION_MARKER_FILES` 는 `check-sync.py` 와 **같은 값이어야 한다** — 한쪽에 파일을 추가하면 다른 쪽도 추가한다.
+  - 줄바꿈을 보존해 읽고 쓴다(`newline=""`). 이 저장소는 LF 인데 **`plugin.json` 만 CRLF** 라, 안 그러면 그 파일 전체가 diff 로 뜬다.
+- **`marketplace.json` 은 안 고쳤다** — 계획에 적혀 있던 "설명문의 5종"이 실제로는 없었다.
+  `plugin.json`·`marketplace.json` 의 description 은 "서브에이전트 오케스트레이션"이라고만 적혀 있어 숫자가 안 박혀 있다. 고칠 것이 없다.
+- 구조 확인(육안): 플러그인이 주는 파일 7개가 다 있다 —
+  `agents/{explore,plan,implement,verify}.md` · `skills/{plan-feature,make-rule}/SKILL.md` · `output-styles/womc-caveman.md`.
+  `commands/womc.md` 의 생성 절도 1)~6) 여섯 개뿐이라 통과 조건 ②의 6개와 맞는다.
+- 확인: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.0.0`.
 
 ## 끝난 일
 
 > 최근 작업만 여기 남긴다. **v1.18.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
+
+- [x] Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화 (v2.0.0) — **파일 작업 완료, 실사용 검증 3건은 위 「지금 하는 일」에 남아 있다**
+  - 손댈 파일: `agents/`(신설 4) · `skills/`(신설 2) · `output-styles/womc-caveman.md`(신설) · `commands/womc.md` ·
+    `CLAUDE.md` · `HARNESS.md` · `SPEC.md` · `README.md` · `.claude/settings.json` · `scripts/check-sync.py` ·
+    `scripts/bump-version.py`(신설) · `.claude-plugin/plugin.json`. **삭제**: `.claude/agents/`(5) · `.claude/skills/`(2) · `.claude/answer-style.js`.
+  - **뒤집힌 전제 (이 작업 전체의 근거 — 다시 의심하지 말 것)**: v1.19.0 에 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물려받는다"고
+    기록해 뒀으나 Claude Code 2.1.224 에서 **거짓**이다. 공식 문서: "Explore and Plan are the only subagents that omit
+    CLAUDE.md and git status. Every other built-in and custom subagent loads both." 이 저장소에서 `explore` 를 띄워 **실측 확인**했다.
+    이 한 문장이 에이전트 보일러플레이트 ~100줄과 케이브맨 말투 5판본을 지탱하고 있었다.
+  - **0단계 실측 5건 (다시 조사하지 말 것)**:
+    ① 플러그인 루트 `agents/` 지원 확실(공식 플러그인 8개가 사용 중) — 단 `subagent_type` 값이 `explore` 인지 `womc:explore` 인지는 **미확인**.
+    ② 프로젝트 `.claude/agents/` 가 플러그인 것을 override — 문서 명시.
+    ③ 플러그인이 준 output style 이름을 `settings.json` 의 `outputStyle` 이 해석하는지 — **미확인**(참고할 사례가 0건이었다).
+    ④ 커스텀 서브에이전트의 CLAUDE.md 상속 — **확정**(위 참조).
+    ⑤ 소문자 `plan` 은 내장 `Plan` 을 오버라이드하지 않는다 — **확정**(대소문자 구분, 둘이 동시에 떠 있었다).
+  - **계획에서 취소한 것 2가지**: `plan`→`design` 개명(이름 충돌이 없어 이득 없음, 고칠 곳 12군데 절약) ·
+    `statusLine` 의 `refreshInterval`(단위가 초·최소 1이라 몇 초마다 node 를 새로 띄우게 됨 — 비용이 이득보다 크다).
+  - 남긴 것:
+    - **서브에이전트·스킬·말투를 플러그인 루트로 옮겼다.** 이제 `/womc` 가 복사하지 않는다 → 골격 생성물 11개 → **6개**.
+      에이전트 4종은 공통 규칙을 지우고 "`CLAUDE.md` 「서브에이전트 보고 규약」을 따른다" 한 줄로 대체(상속되므로).
+      「너는 메인의 대화 이력을 못 본다」만 남겼다 — 이건 상속되지 않는 사실이다.
+    - **`review` 에이전트 폐지** → Claude Code 기본 `/code-review` 권유. `plan-feature` §6 도 그렇게 재작성.
+    - **말투는 출력 스타일 `output-styles/womc-caveman.md` 한 곳**. `keep-coding-instructions: true` **필수**
+      (기본값 false 면 Claude Code 내장 코딩 지침이 통째로 빠진다). `settings.json` 의 `hooks` 삭제 + `outputStyle` 추가.
+    - `commands/womc.md` **800줄 → 495줄**. 임베드 6개(`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`settings.json`·`statusline.js`)만 남았다.
+    - **신설 `/womc eject <이름>`** — 플러그인이 주는 정의를 프로젝트로 꺼낸다. 스킬만 비대칭(플러그인 스킬은 `womc:` 이름표라 꺼내도 둘 다 살아남는다).
+    - **신설 `scripts/bump-version.py`** — 표식 6곳 일괄 변경. `--dry-run` 지원. `VERSION_MARKER_FILES` 는 `check-sync.py` 와 같은 값을 유지한다.
+    - `check-sync.py`: `EMBEDDED_FILES` 12→4개, 버전 표식을 `re.findall` **전수 검사**로(예전엔 첫 표식만 봐서 뒤쪽이 옛 버전이어도 통과했다), README 검사 5종→4종.
+    - **HARNESS.md 를 고칠 때는 `commands/womc.md` 임베드 사본도 같이 고쳐야 한다** — 글자 그대로 같지 않으면 `check-sync.py` 가 DRIFT 로 잡는다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.0.0`.
+    나머지 3건(빈 폴더 생성 · `update` 보존 · 말투)은 사람이 새 세션에서 확인한다.
 
 - [x] 「끝난 일」 회전 규칙을 womc 골격에 심음 (v1.20.0)
   - 손댈 파일: `.claude/skills/plan-feature/SKILL.md`, `commands/womc.md`, `CLAUDE.md`,
