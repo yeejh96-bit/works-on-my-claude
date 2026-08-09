@@ -1,10 +1,10 @@
-# works-on-my-claude v2.0.0
+# works-on-my-claude v2.1.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
 `/womc` 한 번이면 — 불변 작업 규칙(CLAUDE.md) · 프로젝트 명세(SPEC.md) · 안전 기본값(.claude/settings.json) 이 깔리고,
 플러그인이 서브에이전트 4종(조사 `explore` · 설계 `plan` · 구현 `implement` · 검증 `verify`) ·
-운영 절차 스킬 2종(`plan-feature` · `make-rule`) · 답변 말투를 함께 제공한다. 스택도 MCP도 강제하지 않는다.
+운영 절차 스킬 3종(`plan-feature` · `make-rule` · `harness-audit`) · 답변 말투를 함께 제공한다. 스택도 MCP도 강제하지 않는다.
 
 > 골격만 까는 게 아니다. 만드는 동안 **계획(PLAN)·진행상태(TASKS)·검증**을 Claude가 알아서 만들고 갱신한다.
 > 단, 이 파일들은 **필요할 때만** 등장해 평소 컨텍스트를 무겁게 하지 않는다.
@@ -67,7 +67,8 @@ Claude Code 안에서 두 줄이면 끝이다.
 
 - **서브에이전트 4종** — `explore`(조사·haiku) · `plan`(설계·opus) · `implement`(구현 — 유일하게 파일을 직접 고침) · `verify`(동작 검증).
   코드 검토용 에이전트는 두지 않는다 — Claude Code 기본 `/code-review` 를 쓴다.
-- **스킬 2종** — `plan-feature`(기능 추가·수정·버그수정·리팩터를 작게 쪼개 하나씩) · `make-rule`("앞으로 ○○하게 해줘" → 규칙 파일 생성).
+- **스킬 3종** — `plan-feature`(기능 추가·수정·버그수정·리팩터를 작게 쪼개 하나씩) · `make-rule`("앞으로 ○○하게 해줘" → 규칙 파일 생성) · `harness-audit`(Claude Code 업데이트 시 골격에서 뺄 것 점검·기록).
+  `harness-audit` 는 **`/womc update` 마지막에 자동으로 이어진다** — 지난 감사 이후 Claude Code 가 올라갔을 때만 돌고, 실제로 걷어낼 때는 한 번 묻는다.
 - **답변 말투** — 원시인 말투 출력 스타일 `womc-caveman`. `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
 - 이 중 무엇이든 한 프로젝트에서만 고쳐 쓰고 싶으면 `/womc eject <이름>` 으로 프로젝트 안에 꺼내 편집한다.
 

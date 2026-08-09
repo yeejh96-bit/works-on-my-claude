@@ -40,8 +40,9 @@
   `explore`(조사·빠른 haiku) · `plan`(설계·품질 위주 opus) · `implement`(구현·유일하게 파일을 직접 고침) · `verify`(동작 검증).
   코드 검토는 따로 두지 않는다 — Claude Code 에 기본으로 있는 `/code-review` 를 쓴다.
   settings.json 의 비밀 `.env` 차단은 서브에이전트의 **파일 읽기 도구**에도 그대로 적용된다. 다만 Bash 를 가진 에이전트가 `cat .env` 처럼 셸로 읽는 것까지 막지는 못한다 — 진짜 비밀은 프로젝트 폴더 밖에 두는 게 안전하다.
-- **스킬 2종** — `plan-feature` 는 기능을 새로 만들거나 고칠 때(버그수정·리팩터 포함) 쓴다 — 큰 작업은 작게 쪼개 계획(PLAN.md)·진행상태(TASKS.md)로 한 번에 하나씩, 작은 변경은 바로 고친 뒤 동작을 같이 확인한다.
+- **스킬 3종** — `plan-feature` 는 기능을 새로 만들거나 고칠 때(버그수정·리팩터 포함) 쓴다 — 큰 작업은 작게 쪼개 계획(PLAN.md)·진행상태(TASKS.md)로 한 번에 하나씩, 작은 변경은 바로 고친 뒤 동작을 같이 확인한다.
   `make-rule` 은 "앞으로 ○○하게 해줘"라고 하면 적용 범위를 알아서 판단해 `.claude/rules/` 에 규칙 파일을 만든다.
+  `harness-audit` 은 Claude Code 가 업데이트됐을 때 골격에서 뺄 수 있는 것을 가려내 `docs/HARNESS-AUDIT.md` 에 기록한다. `/womc update` 를 돌리면 이 감사가 자동으로 이어진다.
 - **답변 말투** — 원시인 말투 출력 스타일(`womc-caveman`). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
   말투가 이상하면 `/config` 의 Output style 이 `womc-caveman` 인지 확인한다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
 - 이 셋 중 무엇이든 이 프로젝트에서만 고쳐 쓰고 싶으면 `/womc eject <이름>` 으로 프로젝트 안에 꺼내 놓고 편집한다.

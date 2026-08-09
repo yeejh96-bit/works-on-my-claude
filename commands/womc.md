@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.0.0 -->
+<!-- womc:skeleton-version=2.1.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.0.0 -->
+<!-- womc:skeleton-version=2.1.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -168,8 +168,9 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
   `explore`(조사·빠른 haiku) · `plan`(설계·품질 위주 opus) · `implement`(구현·유일하게 파일을 직접 고침) · `verify`(동작 검증).
   코드 검토는 따로 두지 않는다 — Claude Code 에 기본으로 있는 `/code-review` 를 쓴다.
   settings.json 의 비밀 `.env` 차단은 서브에이전트의 **파일 읽기 도구**에도 그대로 적용된다. 다만 Bash 를 가진 에이전트가 `cat .env` 처럼 셸로 읽는 것까지 막지는 못한다 — 진짜 비밀은 프로젝트 폴더 밖에 두는 게 안전하다.
-- **스킬 2종** — `plan-feature` 는 기능을 새로 만들거나 고칠 때(버그수정·리팩터 포함) 쓴다 — 큰 작업은 작게 쪼개 계획(PLAN.md)·진행상태(TASKS.md)로 한 번에 하나씩, 작은 변경은 바로 고친 뒤 동작을 같이 확인한다.
+- **스킬 3종** — `plan-feature` 는 기능을 새로 만들거나 고칠 때(버그수정·리팩터 포함) 쓴다 — 큰 작업은 작게 쪼개 계획(PLAN.md)·진행상태(TASKS.md)로 한 번에 하나씩, 작은 변경은 바로 고친 뒤 동작을 같이 확인한다.
   `make-rule` 은 "앞으로 ○○하게 해줘"라고 하면 적용 범위를 알아서 판단해 `.claude/rules/` 에 규칙 파일을 만든다.
+  `harness-audit` 은 Claude Code 가 업데이트됐을 때 골격에서 뺄 수 있는 것을 가려내 `docs/HARNESS-AUDIT.md` 에 기록한다. `/womc update` 를 돌리면 이 감사가 자동으로 이어진다.
 - **답변 말투** — 원시인 말투 출력 스타일(`womc-caveman`). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
   말투가 이상하면 `/config` 의 Output style 이 `womc-caveman` 인지 확인한다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
 - 이 셋 중 무엇이든 이 프로젝트에서만 고쳐 쓰고 싶으면 `/womc eject <이름>` 으로 프로젝트 안에 꺼내 놓고 편집한다.
@@ -346,7 +347,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.0.0 -->
+<!-- womc:skeleton-version=2.1.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -473,13 +474,20 @@ process.stdin.on("end", () => {
 6. 끝나면 생성 모드와 동일하게 WOMC 로고 아트를 맨 앞에 출력한 뒤, 무엇을 교체했고 무엇을 보존했는지 한국어로 짧게 알린다. **골격 버전(`womc:skeleton-version`)과 그 내용을 어디서 가져왔는지(실행 중 문서 / GitHub 최신 / 로컬 클론)도 함께 적는다.**
    **0단계의 플러그인 갱신 결과도 함께 적는다.** 새 버전으로 올랐으면 "플러그인 캐시가 최신으로 올랐다. Claude Code 를 껐다 켜야 새 명령이 적용된다"고 알린다. 이미 최신이었으면 "플러그인은 이미 최신이었다"고만 적는다. 실패했으면 실패 사실과 위 0-b 의 `/plugin` 수동 업데이트 안내를 함께 적는다.
    `.claude/` 는 Claude Code 가 보호하는 자리라 쓸 때마다 권한을 묻는다는 것, 말투는 Claude Code 를 껐다 켜야 적용된다는 것도 한 줄씩 덧붙인다.
+7. **하네스 감사 (자동).** 위 1~6번으로 골격 갱신을 마쳤으면 곧바로 이어서 한다 — 사용자가 따로 부르지 않아도 된다.
+   - `docs/HARNESS-AUDIT.md` 의 맨 위 기록에 적힌 「마지막 감사 기준 버전」과 지금 `claude --version` 을 비교한다. 파일이 없으면 이번이 첫 감사다 — 그냥 진행한다.
+   - **두 버전이 같으면 건너뛴다** — "지난 감사 이후 Claude Code 가 안 올라갔음" 한 줄만 알리고 끝낸다.
+   - 다르면 `harness-audit` 스킬을 그 자리에서 실행한다. (스킬 절차를 여기 베껴 적지 않는다 — 절차의 진실은 `skills/harness-audit/SKILL.md` 한 곳에만 둔다.)
+   - 스킬이 「뺄 수 있음」을 하나라도 찾으면 **파일을 바로 고치지 말고 사용자에게 한 번 묻는다.** 쉬운 말 예: "지금 골격에서 빼도 되는 게 N개 나왔음. 지금 정리할까요, 기록만 남길까요?" 사용자가 좋다고 하면 `plan-feature` 로 넘어가 정리한다.
+     **묻지 않고 지우는 일은 없다** — 골격을 지우는 건 되돌리기 번거롭고, 근거가 틀리면 잘 돌던 세팅이 깨지기 때문이다.
+   - `harness-audit` 스킬이 없거나(플러그인 캐시가 옛 판) 실행이 안 되면 **조용히 건너뛰고** 갱신 자체는 성공으로 끝낸다 — 감사 때문에 갱신이 실패해서는 안 된다.
 
 ## 꺼내기 모드 (`/womc eject <이름>`)
 인자가 `eject` 로 시작할 때만 이 절차를 수행한다. **womc 플러그인이 주는 정의를 이 프로젝트 안으로 복사해, 사용자가 마음대로 고쳐 쓰게 하는 것**이 목적이다.
 
 꺼낼 수 있는 이름:
 - 서브에이전트 — `explore` · `plan` · `implement` · `verify` → `.claude/agents/<이름>.md`
-- 스킬 — `plan-feature` · `make-rule` → `.claude/skills/<이름>/SKILL.md`
+- 스킬 — `plan-feature` · `make-rule` · `harness-audit` → `.claude/skills/<이름>/SKILL.md`
 - 말투 — `womc-caveman` → `.claude/output-styles/womc-caveman.md`
 
 절차:

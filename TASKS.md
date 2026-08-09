@@ -8,30 +8,32 @@
 (이 파일과 `PLAN.md` 는 기록용으로 남겨 두며 지우지 않는다. **git 에 올린다** — 다른 PC 에서 이어 작업할 때
 진행 상태와 「끝난 일」의 결정 이유를 그대로 볼 수 있어야 하기 때문이다. 커밋할 때 이 두 파일도 함께 넣는다.)
 
-- [~] **v2.0.0 실사용 검증 3건** — 파일 작업(0~5단계)은 전부 끝났고 버전도 `2.0.0` 으로 올라갔다.
+- [~] **v2.0.0·v2.1.0 실사용 검증 4건** — 파일 작업은 전부 끝났고 버전도 `2.1.0` 으로 올라갔다.
   남은 건 **이 저장소 안에서는 할 수 없는 검증**이다. 다른 폴더·새 세션에서 사람이 직접 돌려야 한다.
-  - ⚠ **2026-08-10 — 사용자 결정으로 이 검증을 미루고 v2.1.0 작업을 먼저 시작했다.** 권유는 했고 사용자가 그래도 진행하기로 했다.
-    검증이 안 끝난 채로 v2.1.0 이 진행되므로, **`docs/HARNESS-AUDIT.md` 첫 기록의 미확인 2건은 "실측 필요"로 남겨 둔다**(아래 참조).
-    v2.1.0 이 끝나면 이 항목으로 돌아온다.
+  - ⚠ **2026-08-10 — 사용자 결정으로 v2.0.0 검증을 미루고 v2.1.0 을 먼저 만들었고, v2.1.0 도 파일 작업이 끝났다.**
+    미확인 2건은 `docs/HARNESS-AUDIT.md` 5번 절에 "실측 필요"로 옮겨져 열려 있다. 확인되면 **그 파일도 함께 고친다.**
   - **먼저 할 것**: 커밋·push → `/plugin marketplace update works-on-my-claude` → `/plugin install womc@works-on-my-claude` → **Claude Code 재시작.**
     로컬 플러그인 캐시가 아직 v1.20.0 판이라, 이걸 안 하면 옛 골격을 깔면서 "검증 실패"로 보인다.
   - 손댈 파일: 없다(검증만). 문제가 나오면 `commands/womc.md` 나 `.claude/settings.json` 을 고친다.
-  - 끝난 것으로 보는 조건 3가지:
+  - 끝난 것으로 보는 조건 4가지(①은 이미 통과):
     - ② **빈 폴더에서 `/womc`** → 생성 파일이 정확히 6개
       (`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`.claude/settings.json`·`.claude/statusline.js`).
       `.claude/agents/`·`.claude/skills/`·`answer-style.js` 가 생기면 옛 캐시를 쓰고 있는 것이다.
     - ③ **v1.20.0 골격 폴더 사본에서 `/womc update`** → 레거시(`.claude/agents/`·`.claude/skills/`·`answer-style.js`)가 지워지고,
       `SPEC.md`·`PLAN.md`·`TASKS.md`·`.claude/rules/`·`settings.json` 에 사용자가 추가한 allow 는 전부 남아 있어야 한다.
     - ④ **새 세션에서 말투** — 메인 답변은 케이브맨, **서브에이전트 보고는 평문 한국어**.
-  - **여기서 미확인 2건이 함께 판명된다** (아래 「끝난 일」 v2.0.0 의 실측 1·3번):
-    플러그인 서브에이전트를 부를 때 `subagent_type` 이 `explore` 인지 `womc:explore` 인지 /
-    프로젝트 `settings.json` 의 `outputStyle` 이 **플러그인이 준** 스타일 이름을 해석하는지.
-    `outputStyle` 이 안 먹으면 폴백 둘: ① `output-styles/womc-caveman.md` 에 `force-for-plugin: true` 추가
-    (단 "항상 켜짐"이 되어 사용자 결정과 어긋나므로 **다시 물어야 한다**) ② `/config` 에서 직접 고르게 안내.
-  - 확인 방법: ①은 이미 통과 — `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.0.0`.
+    - ⑤ **`harness-audit` 스킬이 실제로 도는지** (v2.1.0 몫) — 골격을 깐 폴더에서 "하네스 점검해줘"라고 말했을 때
+      이 스킬이 잡히고, 현재 Claude Code 버전을 스스로 알아내 「뺄 수 있는 것 / 남길 것 / 실측 필요」를 근거 URL 과 함께 보고하며,
+      그 결과가 `docs/HARNESS-AUDIT.md` 맨 위에 새 기록으로 쌓이는지 육안 확인.
+      스킬 이름이 안 잡히면 `skills/harness-audit/SKILL.md` 의 frontmatter(`name`·`description` 2키)를 먼저 의심한다 —
+      `description` 값이 큰따옴표로 시작하면 YAML 파싱이 깨진다(만들 때 한 번 걸렸던 자리다).
+  - **위 ②~⑤ 를 돌리면 미확인 2건도 함께 판명된다.** 그 2건의 내용·폴백은 여기 적지 않는다 —
+    **진실은 `docs/HARNESS-AUDIT.md` 5번 절 한 곳에만 둔다**(두 곳에 적어 두면 한쪽만 고치고 다른 쪽이 "아직 열려 있음"으로 남는다).
+    판명되면 그 파일 5번 절을 「확인됨」으로 고치고 맨 위 인용문의 기준 버전도 올린다.
+  - 확인 방법: ①은 이미 통과 — `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.0`.
 
-> 아래는 v2.0.0 작업 중 기록이다. **검증 3건이 끝나면 이 절(「이번 작업의 근거」~「남은 일」)을 지우고
-> 「끝난 일」의 v2.0.0 항목만 남긴다.** 지금은 검증에서 문제가 났을 때 어디를 봐야 하는지 알려 주므로 남겨 둔다.
+> 아래는 v2.0.0 작업 중 기록이다. **검증 4건이 끝나면 이 절(「이번 작업의 근거」~「남은 일」)을 지우고
+> 「끝난 일」의 v2.0.0·v2.1.0 항목만 남긴다.** 지금은 검증에서 문제가 났을 때 어디를 봐야 하는지 알려 주므로 남겨 둔다.
 > 전체 계획 원본은 `C:\Users\s2\.claude\plans\glistening-squishing-nest.md`.
 
 ### 이번 작업의 근거 — 뒤집힌 전제 (가장 중요)
@@ -147,6 +149,36 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
 
 ## 끝난 일
 
+- [x] 하네스 감사 절차를 골격에 심음 (v2.1.0) — **파일 작업 완료, 실사용 검증 1건은 위 「지금 하는 일」에 남아 있다**
+  - 손댈 파일: `skills/harness-audit/SKILL.md`(신설) · `docs/HARNESS-AUDIT.md`(신설) ·
+    `HARNESS.md` · `commands/womc.md` · `README.md` · `SPEC.md` · `.claude-plugin/plugin.json` · `PLAN.md` · `TASKS.md`
+  - 남긴 것:
+    - **신설 `skills/harness-audit/SKILL.md` (세 번째 스킬)** — 7단계 절차: ① `claude --version` + `docs/HARNESS-AUDIT.md` 로 지난 감사 버전 확인
+      ② `explore` 병렬 위임으로 그 사이 변경 조사(결론마다 근거 URL 필수) ③ 골격 항목을 「뺄 수 있음 / 남길 것 / 실측 필요」 셋으로만 판정
+      ④ 사용자에게 쉬운 말로 보고(파일은 안 고친다) ⑤ 「실측 필요」를 `TASKS.md` 「할 일」로 넘김 ⑥ `docs/HARNESS-AUDIT.md` 에 기록 ⑦ 실제 정리는 `plan-feature` 로 인계.
+      **`.claude/skills/` 가 아니라 플러그인 루트 `skills/` 에 있다** — 이제 스킬은 플러그인이 직접 제공한다.
+    - **신설 `docs/HARNESS-AUDIT.md` (감사 기록부)** — 첫 기록이 v2.0.0 이다. 형식 고정:
+      제목줄 「어느 womc 버전 — 언제 / 어느 Claude Code 버전 기준」 + 절 5개(1.무엇을 확인했나 · 2.뒤집힌 전제 · 3.무엇을 뺐나 · 4.무엇을 왜 남겼나 · 5.실측 필요).
+      맨 위 인용문에 「마지막 감사 기준 버전」(지금 Claude Code `2.1.224`)과 「실측 필요 목록이 몇 번 절인지」를 적어 둔다. **최신 기록이 맨 위다.**
+      → **v2.0.0 의 미확인 2건(`subagent_type` 이름 · 플러그인 출력 스타일을 `outputStyle` 이 해석하는지)이 이 파일 5번 절에 "열려 있음"으로 옮겨졌다.**
+        확인되면 그 자리를 「확인됨」으로 고치고 인용문의 기준 버전도 올린다.
+    - **`commands/womc.md` 갱신 모드에 7번 단계 「하네스 감사 (자동)」 신설** — `/womc update` 가 끝나면 곧바로
+      `docs/HARNESS-AUDIT.md` 의 마지막 감사 버전과 `claude --version` 을 대조해, 벌어져 있으면 `harness-audit` 를 **그 자리에서 실행**한다.
+      사용자가 스킬을 따로 부르지 않아도 "플러그인 업데이트 → `/womc update` → 하네스 점검"이 한 흐름으로 이어진다.
+      **「뺄 수 있음」이 나와도 파일을 바로 지우지 않고 한 번 묻는다**(골격 삭제는 되돌리기 번거롭고 근거가 틀리면 세팅이 깨진다).
+      스킬이 없거나 실행이 안 되면 **조용히 건너뛰고 갱신 자체는 성공**으로 끝낸다 — 감사 때문에 갱신이 실패하면 안 된다.
+    - **`SessionStart` 훅(원래 계획의 C안)은 안 만들었다** — `/womc update` 가 감사를 자동으로 부르게 되어 알림 훅의 이득이 더 줄었다.
+      이유는 `PLAN.md` 「나중에 / 안 할 것」에 적어 뒀다.
+    - **`harness-audit` 2단계의 조사 위임이 도구와 안 맞던 것을 고쳤다** — 웹 조사(공식 문서·CHANGELOG)는 `general-purpose` 에 위임한다.
+      `explore` 는 `tools: Read, Grep, Glob` 뿐이라 웹을 못 본다(`agents/explore.md`). 로컬 파일 조사만 `explore` 몫이다.
+      로컬 경로도 womc 저장소 기준에서 **사용자 프로젝트 기준**으로 고쳤다 — 이 스킬은 남의 프로젝트에서 돌기 때문이다.
+    - 문서 6자리에 스킬 2종 → **3종** 반영: `HARNESS.md`(플러그인이 주는 것 절) · `commands/womc.md`(같은 절의 임베드 사본, **글자 그대로 같아야 한다**) ·
+      `commands/womc.md` 꺼내기 모드 목록 · `README.md` 2곳 · `SPEC.md` 3항 4번.
+    - `scripts/check-sync.py` 는 **안 고쳤다** — 스킬은 `commands/womc.md` 에 임베드되지 않아(플러그인이 직접 제공) 대조 대상이 아니다. 다음에도 스킬을 늘릴 때 이 스크립트는 안 건드려도 된다.
+    - 버전은 `py scripts/bump-version.py 2.1.0` 한 줄로 6곳을 올렸다(수동으로 세지 말 것).
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.0`.
+    스킬이 실제로 도는지는 사람이 새 세션에서 확인한다(위 「지금 하는 일」의 ⑤).
+
 > 최근 작업만 여기 남긴다. **v1.18.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
 
@@ -235,31 +267,7 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
 
 ## 할 일
 
-- [ ] **v2.1.0 — 하네스 감사 절차를 골격에 심는다** (v2.0.0 을 끝낸 뒤에 시작한다)
-  - 왜: 지금 womc 에는 **"Claude Code 가 업데이트되면 골격이 따라 얇아지는 절차"가 없다.**
-    v2.0.0 작업(Claude Code 2.1.224 에 맞춘 간소화)은 사용자가 그때그때 말해야만 시작되는 일회성 수정이었다.
-    `/womc update` 도 "womc 최신판"을 가져올 뿐, Claude Code 최신 기능을 보고 골격을 줄여 주지는 않는다.
-    이 항목은 그 빠진 고리를 절차로 굳히는 것이다. **v2.0.0 자체가 이 절차의 첫 실전 사례이므로, 그것을 끝낸 뒤에 만들어야 절차가 정확해진다.**
-  - 손댈 파일: 신설 `skills/harness-audit/SKILL.md` · 신설 `docs/HARNESS-AUDIT.md`(감사 기록) ·
-    `commands/womc.md`(골격 안내에 새 스킬 한 줄) · `README.md` · `HARNESS.md` · `SPEC.md` 3항(스킬 2종 → 3종) ·
-    `scripts/check-sync.py`(새 임베드가 생기면 대조 대상 추가) · `.claude-plugin/plugin.json`
-  - 이어 쓸 것 (v2.0.0 이 남기는 것):
-    - 플러그인 루트 `skills/` 구조 — 새 스킬도 여기에 만든다(`.claude/skills/` 아니다).
-    - v2.0.0 의 0단계 실측 결과 5건과 「계획에서 바뀐 점 2가지」 — **첫 감사 기록의 내용 그 자체**로 `docs/HARNESS-AUDIT.md` 에 옮겨 적는다.
-    - `commands/womc.md` 가 임베드하는 파일이 4개로 줄어든 상태(스킬은 플러그인이 직접 제공하므로 임베드 대상이 아니다).
-  - 만들 것 3가지:
-    - **A. `harness-audit` 스킬** — ① `claude --version` 으로 현재 버전 확인 ② `docs/HARNESS-AUDIT.md` 에서 지난 감사 버전 읽기
-      ③ 그 사이 CHANGELOG·공식 문서(`code.claude.com/docs/en/*`) 조사(`explore` 병렬 위임)
-      ④ 골격 항목을 하나씩 대조해 "이제 Claude Code 기본으로 되는가" 판정 ⑤ 뺄 수 있는 것·반드시 남길 것을 **근거 URL과 함께** 보고
-      ⑥ 문서에 명시 없는 것은 "실측 필요"로 따로 묶어 `TASKS.md` 에 남긴다(v2.0.0 의 0단계 스파이크가 그 견본).
-    - **B. `docs/HARNESS-AUDIT.md`** — 「언제 · 어느 CC 버전 기준 · 무엇을 확인 · 무엇을 뺐나 · 무엇을 왜 남겼나」.
-      다음 감사가 이걸 읽고 이어가 같은 조사를 반복하지 않게 한다. **뒤집힌 전제도 여기 적는다**
-      (예: v1.19.0 의 "서브에이전트는 CLAUDE.md 를 안 물려받는다"가 2.1.224 에서 거짓이 된 일).
-    - **C. `SessionStart` 훅 (선택)** — 현재 CC 버전과 마지막 감사 버전이 많이 벌어졌으면 "감사할 때 됨" 한 줄 띄움.
-      Node.js 필요 → 없으면 조용히 넘어가야 한다. **A·B 를 먼저 만들고, C 는 필요하다고 판단될 때만 붙인다.**
-  - 끝난 것으로 보는 조건: 빈 폴더에 `/womc` 를 깐 뒤 `harness-audit` 를 불렀을 때,
-    현재 CC 버전을 스스로 알아내고 "뺄 수 있는 것 / 남길 것"을 근거 URL과 함께 보고하며, 그 결과가 `docs/HARNESS-AUDIT.md` 에 기록된다.
-  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 전 항목 OK + 실제로 스킬을 한 번 돌려 보고서가 나오는지 육안 확인.
+(비어 있음 — 위 「지금 하는 일」의 실사용 검증 4건이 끝나야 다음 기능을 잡는다.)
 
 <!-- 끝난 항목은 이렇게 적는다:
 - [x] 항목 이름
