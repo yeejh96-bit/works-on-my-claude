@@ -5,7 +5,7 @@
 > 표기: `[ ]` 안 함 · `[~]` 하는 중 · `[x]` 끝남
 
 ## 지금 하는 일
-**v2.0.0 — Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화. 0·1단계 끝, 2~5단계 남음.**
+**v2.0.0 — Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화. 0·1·2·3단계 끝, 4단계 일부(HARNESS.md) 끝. 남은 것은 4단계(README·SPEC)와 5단계.**
 전체 계획은 `C:\Users\s2\.claude\plans\glistening-squishing-nest.md` 에 있다. **내일 이어서 할 때 그 파일부터 읽는다.**
 (이 파일과 `PLAN.md` 는 기록용으로 남겨 두며 지우지 않는다. **git 에 올린다** — 다른 PC 에서 이어 작업할 때
 진행 상태와 「끝난 일」의 결정 이유를 그대로 볼 수 있어야 하기 때문이다. 커밋할 때 이 두 파일도 함께 넣는다.)
@@ -68,34 +68,37 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
 
 **신설 `scripts/bump-version.py` 는 아직 안 만들었다** — 5단계에서 버전을 올릴 때 만들면 된다(표식 6곳 일괄 변경).
 
-### 내일 할 일 (2·4·5단계) — 이 순서대로
+### 2단계에서 남긴 것 (4·5단계가 이어 쓴다)
+**`commands/womc.md` 800줄 → 495줄.** 다음이 실제로 바뀐 자리다.
+
+- **임베드 3구획 삭제 완료** — 에이전트 5종·스킬 2종·`answer-style.js`. 남은 임베드는 6개
+  (`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`settings.json`·`statusline.js`).
+  절 번호가 당겨졌다: **5) `.claude/settings.json` · 6) `.claude/statusline.js`** (예전 6·7번). 8번 절은 사라졌다.
+- `allowed-tools` 에서 `WebFetch` 제거. `argument-hint` 는 `[update | eject <이름>]`, `description` 도 eject 를 언급하도록 고쳤다.
+- 맨 위 버전 주석 → "버전을 올리면 `py scripts/check-sync.py` 를 돌려라"(개수를 세지 않는다).
+- **사실 정정 완료** — "서브에이전트는 CLAUDE.md 를 못 물려받는다"는 문장이 저장소에서 사라졌다.
+  HARNESS 임베드에는 반대로 "**서브에이전트도 이 파일을 함께 물려받는다**"가 들어갔다.
+- 마무리 안내에 2줄 추가 — `.claude/` 는 보호 경로라 매번 권한을 묻는다 / 말투는 Claude Code 재시작 후 적용.
+- **갱신 모드 단계 번호가 바뀌었다** — 새 **2번이 「레거시 정리」**(옛 `.claude/agents/`·`.claude/skills/`·`answer-style.js` 삭제,
+  판정은 1번의 「덮기 전 공통 확인」 재사용), 예전 2번(settings 병합)은 **3번**이 됐고 그 안에서 `outputStyle` 추가와 `hooks` 제거를 다룬다.
+  이후 3·4·5 → **4·5·6**. 0·0-b 와 다운그레이드 방지는 그대로 두었다.
+- **신설 「꺼내기 모드 (`/womc eject <이름>`)」** — 파일 맨 끝. 서브에이전트 4종·스킬 2종·`womc-caveman` 을 프로젝트로 복사한다.
+  스킬 비대칭(플러그인 스킬은 `womc:` 네임스페이스라 복사해도 둘 다 살아남음)을 안내에 적어 두었다.
+- **`HARNESS.md` 는 4단계 몫이지만 여기서 같이 끝냈다** — womc.md 임베드와 라이브가 글자 그대로 같아야 해서(`check-sync.py` DRIFT) 따로 할 수 없었다.
+  54줄 → **64줄**(줄어드는 대신 늘었다: 「먼저 — 이 골격은 womc 플러그인이 있어야 온전히 동작한다」 설치 2줄과
+  「플러그인이 주는 것」 절이 새로 들어갔다). `/fewer-permission-prompts`·`/config` 안내 한 줄씩도 들어갔다.
+  **HARNESS.md 를 다시 고칠 일이 생기면 `commands/womc.md` 임베드와 같이 고쳐야 한다.**
+- 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK (버전은 아직 `1.20.0`).
+
+### 남은 일 (4단계 나머지·5단계) — 이 순서대로
 **커밋은 막혀 있지 않다. 검사기는 통과 상태다.** 버전은 아직 `1.20.0` 이다.
 
-- **2단계 — `commands/womc.md` 임베드 삭제 (810줄 → ~440줄)**
-  - 지울 임베드 3구획: 에이전트 5종 · 스킬 2종 · `answer-style.js`. 이제 플러그인이 직접 제공하므로 임베드가 필요 없다.
-    (구획 앞뒤의 「5) `.claude/` 서문」·8번 절 제목 같은 안내문도 같이 정리한다.)
-  - 남길 임베드 6개: `CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`settings.json`·`statusline.js`.
-    (플러그인은 프로젝트 `CLAUDE.md` 와 `.claude/rules/` 를 줄 수 없다 — 그래서 이 6개는 계속 생성해야 한다.)
-  - `allowed-tools` 에서 `WebFetch` 제거(같은 파일이 그 사용을 금지하고 있어 죽은 권한이다).
-  - **사실 정정 2곳** — "서브에이전트는 CLAUDE.md 를 못 물려받는다" → 물려받는다. `commands/womc.md` 의 5번 서문과 HARNESS 임베드 안.
-  - 맨 위 버전 주석의 "4곳" 안내 → 개수를 세지 말고 "버전을 올리면 `py scripts/check-sync.py` 를 돌려라"로 바꾼다.
-  - 마무리 안내에 2줄 추가: ① `.claude/` 는 Protected path 라 `/womc` 가 쓸 때 매번 권한을 묻는다(허용 누르면 된다)
-    ② 말투는 Claude Code 를 껐다 켜야 켜진다.
-  - 갱신 모드 재작성 — 레거시 정리(옛 프로젝트의 `.claude/agents/`·`.claude/skills/`·`answer-style.js` 삭제).
-    **판정은 기존 「덮기 전 공통 확인」 로직을 그대로 재사용한다**: womc 원본이면 지우고 보고, 사용자가 고친 것이면 그대로 둔다.
-    `answer-style.js` 를 지울 때 `settings.json` 의 `hooks` 항목도 함께 뺀다. `outputStyle` 키는 추가한다.
-    **0·0-b(옛 캐시 우회)와 다운그레이드 방지는 손대지 않는다.**
-  - `eject <이름>` 인자 추가 — 플러그인 정의를 프로젝트로 복사. 에이전트는 프로젝트 파일이 플러그인 것을 이기므로 그대로 커스터마이즈가 된다.
-    **스킬은 비대칭이다** — 플러그인 스킬은 항상 `womc:` 네임스페이스라 복사해도 override 가 아니라 둘 다 살아남는다. 이 점을 안내에 적는다.
-  - 확인: `py scripts/check-sync.py` 전 항목 OK.
-
-- **4단계 — 문서 (세 파일 서로 병렬 가능)**
-  - `HARNESS.md`(54→~35): 사실 정정, "이 골격은 womc 플러그인이 필요하다 + 설치 두 줄" 추가,
-    "권한 질문이 잦으면 `/fewer-permission-prompts`" 한 줄, "말투가 이상하면 `/config` 확인" 한 줄.
+- **4단계 — 문서 (두 파일 서로 병렬 가능. `HARNESS.md` 는 위에서 이미 끝냈다)**
   - `README.md`(132→~100): **「수동 설치」 절 삭제**(이제 `commands/womc.md` 만 복사하면 반쪽 골격이라 잘못된 안내다),
     구조도·에이전트 4종 갱신, 중복 설명 압축.
   - `SPEC.md` 2·3·4항 정정: 에이전트 5종→4종, 미니 하네스 근거 정정, 말투 관리 방식 변경, 스킬 2종은 유지.
-  - 확인: 세 문서에서 `answer-style`·`review` 언급 0건.
+    `/womc eject` 도 3항 1번에 한 줄 넣는다(2단계에서 새로 생긴 기능이라 SPEC 에 없다).
+  - 확인: 두 문서에서 `answer-style`·`review` 언급 0건.
 
 - **5단계 — 버전 2.0.0 + 실사용 검증**
   - `scripts/bump-version.py` 를 만들어 표식 6곳(`commands/womc.md`×3·`CLAUDE.md`·`plugin.json`·`README.md` 제목)을 한 번에 올린다.
