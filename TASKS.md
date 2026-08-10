@@ -8,150 +8,18 @@
 (이 파일과 `PLAN.md` 는 기록용으로 남겨 두며 지우지 않는다. **git 에 올린다** — 다른 PC 에서 이어 작업할 때
 진행 상태와 「끝난 일」의 결정 이유를 그대로 볼 수 있어야 하기 때문이다. 커밋할 때 이 두 파일도 함께 넣는다.)
 
-- [~] **v2.0.0·v2.1.0 실사용 검증 4건** — 파일 작업은 전부 끝났고 버전도 `2.1.0` 으로 올라갔다.
-  남은 건 **이 저장소 안에서는 할 수 없는 검증**이다. 다른 폴더·새 세션에서 사람이 직접 돌려야 한다.
-  - ⚠ **2026-08-10 — 사용자 결정으로 v2.0.0 검증을 미루고 v2.1.0 을 먼저 만들었고, v2.1.0 도 파일 작업이 끝났다.**
-  - ✅ **2026-08-10 (같은 날, `/womc update` 의 자동 하네스 감사) — 미확인 2건이 둘 다 닫혔다.**
-    `docs/HARNESS-AUDIT.md` v2.0.0 기록 5번 절이 「확인됨」으로 고쳐졌고, 새 v2.1.0 감사 기록이 맨 위에 쌓였다.
-    **그중 ②는 실제 버그로 판명됐다** — 아래 「할 일」의 첫 항목이 그것이다. 통과 조건 ④(말투)는 그 버그를 고치기 전에는 반드시 실패한다.
-  - **먼저 할 것**: 커밋·push → `/plugin marketplace update works-on-my-claude` → `/plugin install womc@works-on-my-claude` → **Claude Code 재시작.**
-    로컬 플러그인 캐시가 아직 v1.20.0 판이라, 이걸 안 하면 옛 골격을 깔면서 "검증 실패"로 보인다.
-  - 손댈 파일: 없다(검증만). 문제가 나오면 `commands/womc.md` 나 `.claude/settings.json` 을 고친다.
-  - 끝난 것으로 보는 조건 4가지(①은 이미 통과):
-    - ② **빈 폴더에서 `/womc`** → 생성 파일이 정확히 6개
-      (`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`.claude/settings.json`·`.claude/statusline.js`).
-      `.claude/agents/`·`.claude/skills/`·`answer-style.js` 가 생기면 옛 캐시를 쓰고 있는 것이다.
-    - ③ **v1.20.0 골격 폴더 사본에서 `/womc update`** → 레거시(`.claude/agents/`·`.claude/skills/`·`answer-style.js`)가 지워지고,
-      `SPEC.md`·`PLAN.md`·`TASKS.md`·`.claude/rules/`·`settings.json` 에 사용자가 추가한 allow 는 전부 남아 있어야 한다.
-    - ④ **새 세션에서 말투** — 메인 답변은 케이브맨, **서브에이전트 보고는 평문 한국어**.
-    - ⑤ **`harness-audit` 스킬이 실제로 도는지** (v2.1.0 몫) — 골격을 깐 폴더에서 "하네스 점검해줘"라고 말했을 때
-      이 스킬이 잡히고, 현재 Claude Code 버전을 스스로 알아내 「뺄 수 있는 것 / 남길 것 / 실측 필요」를 근거 URL 과 함께 보고하며,
-      그 결과가 `docs/HARNESS-AUDIT.md` 맨 위에 새 기록으로 쌓이는지 육안 확인.
-      스킬 이름이 안 잡히면 `skills/harness-audit/SKILL.md` 의 frontmatter(`name`·`description` 2키)를 먼저 의심한다 —
-      `description` 값이 큰따옴표로 시작하면 YAML 파싱이 깨진다(만들 때 한 번 걸렸던 자리다).
-  - ~~**위 ②~⑤ 를 돌리면 미확인 2건도 함께 판명된다.**~~ → **2026-08-10 감사에서 먼저 판명됐다.**
-    **진실은 여전히 `docs/HARNESS-AUDIT.md` 한 곳에만 둔다** — 새 「실측 필요」 4건은 그 파일 v2.1.0 기록 5번 절에 있고,
-    아래 「할 일」에는 **무엇을 어떻게 확인하는지만** 적는다(내용을 두 곳에 베끼지 않는다).
-  - 확인 방법: ①은 이미 통과 — `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.0`.
-
-> 아래는 v2.0.0 작업 중 기록이다. **검증 4건이 끝나면 이 절(「이번 작업의 근거」~「남은 일」)을 지우고
-> 「끝난 일」의 v2.0.0·v2.1.0 항목만 남긴다.** 지금은 검증에서 문제가 났을 때 어디를 봐야 하는지 알려 주므로 남겨 둔다.
-> 전체 계획 원본은 `C:\Users\s2\.claude\plans\glistening-squishing-nest.md`.
-
-### 이번 작업의 근거 — 뒤집힌 전제 (가장 중요)
-v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물려받는 게 맞음"으로 확인해 기록했었다(아래 v1.19.0 항목).
-**Claude Code 2.1.224 에서 이 명제는 거짓이다.** 공식 문서 원문:
-> "Explore and Plan are the only subagents that omit CLAUDE.md and git status. Every other built-in and custom subagent loads both."
-
-이 저장소에서 **실측으로 확인했다** — `explore` 서브에이전트를 띄워 물어보니 CLAUDE.md·SPEC.md(@import)·git status 를 전부 받고 있었다.
-이 한 문장이 에이전트 보일러플레이트 ~100줄과 케이브맨 말투 5판본을 지탱하고 있었다.
-
-### 0단계 실측 결과 (5건 — 다시 조사하지 말 것)
-1. 플러그인 루트 `agents/` — 공식 플러그인 8개가 이미 사용 중(`~/.claude/plugins/marketplaces/claude-plugins-official/plugins/*/agents/`). 지원 확실.
-   **`subagent_type` 값이 `explore` 인지 `womc:explore` 인지는 아직 미확인** — `/reload-plugins` 후 실사용에서 확인할 것.
-2. 프로젝트 `.claude/agents/` 가 플러그인 것을 override — 문서 명시. 실측은 5단계로 미룸.
-3. **플러그인이 제공한 output style 이름을 프로젝트 `settings.json` 의 `outputStyle` 이 해석하는지 — 미확인.**
-   로컬에 `output-styles/` 를 쓰는 플러그인 사례가 0건이라 참고할 것이 없었다.
-   → 안 되면 폴백 2가지: ① `output-styles/womc-caveman.md` 에 `force-for-plugin: true` 추가(단 "항상 켜짐"이라 사용자 결정과 어긋남 → 다시 물어야 함)
-   ② 사용자가 `/config` 에서 직접 고르게 안내.
-4. **커스텀 서브에이전트의 CLAUDE.md 상속 — 확정(실측).** 위 참조.
-5. **소문자 `plan` 은 내장 `Plan` 을 오버라이드하지 않는다 — 확정.** 이 세션의 에이전트 목록에 소문자 `explore`/`plan` 과
-   내장 `Explore`/`Plan` 이 **동시에** 떠 있었다(대소문자 구분).
-   → **계획에 있던 `plan` → `design` 개명은 취소했다.** 이름 충돌이 없어 이득이 사라졌고, 고칠 곳 12군데를 아꼈다.
-
-### 계획에서 바뀐 점 2가지 (계획 파일보다 이 기록이 최신이다)
-- **`plan` → `design` 개명 취소** (위 5번).
-- **`statusLine` 의 `refreshInterval` 추가 취소.** 공식 문서 확인 결과 단위가 **밀리초가 아니라 초**이고 최소값이 `1` 이다
-  (계획서의 `3000` 은 50분이 된다). 몇 초마다 node 프로세스를 새로 띄우는 비용이 Windows 에서 이득보다 커서 아예 넣지 않기로 했다.
-  womc 상태줄은 이벤트 기반 갱신으로 충분하다.
-
-### 1단계에서 남긴 것 (2단계가 그대로 이어 쓴다)
-**신설 — 플러그인 루트 (이제 `/womc` 가 생성하지 않고 플러그인이 직접 제공한다):**
-- `agents/explore.md`(25→17줄) · `agents/plan.md`(28→21, `effort: high` 추가) · `agents/implement.md`(27→22) · `agents/verify.md`(26→20)
-  - 4종 모두 언어·말투·"확인 못 함"·원문금지 줄을 지우고 **`CLAUDE.md` 「서브에이전트 보고 규약」을 따른다`** 한 줄로 대체했다.
-  - 「너는 메인의 대화 이력을 못 본다」는 **남겼다** — 이건 상속되지 않는 사실이다.
-- `skills/plan-feature/SKILL.md` — §6 을 `review` 위임 → **사용자에게 `/code-review` 권유**로 재작성. §5(verify)는 그대로.
-- `skills/make-rule/SKILL.md` — §0 의 문체 분기를 `CLAUDE.md`+`answer-style.js` 2곳 → **출력 스타일 파일 1곳**으로.
-  §2 끝에 "`paths` 스코프 규칙은 서브에이전트 전달이 보장되지 않는다" 한 줄 추가.
-- `output-styles/womc-caveman.md` — 케이브맨 말투 **정본**. `keep-coding-instructions: true` **필수**(기본값 false 면 Claude Code 내장 코딩 지침이 통째로 빠진다).
-
-**삭제:** `.claude/agents/`(5개, `review.md` 포함) · `.claude/skills/`(2개) · `.claude/answer-style.js`
-→ `.claude/` 에 남은 것은 `settings.json` · `statusline.js` 둘뿐이다.
-
-**수정:**
-- `CLAUDE.md` — 「설명 방식」 15줄→2줄, 「서브에이전트 보고 규약」 6줄 신설, 「적극 위임」 재작성(위임 판단 기준 3가지 명시·5종→4종),
-  「절차 지키기」에 "스킬 목록이 안 보여도 `plan-feature` 로 부른다" 보강.
-- `.claude/settings.json` — `hooks` 블록 삭제, `"outputStyle": "womc-caveman"` 추가. **`deny` 7줄과 `allow` 4줄은 그대로 두었다.**
-
-### 3단계도 끝냈다 (커밋 `7433ad6`)
-1단계를 끝내니 `check-sync.py` 가 지운 파일을 찾다 죽어 커밋이 막혔다. 그래서 3단계를 앞당겨 같이 처리했다.
-- `EMBEDDED_FILES` 12개 → **4개**(`CLAUDE.md`·`HARNESS.md`·`.claude/settings.json`·`.claude/statusline.js`).
-- 버전 표식 검사를 `re.search` → **`re.findall` 전수 검사**로 바꾸고 대상 파일을 `VERSION_MARKER_FILES`
-  (`commands/womc.md`·`CLAUDE.md`)로 뺐다. 예전에는 첫 표식 하나만 봐서 뒤쪽이 옛 버전이어도 통과하는 구멍이 있었다.
-  지금 `commands/womc.md` 에 표식이 3개 있고 전부 검사된다.
-- README 검사 5종 → 4종.
-- **`commands/womc.md` 의 `CLAUDE.md`·`.claude/settings.json` 임베드 사본도 라이브와 똑같이 맞췄다**(안 그러면 DRIFT).
-  → `commands/womc.md` 의 「설명 방식」·「서브에이전트 보고 규약」·「적극 위임」·「절차 지키기」·6번 settings 블록은 **이미 최신이다. 다시 안 고쳐도 된다.**
-- 확인: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK.
-
-**신설 `scripts/bump-version.py` 는 아직 안 만들었다** — 5단계에서 버전을 올릴 때 만들면 된다(표식 6곳 일괄 변경).
-
-### 2단계에서 남긴 것 (4·5단계가 이어 쓴다)
-**`commands/womc.md` 800줄 → 495줄.** 다음이 실제로 바뀐 자리다.
-
-- **임베드 3구획 삭제 완료** — 에이전트 5종·스킬 2종·`answer-style.js`. 남은 임베드는 6개
-  (`CLAUDE.md`·`SPEC.md`·`HARNESS.md`·`.gitignore`·`settings.json`·`statusline.js`).
-  절 번호가 당겨졌다: **5) `.claude/settings.json` · 6) `.claude/statusline.js`** (예전 6·7번). 8번 절은 사라졌다.
-- `allowed-tools` 에서 `WebFetch` 제거. `argument-hint` 는 `[update | eject <이름>]`, `description` 도 eject 를 언급하도록 고쳤다.
-- 맨 위 버전 주석 → "버전을 올리면 `py scripts/check-sync.py` 를 돌려라"(개수를 세지 않는다).
-- **사실 정정 완료** — "서브에이전트는 CLAUDE.md 를 못 물려받는다"는 문장이 저장소에서 사라졌다.
-  HARNESS 임베드에는 반대로 "**서브에이전트도 이 파일을 함께 물려받는다**"가 들어갔다.
-- 마무리 안내에 2줄 추가 — `.claude/` 는 보호 경로라 매번 권한을 묻는다 / 말투는 Claude Code 재시작 후 적용.
-- **갱신 모드 단계 번호가 바뀌었다** — 새 **2번이 「레거시 정리」**(옛 `.claude/agents/`·`.claude/skills/`·`answer-style.js` 삭제,
-  판정은 1번의 「덮기 전 공통 확인」 재사용), 예전 2번(settings 병합)은 **3번**이 됐고 그 안에서 `outputStyle` 추가와 `hooks` 제거를 다룬다.
-  이후 3·4·5 → **4·5·6**. 0·0-b 와 다운그레이드 방지는 그대로 두었다.
-- **신설 「꺼내기 모드 (`/womc eject <이름>`)」** — 파일 맨 끝. 서브에이전트 4종·스킬 2종·`womc-caveman` 을 프로젝트로 복사한다.
-  스킬 비대칭(플러그인 스킬은 `womc:` 네임스페이스라 복사해도 둘 다 살아남음)을 안내에 적어 두었다.
-- **`HARNESS.md` 는 4단계 몫이지만 여기서 같이 끝냈다** — womc.md 임베드와 라이브가 글자 그대로 같아야 해서(`check-sync.py` DRIFT) 따로 할 수 없었다.
-  54줄 → **64줄**(줄어드는 대신 늘었다: 「먼저 — 이 골격은 womc 플러그인이 있어야 온전히 동작한다」 설치 2줄과
-  「플러그인이 주는 것」 절이 새로 들어갔다). `/fewer-permission-prompts`·`/config` 안내 한 줄씩도 들어갔다.
-  **HARNESS.md 를 다시 고칠 일이 생기면 `commands/womc.md` 임베드와 같이 고쳐야 한다.**
-- 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK (버전은 아직 `1.20.0`).
-
-### 4단계에서 남긴 것 (5단계가 이어 쓴다)
-**문서 3종이 모두 새 구조에 맞춰졌다. 남은 것은 5단계뿐이다.**
-
-- **`README.md` 132줄 → 87줄.**
-  - 「수동 설치」 절 **삭제**(`commands/womc.md` 만 복사하면 반쪽 골격이라 잘못된 안내였다).
-  - 구조도에서 `.claude/agents/`·`.claude/skills/`·`answer-style.js` 를 뺐다 — 생성물은 6개뿐이다.
-  - **「플러그인이 주는 것」 절 신설** — 에이전트 4종·스킬 2종·`womc-caveman`·`/womc eject <이름>`.
-  - 표·토큰 절약 절의 "5종"·`review` 언급을 전부 4종으로. 말투 설명을 CLAUDE.md 「설명 방식」 → **출력 스타일**로 정정.
-  - 갱신 안내를 3단계 나열에서 "`/womc update` 한 줄 + 안 될 때만 수동" 으로 압축.
-  - **제목 버전은 아직 `1.20.0` 이다** — 5단계 `bump-version.py` 가 올릴 자리다.
-- **`SPEC.md` 2·3·4·5항 정정** (1항에도 플러그인 루트 `agents/`·`skills/`·`output-styles/` 한 줄 추가).
-  - 3항 1번에 `/womc eject` 한 줄, 2번의 `answer-style.js` → `outputStyle`+출력 스타일 파일,
-    3번은 **4종 + "서브에이전트도 CLAUDE.md 를 물려받는다"** 로 사실 정정, 4번은 검토를 `/code-review` 권유로.
-  - 5항 산출물 목록에 `agents/`·`skills/`·`output-styles/` 추가.
-  - **SPEC.md 는 CLAUDE.md 에 `@import` 되므로 매 세션 로드된다** — 늘리지 말 것(32줄 유지).
-- 확인: 두 문서에서 `answer-style` 0건, `review` 는 `/code-review` 2건만 남음.
-  `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK.
-
-### 5단계에서 남긴 것 (검증만 남았다)
-- **신설 `scripts/bump-version.py`** — `py scripts/bump-version.py <새버전>` 한 줄로 표식 6곳을 한꺼번에 올린다
-  (`plugin.json` version · `README.md` 제목 · `womc:skeleton-version` 표식 4개 = `commands/womc.md`×3 + `CLAUDE.md`).
-  - `--dry-run` 을 주면 어디를 몇 곳 고칠지 보여주기만 한다. **버전을 내리는 건 막아 뒀다**(손으로 해야 한다).
-  - 표식 파일 목록 `VERSION_MARKER_FILES` 는 `check-sync.py` 와 **같은 값이어야 한다** — 한쪽에 파일을 추가하면 다른 쪽도 추가한다.
-  - 줄바꿈을 보존해 읽고 쓴다(`newline=""`). 이 저장소는 LF 인데 **`plugin.json` 만 CRLF** 라, 안 그러면 그 파일 전체가 diff 로 뜬다.
-- **`marketplace.json` 은 안 고쳤다** — 계획에 적혀 있던 "설명문의 5종"이 실제로는 없었다.
-  `plugin.json`·`marketplace.json` 의 description 은 "서브에이전트 오케스트레이션"이라고만 적혀 있어 숫자가 안 박혀 있다. 고칠 것이 없다.
-- 구조 확인(육안): 플러그인이 주는 파일 7개가 다 있다 —
-  `agents/{explore,plan,implement,verify}.md` · `skills/{plan-feature,make-rule}/SKILL.md` · `output-styles/womc-caveman.md`.
-  `commands/womc.md` 의 생성 절도 1)~6) 여섯 개뿐이라 통과 조건 ②의 6개와 맞는다.
-- 확인: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.0.0`.
+- 지금 진행 중인 항목 없다. 다음에 할 일은 아래 「할 일」에서 집는다.
+- ✅ **2026-08-10 — v2.0.0·v2.1.0·v2.1.1 의 실사용 검증 5건이 전부 통과했다.** 결과는 아래 「끝난 일」의 각 항목에 적어 두었다.
+  검증에 쓴 시험 폴더(`womc-old-test`, v1.20.0 커밋 `481bd76` 의 골격 사본)는 그 안에서 나온 감사 기록을
+  `docs/HARNESS-AUDIT.md` v2.1.1 기록으로 옮긴 뒤 지웠다.
+  v2.0.0 작업 중의 단계별 기록(「이번 작업의 근거」~「5단계에서 남긴 것」)은 검증이 끝나 역할이 사라졌으므로 이 자리에서 지웠다 —
+  결정 이유는 「끝난 일」의 v2.0.0 항목과 `docs/HARNESS-AUDIT.md` 에 남아 있다.
 
 ## 끝난 일
 
-- [x] 말투가 한 번도 안 켜지던 버그 수정 — A안 (v2.1.1) — **파일 작업 완료, 육안 검증 1건 남음**
+- [x] 말투가 한 번도 안 켜지던 버그 수정 — A안 (v2.1.1) — **검증까지 완료 (2026-08-10)**
+  - ✅ **육안 검증 통과** — 재시작 뒤 메인 답변이 실제로 원시인 말투로 나왔다. `womc:explore` 서브에이전트 보고는 평문 한국어였다.
+    시험 폴더에 `/womc update` 를 돌렸을 때도 `outputStyle` 이 `"womc:womc-caveman"` 으로 들어갔다(갱신 모드 3번의 자동 교정이 동작).
   - 손댈 파일: `.claude/settings.json` · `commands/womc.md`(3자리) · `HARNESS.md` · `README.md` · `PLAN.md` · `TASKS.md` · `.claude-plugin/plugin.json`
   - **버그의 정체**: 플러그인이 제공하는 출력 스타일은 레지스트리에 **`플러그인이름:스타일이름`**(`womc:womc-caveman`)으로 등록되고,
     조회는 **키 정확일치**다(정규화가 콜론을 제거하지 않는다). 그런데 골격이 넣던 값은 `"womc-caveman"` 이라 **아무것도 못 찾고 조용히 무시**됐다.
@@ -173,7 +41,11 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
     **말투가 실제로 켜지는지는 스크립트로 못 잡는다** — 커밋·push → 플러그인 재설치 → **Claude Code 재시작** 후
     메인 답변이 원시인 말투인지 육안 확인해야 한다(위 「지금 하는 일」의 통과 조건 ④).
 
-- [x] 하네스 감사 절차를 골격에 심음 (v2.1.0) — **파일 작업 완료, 실사용 검증 1건은 위 「지금 하는 일」에 남아 있다**
+- [x] 하네스 감사 절차를 골격에 심음 (v2.1.0) — **검증까지 완료 (2026-08-10)**
+  - ✅ **검증 통과** — 시험 폴더에서 `/womc update` 를 돌리자 7번 단계가 **사람이 부르지 않았는데** 감사를 실행했고,
+    그 폴더에 `docs/HARNESS-AUDIT.md` 가 규정 형식(제목줄 + 5개 절, 근거 URL 포함)으로 새로 생겼다.
+    **배운 것**: 감사는 자기 폴더의 기록만 본다 — 지난 기록이 없는 폴더에서 돌리면 이미 끝난 일을 다시 「뺄 수 있음」으로 올린다.
+    결과를 옮겨 올 때 지난 기록과 대조해야 한다(`docs/HARNESS-AUDIT.md` v2.1.1 기록 3번에서 그렇게 2건을 기각했다).
   - 손댈 파일: `skills/harness-audit/SKILL.md`(신설) · `docs/HARNESS-AUDIT.md`(신설) ·
     `HARNESS.md` · `commands/womc.md` · `README.md` · `SPEC.md` · `.claude-plugin/plugin.json` · `PLAN.md` · `TASKS.md`
   - 남긴 것:
@@ -206,7 +78,10 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
 > 최근 작업만 여기 남긴다. **v1.18.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
 
-- [x] Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화 (v2.0.0) — **파일 작업 완료, 실사용 검증 3건은 위 「지금 하는 일」에 남아 있다**
+- [x] Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화 (v2.0.0) — **검증까지 완료 (2026-08-10)**
+  - ✅ **검증 3건 통과** — ① 빈 폴더에서 `/womc` → 생성 파일 정확히 6개(레거시 0개).
+    ② v1.20.0 골격 사본에서 `/womc update` → 레거시 8개 삭제, 사용자 파일(`SPEC.md`·`PLAN.md`·`TASKS.md`·`.claude/rules/`·추가 allow) 전부 보존,
+    **본문만 고친 `.claude/agents/verify.md` 는 「사용자가 고친 것」으로 판정해 남겼다**(판정 기준을 넓힐 필요 없음). ③ 말투는 위 v2.1.1 항목 참조.
   - 손댈 파일: `agents/`(신설 4) · `skills/`(신설 2) · `output-styles/womc-caveman.md`(신설) · `commands/womc.md` ·
     `CLAUDE.md` · `HARNESS.md` · `SPEC.md` · `README.md` · `.claude/settings.json` · `scripts/check-sync.py` ·
     `scripts/bump-version.py`(신설) · `.claude-plugin/plugin.json`. **삭제**: `.claude/agents/`(5) · `.claude/skills/`(2) · `.claude/answer-style.js`.
@@ -286,8 +161,9 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
 
 ## 할 일
 
-> 아래 4건은 2026-08-10 하네스 감사(`/womc update` 자동 실행)가 남긴 것이다.
-> **각 항목의 배경·근거 URL·선택지는 `docs/HARNESS-AUDIT.md` 의 v2.1.0 기록 5번 절에 있다** — 여기엔 확인 방법만 적는다.
+> 아래 4건은 2026-08-10 하네스 감사 2회(`/womc update` 가 자동 실행)가 남긴 것이다.
+> **각 항목의 배경·근거 URL·선택지는 `docs/HARNESS-AUDIT.md` 의 v2.1.1 기록 5번 절에 있다** — 여기엔 확인 방법만 적는다.
+> (감사 5번①「`outputStyle` 을 어떻게 고칠 것인가」는 확인됨으로 닫혔다 — v2.1.1 의 A안이 실제로 동작한다.)
 
 - [ ] ~~**`force-for-plugin: true` 가 이 판에서 실제로 먹는지 확인 (감사 5번②)**~~ — **보류.**
   A안으로 고쳤으므로 지금은 필요 없다. 나중에 "프로젝트마다 `outputStyle` 을 박지 않게" 하고 싶어질 때만 다시 꺼낸다.
@@ -303,6 +179,18 @@ v1.19.0 감사에서 "커스텀 서브에이전트는 CLAUDE.md 를 **안** 물�
   - 위 항목이 "필요하다"로 나올 때만 의미가 있다. 골격에 4줄을 박는 대신 이 번들 스킬에 맡겨도 되는지 판단한다.
   - 확인 방법: 골격을 깐 폴더에서 `/fewer-permission-prompts` 를 한 번 돌리고, `.claude/settings.json` 의 `allow` 에
     PowerShell 읽기 전용 명령이 실제로 추가되는지 본다.
+
+- [ ] **내장 Task 도구(`TaskCreate`·`/tasks`)가 `TASKS.md` 체크박스를 대체하는지 확인 (감사 5번⑤ — 신규)**
+  - `TodoWrite` 는 v2.1.142 부터 기본 비활성이고 구조화된 Task 도구로 대체됐다. 그 목록은 **세션을 껐다 켜도 유지된다.**
+    맞다면 골격의 `[ ]`/`[~]`/`[x]` 추적이 중복이다. **단 「손댈 파일·이어 쓸 것·끝난 것으로 보는 조건·확인 방법」 서술은 대체물이 없다** — 그건 남긴다.
+  - 확인 방법: 이 저장소에서 `/tasks` 로 항목을 두어 개 만들고 Claude Code 를 껐다 켠 뒤 그대로 남아 있는지 본다.
+    남아 있어도 위 네 가지 서술을 담을 자리가 있는지까지 봐야 판단할 수 있다.
+
+- [ ] **`subagentStatusLine`·`/statusline` 을 골격에 들일지 판단 (감사 4번 「새로 챙길 것」 — 신규, 급하지 않음)**
+  - `subagentStatusLine`(v2.1.205+)은 서브에이전트 패널 행을 따로 꾸민다. `/statusline` 은 상태줄 스크립트를 자동 생성해 준다.
+    후자가 쓸 만하면 골격이 `.claude/statusline.js` 를 직접 들고 갈 필요가 줄어든다.
+  - 확인 방법: 시험 폴더에서 `/statusline` 을 한 번 돌려 무엇이 생기는지 보고, 지금 `statusline.js` 가 보여 주는
+    5시간·주간 한도까지 나오는지 비교한다. 안 나오면 지금 것을 유지한다.
 
 <!-- 끝난 항목은 이렇게 적는다:
 - [x] 항목 이름

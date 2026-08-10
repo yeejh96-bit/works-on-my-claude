@@ -4,7 +4,91 @@
 > 기본 제공하게 된 기능"을 골격에서 걷어낸 이력을 남긴다. 다음 감사는 **맨 위 기록의
 > 「마지막 감사 기준 버전」부터** 시작하고, 같은 조사를 반복하지 않는다.
 > 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.226` (2026-08-10).
-> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.1.0 기록의 5번을 본다 — 4건이 열려 있다.
+> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.1.1 기록의 5번을 본다 — 5건이 열려 있다.
+
+## v2.1.1 — 2026-08-10 / Claude Code `2.1.226` 기준
+
+> **이 기록은 다른 폴더에서 돌아간 감사를 옮겨 온 것이다.** `TASKS.md` 조건 ③ 을 검증하려고 만든
+> 시험 폴더(`womc-old-test`, v1.20.0 골격 사본)에서 `/womc update` 를 돌렸고, 그 7번 단계가
+> **사람이 부르지 않았는데 스스로** 감사를 실행했다. 조건 ⑤ 가 이걸로 통과했다.
+> 그 폴더에는 지난 기록이 없어 감사가 **「첫 감사」로 처리**됐다 — 그래서 이미 끝난 일을 다시
+> 「뺄 수 있음」으로 올린 항목이 섞여 있다. 아래 3번에서 그걸 가려냈다.
+> **여기서 배운 것**: 감사는 자기 폴더의 `docs/HARNESS-AUDIT.md` 만 본다. 남의 폴더에서 돌리면
+> 기억이 없는 상태로 판단하므로, 결과를 옮겨 올 때 반드시 지난 기록과 대조해야 한다.
+
+### 1. 무엇을 확인했나
+- 골격이 손으로 떠안고 있는 9가지를 공식 문서와 대조했다 — 상태줄 · `.env` 차단 · `allow` 목록 ·
+  서브에이전트 4종 · `CLAUDE.md` 상속 · `outputStyle` · `.claude/rules/` · `PLAN.md`·`TASKS.md` · `/code-review` 대체.
+- 조사 분담은 스킬 규정대로였다 — 웹(공식 문서·CHANGELOG)은 `general-purpose`, 로컬 실태는 `explore`.
+- 지난 v2.1.0 기록의 「실측 필요」 4건 중 ①이 이번에 닫혔다(아래 2번).
+
+### 2. 뒤집힌 전제
+**① 「`outputStyle` 값 문제는 아직 미확인」 → 닫혔다. v2.1.1 의 A안이 실제로 먹는다.**
+- 근거(실측): 이 저장소 세션의 메인 답변이 **원시인 말투로 나왔다.** `.claude/settings.json:2` 의 값은 `"womc:womc-caveman"`.
+- 근거(실측): 시험 폴더 갱신 결과에도 `"womc:womc-caveman"` 이 들어갔다 — 갱신 모드 3번의 자동 교정이 동작한다.
+- 근거(실측): `womc:explore` 서브에이전트를 띄웠더니 보고가 **평문 한국어**였다 — 출력 스타일은 서브에이전트에
+  상속되지 않고, 보고 형식은 `CLAUDE.md` 「서브에이전트 보고 규약」이 담당한다는 설계가 그대로 확인됐다.
+→ v2.1.0 기록 5번①은 **「확인됨」으로 닫는다.** (B·C안은 채택하지 않았다. B안은 5번②에 보류로 남아 있다.)
+
+**② 「`/output-style` 명령으로 말투를 바꾼다」 → 그 명령은 사라졌다.**
+- 근거: https://code.claude.com/docs/en/output-styles — v2.1.73 deprecated, v2.1.91 제거.
+  이제 `/config` → Output style 이거나 설정 파일 직접 편집이다.
+- 영향: 문서에서 `/output-style` 을 안내하는 자리가 있으면 `/config` 로 고쳐야 한다. **현재 골격에는 없다**(확인함).
+
+**③ 「진행상태는 파일로만 관리할 수 있다」 → 내장 대체물이 생겼다.**
+- 근거: https://code.claude.com/docs/en/tools-reference · https://code.claude.com/docs/en/agent-sdk/todo-tracking
+- `TodoWrite` 는 v2.1.142 부터 기본 비활성이고, `TaskCreate`/`TaskUpdate`/`TaskGet`/`TaskList` 와 `/tasks` 로 대체됐다.
+  이 태스크 목록은 **세션을 다시 켜도 유지된다.**
+
+### 3. 무엇을 뺐나 (근거)
+**이번에도 골격 파일은 한 줄도 고치지 않았다.** 아래는 판정과, 그중 **기각한 것**이다.
+
+**기각 2건 — 감사가 기억 없이 돌아 생긴 중복이다.**
+- ~~「서브에이전트 정의 안의 하네스 보일러플레이트를 뺄 수 있다」~~ → **이미 v2.0.0 에서 뺐다.**
+  지금 `agents/` 4종은 공통 규칙 자리에 "`CLAUDE.md` 「서브에이전트 보고 규약」을 따른다" 한 줄만 있다. 뺄 것이 없다.
+- ~~「커스텀 `explore`·`plan` 을 내장 `Explore`·`Plan` 으로 대체할 수 있다」~~ → **v2.1.0 감사가 같은 지적을 이미 기각했다.**
+  플러그인 스코프의 `womc:explore` 는 내장 `Explore` 를 덮지 않고 **별개 이름으로 공존**하며 자기 `model: haiku` 를 그대로 쓴다
+  (v2.0.0 실측). 내장 `Explore` 는 `CLAUDE.md` 를 안 물려받지만 `womc:explore` 는 물려받는다는 차이도 있다 —
+  「서브에이전트 보고 규약」이 상속되는 것이 womc 설계의 전제이므로, 바꾸면 보고 형식이 깨진다.
+
+**남은 판정 1건 — 「뺄 수 있음」이되 조건부다.**
+- **`TASKS.md` 의 체크박스 추적(`[ ]`/`[~]`/`[x]`)** — 내장 Task 도구가 세션을 넘어 유지되므로 중복이다.
+  근거: https://code.claude.com/docs/en/tools-reference
+  **단 「손댈 파일 · 이어 쓸 것 · 끝난 것으로 보는 조건 · 확인 방법」 서술은 대체물이 없다** — 이건 남겨야 한다.
+  실제로 걷어낼지는 `plan-feature` 로 넘긴다(아래 5번⑤).
+
+### 4. 무엇을 왜 남겼나
+지난 기록과 판정이 같다. 근거 URL 만 새로 확인했다.
+- `.claude/statusline.js` + `statusLine` — 기본 상태줄이 없다. 쓰는 필드(`context_window.*`·`rate_limits.five_hour`·
+  `rate_limits.seven_day`)가 전부 실재한다. https://code.claude.com/docs/en/statusline
+- `permissions.deny` 의 `.env` 7줄 — `.env` **읽기**는 기본 차단이 아니다. 기본 보호는 **쓰기**에만 걸리고
+  그 목록에 `.env` 가 없다. https://code.claude.com/docs/en/permissions
+- `.claude/rules/` + `paths` 프론트매터 — 공식 기능이고 글롭 스코프도 지원한다.
+  **새로 확인한 주의점**: 경로 스코프 규칙은 `/compact` 뒤 자동 재주입되지 않고, 해당 파일을 다시 읽을 때 재로드된다.
+  https://code.claude.com/docs/en/memory
+- 서브에이전트 `implement`·`verify` — 구현·검증 역할의 내장 대응물이 없다. https://code.claude.com/docs/en/sub-agents
+- `PLAN.md` — plan mode 는 계획을 파일로 남기지 않는다. 세션·PC 를 넘는 인수인계는 대체물이 없다.
+- `outputStyle` 설정 — 기능도 키도 유효하다(위 2번①에서 실측).
+
+**새로 챙길 만한 것 2가지** (빼는 게 아니라 **더할 것**. 둘 다 아직 안 넣었다):
+- **`subagentStatusLine`** (v2.1.205+) — 서브에이전트 패널 행을 따로 꾸밀 수 있다. https://code.claude.com/docs/en/statusline
+- **`/statusline`** 명령이 상태줄 스크립트를 자동 생성해 준다. 골격이 `statusline.js` 를 손으로 들고 갈 필요가 줄 수 있다. 같은 URL
+
+### 5. 실측 필요 — **5건**
+①~④ 는 v2.1.0 기록에서 그대로 이월된 것이고(①은 닫혔다), ⑤ 가 이번에 새로 생겼다.
+
+① ~~`outputStyle` 을 어떻게 고칠 것인가~~ → **확인됨 (위 2번①).** A안으로 해결됐다.
+② **`force-for-plugin: true` 가 이 판(2.1.226)에서 실제로 먹는지** — **보류.** A안으로 해결됐으므로 급하지 않다.
+   "프로젝트마다 `outputStyle` 을 박지 않게" 하고 싶어질 때만 다시 꺼낸다.
+   **확인 방법**: 스타일 frontmatter 에 넣고 플러그인 재설치 → 재시작 → `outputStyle` 이 **아예 없는** 폴더에서 말투가 나오는지 본다.
+③ **`permissions.allow` 의 PowerShell 4줄이 필요한지** — 문서는 내장 read-only 자동 허용을 **Bash 만** 명시한다.
+   **확인 방법**: Windows 에서 그 4줄을 지운 뒤 `git status` 를 시켜 권한 프롬프트가 뜨는지 본다. 안 뜨면 뺄 수 있다.
+   https://code.claude.com/docs/en/permissions#read-only-commands
+④ **`/fewer-permission-prompts` 로 allow 목록을 대체할 수 있는지** — ③이 "필요하다"로 나올 때만 의미가 있다.
+   **확인 방법**: 골격을 깐 폴더에서 한 번 돌리고 `allow` 에 PowerShell 읽기 전용 명령이 실제로 추가되는지 본다.
+⑤ **내장 Task 도구(`TaskCreate`/`/tasks`)가 `TASKS.md` 체크박스를 실제로 대체하는지** (신규, 위 3번).
+   **확인 방법**: 이 저장소에서 `/tasks` 로 항목을 몇 개 만들고 Claude Code 를 껐다 켠 뒤 그대로 남아 있는지 본다.
+   남아 있어도 **「손댈 파일·이어 쓸 것·완료 조건·확인 방법」을 담을 자리가 있는지**까지 봐야 판단할 수 있다.
 
 ## v2.1.0 — 2026-08-10 / Claude Code `2.1.226` 기준
 
@@ -61,8 +145,9 @@ SendMessage · Remote Control · 인증/샌드박스 버그수정뿐이고, 서�
 근거로 든 문서 문장은 *user/project 스코프에서 `Explore` 라는 이름을 쓴 경우* 이야기다. 플러그인 스코프의
 `womc:explore` 는 내장 `Explore` 를 덮지 않고 **별개 이름으로 공존**하며(v2.0.0 감사에서 실측 확인), 자기 `model` 을 그대로 쓴다.
 
-### 5. 실측 필요 — **4건**
-① **`.claude/settings.json` 의 `outputStyle` 을 어떻게 고칠 것인가** (위 2번 버그). 길이 셋이고 각각 대가가 다르다:
+### 5. 실측 필요 — **4건 중 ①은 「확인됨」으로 닫혔다 (2026-08-10, 위 v2.1.1 기록 2번①). ②~④는 v2.1.1 기록 5번으로 이월했다.**
+① ~~**`.claude/settings.json` 의 `outputStyle` 을 어떻게 고칠 것인가**~~ → **확인됨: A안을 적용했고 실제로 말투가 켜졌다.**
+   (아래 세 갈래는 판단 근거로 남긴다.) 길이 셋이고 각각 대가가 다르다:
    (A) 골격 값을 `"womc:womc-caveman"` 으로 — 가장 작은 수정. 단 플러그인 이름이 바뀌면 깨진다.
    (B) `output-styles/womc-caveman.md` 에 `force-for-plugin: true` — settings.json 의 `outputStyle` 줄 자체가 불필요해진다.
        단 womc 가 켜진 **모든** 프로젝트에 강제 적용되고 사용자의 `outputStyle` 을 덮어쓴다.
