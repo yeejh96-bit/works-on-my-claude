@@ -1,4 +1,4 @@
-# works-on-my-claude v2.1.1
+# works-on-my-claude v2.2.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
@@ -55,7 +55,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 ├─ HARNESS.md         # 사람이 읽는 구조 안내서 (Claude가 자동으로 읽지 않음 — 토큰 0)
 ├─ .gitignore         # node_modules / .env / dist 등 (견본 .env.example 은 예외)
 └─ .claude/
-   ├─ settings.json      # 하네스: 비밀 .env 읽기 차단(견본 .env.example 은 읽힘) + PowerShell 읽기 전용 명령 허용 + 답변 말투(outputStyle) 지정
+   ├─ settings.json      # 하네스: 비밀 .env 읽기 차단(견본 .env.example 은 읽힘) + 답변 말투(outputStyle) 지정
    └─ statusline.js      # 터미널 하단 상태줄 — 모델명·토큰·5시간/주간 한도·폴더명 (Node 필요, settings.json 의 statusLine 이 실행)
 ```
 > `.mcp.json` 은 **만들지 않는다.** MCP는 프로젝트마다 다르므로 필요할 때 직접 추가한다.
@@ -97,7 +97,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 - **`plan-feature` 스킬** — 큰 작업을 한꺼번에 벌이지 않고 작은 단계로 쪼개 하나씩 진행하게 해, 한 세션에 컨텍스트가 터지는 걸 막는다. 스킬은 **필요할 때만 로드**돼 평소 컨텍스트를 차지하지 않는다.
 - **CLAUDE.md의 "적극 위임" 규칙** — 위 습관(무거운 일은 위임, 한 번에 한 기능, 기능이 끝나면 새 세션)을 매 세션 Claude에게 상기시킨다.
 - **원시인 말투 출력 스타일** — 대화 답변을 짧게 만들어 출력 토큰을 아낀다. 한 줄에 한 뜻, 2~5 단어 단문, 명사형으로 끝낸다. 다음 할 일·되묻는 질문·위험 경고는 줄이지 않고, SPEC·PLAN·TASKS 같은 파일 문서와 서브에이전트 보고에는 적용되지 않는다.
-- **settings.json** — 비밀키 파일(`.env` 와 그 변형) 읽기를 하위 폴더 것까지 차단해 입문자를 보호하되, 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있게 **비밀이 들어가는 이름만 골라** 막는다. Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령도 미리 허용한다. (Bash의 `git status` 등은 Claude Code가 기본으로 허용하고, Mac/Linux에선 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 중요한 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.)
+- **settings.json** — 비밀키 파일(`.env` 와 그 변형) 읽기를 하위 폴더 것까지 차단해 입문자를 보호하되, 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있게 **비밀이 들어가는 이름만 골라** 막는다. 허용 목록(`allow`)은 비워 둔다 — `git status`·`Get-ChildItem` 같은 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하기 때문이다(Bash·PowerShell 모두. Windows 실측, 2026-08-10). (차단은 파일 읽기 도구에만 걸리므로, 진짜 중요한 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.)
 
 ## 설계 원리
 **변하지 않는 것만 내용을 채우고, 프로젝트마다 달라지는 것은 빈 칸으로 두거나 아예 만들지 않는다.**

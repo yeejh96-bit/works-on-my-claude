@@ -8,29 +8,23 @@
 (이 파일과 `PLAN.md` 는 기록용으로 남겨 두며 지우지 않는다. **git 에 올린다** — 다른 PC 에서 이어 작업할 때
 진행 상태와 「끝난 일」의 결정 이유를 그대로 볼 수 있어야 하기 때문이다. 커밋할 때 이 두 파일도 함께 넣는다.)
 
-- [~] **하네스 감사가 남긴 실측 3건 — 재시작 한 번으로 순서대로 처리한다 (2026-08-10 시작)**
-  사용자가 재시작하고 돌아와 "다음 뭐 하지?"라고 물으면 **이 항목을 그대로 읽어 안내한다.**
-  각 건의 배경·근거 URL 은 `docs/HARNESS-AUDIT.md` v2.1.1 기록 5번 절에 있다.
-  - **1) 내장 Task 도구가 `TASKS.md` 체크박스를 대체하는지 (감사 5번⑤)** — 재시작 직후 바로.
-    - 재시작 전에 이 세션에서 `TaskCreate` 로 `#1 [실측용] 재시작 뒤에도 이 항목이 남아 있는지 확인` 을 만들어 두었다.
-    - 사용자에게 `/tasks` 를 실행해 그 항목이 보이는지 물어본다(도구로는 `TaskList`).
-    - **보이면 「유지됨」** → 체크박스 대체 가능성이 있으므로 `plan-feature` 로 넘겨 검토한다.
-      **안 보이면 「세션용」** → `TASKS.md` 체크박스는 대체 불가. 그대로 두고 「할 일」의 그 항목을 닫는다.
-    - 판정을 `docs/HARNESS-AUDIT.md` v2.1.1 기록 5번⑤ 와 「할 일」 양쪽에 적는다.
-  - **2) `permissions.allow` 의 PowerShell 4줄이 필요한지 (감사 5번③)**
-    - 먼저 사용자에게 `/permissions` 로 **권한 모드가 기본인지** 확인시킨다. bypass·acceptEdits 면 프롬프트가 안 떠서 결과를 믿을 수 없다.
-    - `.claude/settings.json` 의 `allow` 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)을 지운다 → 재시작 →
-      PowerShell 로 `git status` 를 실행해 본다.
-    - **프롬프트가 뜨는지는 사용자만 볼 수 있다** — 반드시 사용자에게 물어본다.
-      안 뜨면 4줄을 뺄 수 있다(그러면 `commands/womc.md` 5번 절의 임베드도 같이 고친다). 뜨면 그대로 둔다.
-    - 확인이 끝나면 `git checkout .claude/settings.json` 으로 되돌린다.
-  - **3) `/fewer-permission-prompts` 로 allow 목록을 대체할 수 있는지 (감사 5번④)** — 2)가 "필요하다"로 나올 때만.
-    - 사용자가 `/fewer-permission-prompts` 를 실행한다(슬래시 명령이라 Claude 가 직접 못 돌린다).
-    - `git diff .claude/settings.json` 으로 무엇이 추가됐는지 확인한다. PowerShell 읽기 전용 명령이 들어가면 골격에 4줄을 박는 대신 이 스킬에 맡길 수 있다.
-    - 확인이 끝나면 되돌린다.
-  - 손댈 파일: `.claude/settings.json`(임시로만, 되돌린다) · 결과 기록은 `docs/HARNESS-AUDIT.md` · `TASKS.md`.
-  - 끝난 것으로 보는 조건: 3건 각각이 「확인됨」 또는 「필요 없음」으로 판정되고 그 판정이 두 파일에 적혔을 때.
-    골격을 실제로 줄이는 일은 이 항목이 하지 않는다 — 「뺄 수 있음」이 나오면 `plan-feature` 로 넘긴다.
+- ✅ **하네스 감사가 남긴 실측 3건 — 전부 끝났다 (2026-08-10).** 다음에 할 일은 아래 「할 일」 맨 위 항목이다.
+  - **1) 내장 Task 도구가 `TASKS.md` 체크박스를 대체하는지 (감사 5번⑤)** — **대체 못 한다.** 내장 Task 목록은 세션용이다.
+    골격 그대로 유지. 실측 내용은 「할 일」의 닫힌 항목과 `docs/HARNESS-AUDIT.md` v2.1.1 기록 3번·5번⑤ 에 있다.
+  - **2) `permissions.allow` 의 PowerShell 4줄이 필요한지 (감사 5번③)** — **필요 없다. 뺄 수 있다.**
+    - **실측**: `.claude/settings.json` 의 `allow` 4줄과 `.claude/settings.local.json` 의 같은 3줄을 모두 지우고,
+      `~/.claude/settings.json` 의 `"defaultMode": "auto"` 를 프로젝트 설정의 `"defaultMode": "default"` 로 덮은 상태에서
+      (상태바 `⏸ manual mode on` 확인) `git status` · `Get-ChildItem` 을 실행 → **둘 다 권한 프롬프트가 뜨지 않았다.**
+    - **1차 측정은 무효였다** — 도중에 사용자가 auto 로 바꿔 분류기가 대신 승인하는 상태였다. manual 로 되돌려 다시 측정했다.
+      **다음에 권한 실측을 할 때는 측정 직전·직후에 상태바 모드를 반드시 확인한다.**
+    - **판정의 범위**: 확인된 것은 "실사용에서 프롬프트가 안 뜬다"까지다. 내장 자동 허용 때문인지 샌드박스 실행 때문인지는
+      갈라내지 못했다 — 어느 쪽이든 골격에 4줄을 박을 이유가 없다는 결론은 같다.
+    - **측정에 쓴 파일 2개는 백업으로 원상 복구했다** (`.claude/settings.json` · `.claude/settings.local.json`).
+      `"defaultMode": "default"` 임시 줄도 함께 사라졌다. `git diff` 에 두 파일이 안 뜨는 것으로 확인했다.
+    - **골격에서 실제로 4줄을 빼는 일은 이 항목이 하지 않는다** — 「할 일」 맨 위로 넘겼다.
+  - **3) `/fewer-permission-prompts` 로 allow 목록을 대체할 수 있는지 (감사 5번④)** — **불필요해졌다.**
+    2)가 "필요 없음"으로 나와 대체할 대상 자체가 사라졌다. allow 목록을 다시 늘리고 싶어질 때만 꺼낸다.
+  - 손댄 파일: `.claude/settings.json`·`.claude/settings.local.json`(둘 다 원상 복구) · 기록은 `docs/HARNESS-AUDIT.md` v2.1.1 기록 5번 · 이 파일.
 - ✅ **2026-08-10 — v2.0.0·v2.1.0·v2.1.1 의 실사용 검증 5건이 전부 통과했다.** 결과는 아래 「끝난 일」의 각 항목에 적어 두었다.
   검증에 쓴 시험 폴더(`womc-old-test`, v1.20.0 커밋 `481bd76` 의 골격 사본)는 그 안에서 나온 감사 기록을
   `docs/HARNESS-AUDIT.md` v2.1.1 기록으로 옮긴 뒤 지웠다.
@@ -38,6 +32,20 @@
   결정 이유는 「끝난 일」의 v2.0.0 항목과 `docs/HARNESS-AUDIT.md` 에 남아 있다.
 
 ## 끝난 일
+
+- [x] 골격에서 `permissions.allow` 의 PowerShell 4줄을 뺌 (v2.2.0) — **2026-08-10**
+  - 근거: 같은 날 실측(위 「지금 하는 일」의 2) · `docs/HARNESS-AUDIT.md` v2.1.1 기록 5번③). **다시 실측하지 말 것.**
+  - 손댄 파일: `.claude/settings.json` · `commands/womc.md`(3자리) · `HARNESS.md` · `README.md`(2자리) · `SPEC.md` · `PLAN.md` · 이 파일 · `.claude-plugin/plugin.json`
+  - 남긴 것:
+    - `allow` 는 이제 **빈 배열**이다(키는 남겼다 — 사용자가 나중에 채울 자리). `.claude/settings.json` 과
+      `commands/womc.md` 5번 절 임베드 **두 곳을 같은 값으로** 고쳤다. 한쪽만 고치면 `check-sync.py` 가 DRIFT 로 잡는다.
+    - **갱신 모드 3번에 옛 4줄 청소를 넣은 것이 절반의 핵심이다** (`commands/womc.md` 갱신 모드 3번) —
+      `allow` 에 옛 기본값 4줄이 **그대로** 있으면 그 4개만 지운다. **다른 항목은 사용자가 넣은 것이라 안 건드린다.**
+      이 예외가 없으면 이미 깔린 프로젝트가 영영 옛 4줄을 안고 간다(v2.1.1 의 `outputStyle` 자동 교정과 같은 패턴이다).
+    - 문구를 고친 자리는 **`HARNESS.md` ↔ `commands/womc.md` HARNESS 임베드 사본이 글자 그대로 같아야 한다** — 둘 다 같이 고쳤다.
+    - 버전은 `py scripts/bump-version.py 2.2.0` 한 줄로 6곳을 올렸다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.2.0`.
+    **갱신 모드의 옛 4줄 청소가 실제로 도는지는 스크립트로 못 잡는다** — 위 「할 일」의 남은 항목에서 사람이 확인한다.
 
 - [x] 말투가 한 번도 안 켜지던 버그 수정 — A안 (v2.1.1) — **검증까지 완료 (2026-08-10)**
   - ✅ **육안 검증 통과** — 재시작 뒤 메인 답변이 실제로 원시인 말투로 나왔다. `womc:explore` 서브에이전트 보고는 평문 한국어였다.
@@ -97,7 +105,7 @@
   - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.0`.
     스킬이 실제로 도는지는 사람이 새 세션에서 확인한다(위 「지금 하는 일」의 ⑤).
 
-> 최근 작업만 여기 남긴다. **v1.18.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
+> 최근 작업만 여기 남긴다. **v1.19.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
 
 - [x] Claude Code 2.1.x 기본기능에 맞춘 하네스 간소화 (v2.0.0) — **검증까지 완료 (2026-08-10)**
@@ -150,63 +158,36 @@
     - `docs/` 폴더는 골격이 만들지 않는다. 회전이 처음 일어날 때 만든다.
   - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 전 항목 OK, 버전 `1.20.0` 통과.
 
-- [x] 하네스 감사 지적 13건 일괄 수정 (v1.19.0)
-  - 손댈 파일: `commands/womc.md`, `CLAUDE.md`, `HARNESS.md`, `README.md`, `.claude/answer-style.js`,
-    `.claude/statusline.js`, `.claude/settings.local.json`, `scripts/check-sync.py`, `.claude-plugin/plugin.json`
-  - 먼저 확인한 것 (`claude-code-guide` 위임): `.claude/rules/` 의 `paths` 필터 **공식 지원 맞음**,
-    커스텀 서브에이전트는 CLAUDE.md **안 물려받는 게 맞음**, UserPromptSubmit 훅의 **평문 stdout 주입 유효**.
-    → 감사에서 "고쳐야 한다"고 지적됐던 이 3건은 기존 서술이 옳아 **고치지 않았다**. 다시 의심되면 이 결론부터 볼 것.
-  - 남긴 것 (갱신 모드 = `commands/womc.md` 「갱신 모드」 절):
-    - 1번에 「덮기 전 공통 확인」 블록 신설 — agents/skills 를 덮기 전 골격인지 판정, 사용자 파일이면 건너뛰고 보고.
-    - `CLAUDE.md` 덮을 때 기존 `## 설명 방식` 절을 읽어 두었다가 되돌려 놓도록 지시(말투 설정 보존). `answer-style.js` 도 같은 방식으로 문구 보존.
-    - `womc:begin`/`womc:end` 를 **정확 일치가 아니라 "그 문자열이 들어 있는 줄"** 로 찾도록 명시 — 구획 중복 누적 방지.
-    - 0-b 임시파일 경로를 `${TMPDIR:-${TEMP:-/tmp}}` 로 통일(`%TEMP%` 는 Git Bash 에서 안 풀림).
-    - 다운그레이드 방지 단계 추가 — 프로젝트 `CLAUDE.md` 의 `womc:skeleton-version` 이 적용하려는 것보다 높으면 멈춤.
-  - 남긴 것 (생성 모드·골격):
-    - 생성된 `CLAUDE.md` 맨 위(H1 바로 아래)에 `<!-- womc:skeleton-version=x.y.z -->` 를 찍는다. 온보딩 병합 구획 안에도 같은 표식.
-      **버전을 올릴 때 고칠 자리가 4곳이 됐다** — `commands/womc.md` 맨 위 표식, CLAUDE.md 골격 안 표식, 온보딩 구획 안 표식, `plugin.json`. (`commands/womc.md` 맨 위 주석에 적어 뒀다.)
-    - 생성 끝에 `git rev-parse --git-dir` 로 저장소 여부 확인 → 아니면 `git init` 을 **묻는다**(자동 실행 안 함).
-    - 온보딩 CLAUDE.md 병합 템플릿에서 "지시문이 본문에 섞여 들어가던" 형태를 《여기》 자리표시자 + 별도 설명으로 정리.
-  - 남긴 것 (저장소 자체):
-    - `settings.local.json` 의 `PowerShell(git *)` 를 동사별로 분리(파괴적 git 명령 무프롬프트 통과 차단) + `py scripts/check-sync.py` 허용 추가.
-    - `scripts/check-sync.py` 에 검사 3개 추가: `.claude/answer-style.js` 를 `EMBEDDED_FILES` 에 포함,
-      `womc.md` 골격 버전 표식 ↔ `plugin.json` 대조, README 에 서브에이전트 5종이 모두 등장하는지.
-    - `CLAUDE.md` 「세션을 이어서 하기」의 "세션 시작 시 PLAN/TASKS 를 먼저 읽는다" → **"필요할 때만 읽는다"** 로 변경.
-      (매 세션 무조건 읽으면 import 안 한 의미가 없어 always-on 과 같아진다.)
-    - `.claude/answer-style.js` 출력을 6줄 → 1줄 핵심으로 축소. 전체 규칙은 CLAUDE.md 에만 두고 훅은 짧게 유지(파일 주석에 그 이유를 적어 뒀다).
-    - `.claude/statusline.js` 의 `statusline-debug.json` 기록 코드 2곳 제거(rate_limits 없는 환경에서 상태줄 갱신마다 홈에 파일을 계속 쓰던 디버그 잔재).
-    - `HARNESS.md`·`README.md` 사실관계 정정 — "읽기 전용 4종은 실수로도 못 고침"(verify·review 는 Bash 보유),
-      ".env 차단이 서브에이전트에도 적용"(Bash 로는 뚫림), README 의 에이전트 2종 → 5종, "verify 는 haiku"(실제 sonnet), statusline.js 누락.
-  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 15항목 전부 OK, 버전 `1.19.0` 통과.
-    추가로 `node .claude/answer-style.js`·`node .claude/statusline.js` 직접 실행해 정상 출력 확인,
-    `~/.claude/statusline-debug.json` 의 mtime 이 실행 시각보다 앞선 것으로 재기록 안 됨을 확인.
-
 ## 할 일
 
-> 아래 4건은 2026-08-10 하네스 감사 2회(`/womc update` 가 자동 실행)가 남긴 것이다.
+> 2026-08-10 하네스 감사 2회(`/womc update` 가 자동 실행)가 남긴 4건 중 **③④는 닫혔고, ②는 보류다.**
 > **각 항목의 배경·근거 URL·선택지는 `docs/HARNESS-AUDIT.md` 의 v2.1.1 기록 5번 절에 있다** — 여기엔 확인 방법만 적는다.
-> (감사 5번①「`outputStyle` 을 어떻게 고칠 것인가」는 확인됨으로 닫혔다 — v2.1.1 의 A안이 실제로 동작한다.)
+> 실제로 열려 있는 일은 **v2.2.0 갱신 모드 확인**과 **`subagentStatusLine` 판단** 두 개뿐이다.
 
 - [ ] ~~**`force-for-plugin: true` 가 이 판에서 실제로 먹는지 확인 (감사 5번②)**~~ — **보류.**
   A안으로 고쳤으므로 지금은 필요 없다. 나중에 "프로젝트마다 `outputStyle` 을 박지 않게" 하고 싶어질 때만 다시 꺼낸다.
   - 확인 방법: `output-styles/womc-caveman.md` frontmatter 에 넣고 플러그인 재설치 → 재시작 → **settings.json 에 `outputStyle` 이
     아예 없는 폴더**에서 메인 답변이 원시인 말투로 나오는지 본다.
 
-- [ ] **`permissions.allow` 의 PowerShell 4줄이 정말 필요한지 확인 (감사 5번③)**
-  - 문서는 내장 read-only 자동 허용을 **Bash 만** 명시하고 PowerShell 은 언급이 없다. 필요 없으면 골격에서 4줄을 뺄 수 있다.
-  - 확인 방법: Windows 에서 임시 폴더에 골격을 깔고 `.claude/settings.json` 의 `allow` 4줄을 지운 뒤,
-    `git status` 를 시켜 **권한 프롬프트가 뜨는지** 본다. 안 뜨면 뺄 수 있다(그러면 `commands/womc.md` 5번 절도 같이 고친다).
+- [x] ~~**골격에서 `permissions.allow` 의 PowerShell 4줄을 뺀다**~~ → **v2.2.0 으로 끝났다 (2026-08-10).** 「끝난 일」 참고.
 
-- [ ] **`/fewer-permission-prompts` 로 allow 목록을 대체할 수 있는지 확인 (감사 5번④)**
-  - 위 항목이 "필요하다"로 나올 때만 의미가 있다. 골격에 4줄을 박는 대신 이 번들 스킬에 맡겨도 되는지 판단한다.
-  - 확인 방법: 골격을 깐 폴더에서 `/fewer-permission-prompts` 를 한 번 돌리고, `.claude/settings.json` 의 `allow` 에
-    PowerShell 읽기 전용 명령이 실제로 추가되는지 본다.
+- [ ] **v2.2.0 갱신 모드가 옛 `allow` 4줄을 실제로 지우는지 확인 (사람이 해야 함)**
+  - 이 저장소 안에서는 못 한다. v2.2.0 을 커밋·push → 플러그인 재설치 → **Claude Code 재시작** 뒤라야 의미가 있다.
+  - 확인 방법: 옛 골격(4줄이 든 `.claude/settings.json`)이 깔린 폴더에서 `/womc update` 를 돌린 뒤,
+    그 파일의 `allow` 가 `[]` 가 됐는지 본다. **사용자가 직접 넣은 다른 allow 항목은 남아 있어야 한다** — 같이 확인한다.
+  - 시험 폴더를 새로 만든다면 `.claude/settings.json` 에 4줄 + 사용자 항목 1줄(예: `Bash(npm test:*)`)을 넣어 두고 돌린다.
 
-- [ ] **내장 Task 도구(`TaskCreate`·`/tasks`)가 `TASKS.md` 체크박스를 대체하는지 확인 (감사 5번⑤ — 신규)**
-  - `TodoWrite` 는 v2.1.142 부터 기본 비활성이고 구조화된 Task 도구로 대체됐다. 그 목록은 **세션을 껐다 켜도 유지된다.**
-    맞다면 골격의 `[ ]`/`[~]`/`[x]` 추적이 중복이다. **단 「손댈 파일·이어 쓸 것·끝난 것으로 보는 조건·확인 방법」 서술은 대체물이 없다** — 그건 남긴다.
-  - 확인 방법: 이 저장소에서 `/tasks` 로 항목을 두어 개 만들고 Claude Code 를 껐다 켠 뒤 그대로 남아 있는지 본다.
-    남아 있어도 위 네 가지 서술을 담을 자리가 있는지까지 봐야 판단할 수 있다.
+- [x] ~~**`/fewer-permission-prompts` 로 allow 목록을 대체할 수 있는지 확인 (감사 5번④)**~~
+  → **불필요해졌다 (2026-08-10).** 위 항목이 "필요 없음"으로 나와 대체할 대상 자체가 사라졌다.
+  allow 목록을 다시 늘리고 싶어질 때만 꺼낸다.
+
+- [x] ~~**내장 Task 도구(`TaskCreate`·`/tasks`)가 `TASKS.md` 체크박스를 대체하는지 확인 (감사 5번⑤)**~~
+  → **확인됨: 대체 못 한다 (2026-08-10). 골격은 그대로 둔다.**
+  - 실측: 세션 A 에서 `TaskCreate` 로 항목 1개 생성 → Claude Code 재시작 → 새 세션에서 `TaskList` 가 `No tasks found`,
+    사용자가 `/tasks` 로 본 화면도 빈 목록이었다. 내장 Task 목록은 **세션용**이라 세션을 넘는 인수인계에 못 쓴다.
+    (그 사이 `/clear` 도 실행됐으므로 소실 원인이 재시작인지 `/clear` 인지는 구분 안 되지만, 어느 쪽이든 결론은 같다.)
+  - 그래서 `TASKS.md` 의 `[ ]`/`[~]`/`[x]` 와 「손댈 파일·이어 쓸 것·완료 조건·확인 방법」 서술을 **전부 유지한다.**
+    `docs/HARNESS-AUDIT.md` v2.1.1 기록 3번의 「뺄 수 있음」 판정도 이것으로 기각했다.
 
 - [ ] **`subagentStatusLine`·`/statusline` 을 골격에 들일지 판단 (감사 4번 「새로 챙길 것」 — 신규, 급하지 않음)**
   - `subagentStatusLine`(v2.1.205+)은 서브에이전트 패널 행을 따로 꾸민다. `/statusline` 은 상태줄 스크립트를 자동 생성해 준다.

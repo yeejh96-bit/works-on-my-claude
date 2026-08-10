@@ -5,12 +5,7 @@
     "command": "node .claude/statusline.js"
   },
   "permissions": {
-    "allow": [
-      "PowerShell(git status:*)",
-      "PowerShell(git diff:*)",
-      "PowerShell(git log:*)",
-      "PowerShell(Get-ChildItem:*)"
-    ],
+    "allow": [],
     "deny": [
       "Read(**/.env)",
       "Read(**/.env.local)",

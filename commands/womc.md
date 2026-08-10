@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.1.1 -->
+<!-- womc:skeleton-version=2.2.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.1.1 -->
+<!-- womc:skeleton-version=2.2.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -149,9 +149,9 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
   (기존 프로젝트면 이미 있던 `CLAUDE.md`·설정에 womc 규칙을 덧붙여 병합하고, 코드 관례를 `.claude/rules/` 로 캡처하며, 구조 정리는 `plan-feature` 로 넘기도록 제안한다.)
 - **.claude/settings.json** — 하네스(작업 환경) 기본값. 비밀키 파일(`.env` 와 그 변형)을 하위 폴더 것까지
   Claude가 읽지 못하게 막고(`deny`), 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있게 둔다.
-  Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령도 미리 허용해 두고, `outputStyle` 로 답변 말투를 이 프로젝트에서만 켠다.
-  (`git status` 같은 Bash 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하므로 따로 적지 않는다.
-  Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.
+  `outputStyle` 로 답변 말투를 이 프로젝트에서만 켠다. 미리 허용해 두는 명령(`allow`)은 없다 — 빈 목록으로 시작한다.
+  (`git status` 같은 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하므로 따로 적지 않는다 —
+  Bash 든 PowerShell 이든 마찬가지다(Windows 실측, 2026-08-10). 차단은 파일 읽기 도구에만 걸리므로, 진짜 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.
   권한을 묻는 일이 잦아지면 `/fewer-permission-prompts` 를 한 번 돌리면 자주 쓰는 읽기 전용 명령이 허용 목록에 추가된다.)
 - **.claude/statusline.js** — 터미널 하단 상태줄 스크립트(Node). 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 보여준다.
   `.claude/settings.json` 의 `statusLine` 항목이 이 파일을 실행한다. Node.js 가 설치돼 있어야 동작하며, 없어도 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
@@ -233,8 +233,9 @@ Thumbs.db
   `.env.*` 처럼 통째로 막지 않고 **비밀이 들어가는 이름만 골라서** 막는다. (deny 는 allow 보다 우선이라, 통째로 막으면 견본만 예외로 풀 방법이 없다.
   흔한 이름 기준이므로 특이한 이름의 비밀 파일까지 다 잡지는 못한다 — 진짜 중요한 비밀은 프로젝트 폴더 밖에 둔다.)
   또한 이 차단은 파일 읽기 도구(Read)에만 걸린다. 터미널 명령으로 읽는 것까지 다 막지는 못한다.
-- `git status` 같은 Bash 읽기 전용 명령은 Claude Code 가 **기본으로 프롬프트 없이 허용**하므로 적지 않는다.
-  Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령만 미리 허용해 둔다. (Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다 — 해는 없다.)
+- `allow` 는 **빈 목록으로 둔다.** `git status`·`Get-ChildItem` 같은 읽기 전용 명령은 Claude Code 가
+  **기본으로 프롬프트 없이 허용**하므로 적을 필요가 없다 — Bash 뿐 아니라 **PowerShell 도 마찬가지**다(Windows 실측, 2026-08-10).
+  v2.1.1 까지는 PowerShell 4줄을 박아 두었으나 불필요한 것으로 확인돼 뺐다. 필요한 것이 생기면 그때 추가한다.
 - `push`·`reset` 같이 되돌리기 어려운 명령은 일부러 넣지 않는다 — 그건 매번 확인받는 게 맞다.
 - `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(프로젝트 루트 기준 상대 경로, 6번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
 - `outputStyle` 은 womc 플러그인이 제공하는 답변 말투를 이 프로젝트에서만 켠다. 다른 폴더에서는 평소 말투 그대로다.
@@ -251,12 +252,7 @@ Thumbs.db
     "command": "node .claude/statusline.js"
   },
   "permissions": {
-    "allow": [
-      "PowerShell(git status:*)",
-      "PowerShell(git diff:*)",
-      "PowerShell(git log:*)",
-      "PowerShell(Get-ChildItem:*)"
-    ],
+    "allow": [],
     "deny": [
       "Read(**/.env)",
       "Read(**/.env.local)",
@@ -349,7 +345,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.1.1 -->
+<!-- womc:skeleton-version=2.2.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -465,6 +461,7 @@ process.stdin.on("end", () => {
 3. `.claude/settings.json` 은 통째로 덮어쓰지 않는다. 기존 파일을 먼저 읽고,
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.)
+   **`allow` 에 옛 골격의 PowerShell 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)이 있으면 그 4개만 지운다** — v2.2.0 에서 뺀 옛 기본값이다. 읽기 전용 명령은 Bash·PowerShell 모두 Claude Code 가 기본으로 프롬프트 없이 허용하므로 필요 없다(Windows 실측, 2026-08-10). **그 4개 말고 `allow` 에 들어 있는 항목은 사용자가 직접 넣은 것이므로 한 줄도 건드리지 않는다.**
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
    `outputStyle` 키가 없으면 `"womc:womc-caveman"` 으로 추가한다. **값이 정확히 `"womc-caveman"`(접두 `womc:` 가 빠진 옛 골격의 값)이면 `"womc:womc-caveman"` 으로 고친다** — 그 값은 어떤 스타일과도 매칭되지 않아 말투가 조용히 안 켜지던 버그이므로, 사용자가 고른 말투로 보지 않는다(v2.1.1 에서 고쳤다). 그 둘 말고 **다른 값이 들어 있으면 덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 어느 쪽이었는지 완료 보고에 한 줄만 알린다.
    `hooks` 는 이렇게 다룬다 — 위 2번에서 `answer-style.js` 를 지웠으면 `node .claude/answer-style.js` 를 실행하는 `UserPromptSubmit` 항목도 함께 뺀다(스크립트가 없는데 훅만 남으면 매 입력마다 실패한다). 그 결과 `hooks` 가 비면 키째 지운다. 사용자가 직접 넣은 다른 훅은 건드리지 않는다.

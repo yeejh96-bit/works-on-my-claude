@@ -21,9 +21,9 @@
   (기존 프로젝트면 이미 있던 `CLAUDE.md`·설정에 womc 규칙을 덧붙여 병합하고, 코드 관례를 `.claude/rules/` 로 캡처하며, 구조 정리는 `plan-feature` 로 넘기도록 제안한다.)
 - **.claude/settings.json** — 하네스(작업 환경) 기본값. 비밀키 파일(`.env` 와 그 변형)을 하위 폴더 것까지
   Claude가 읽지 못하게 막고(`deny`), 비밀이 없는 견본 파일(`.env.example`)은 읽을 수 있게 둔다.
-  Windows(PowerShell)에서 자주 쓰는 읽기 전용 명령도 미리 허용해 두고, `outputStyle` 로 답변 말투를 이 프로젝트에서만 켠다.
-  (`git status` 같은 Bash 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하므로 따로 적지 않는다.
-  Mac/Linux 에서는 PowerShell 항목이 조용히 무시된다. 차단은 파일 읽기 도구에만 걸리므로, 진짜 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.
+  `outputStyle` 로 답변 말투를 이 프로젝트에서만 켠다. 미리 허용해 두는 명령(`allow`)은 없다 — 빈 목록으로 시작한다.
+  (`git status` 같은 읽기 전용 명령은 Claude Code가 기본으로 프롬프트 없이 허용하므로 따로 적지 않는다 —
+  Bash 든 PowerShell 이든 마찬가지다(Windows 실측, 2026-08-10). 차단은 파일 읽기 도구에만 걸리므로, 진짜 비밀은 프로젝트 폴더 밖에 두는 게 가장 안전하다.
   권한을 묻는 일이 잦아지면 `/fewer-permission-prompts` 를 한 번 돌리면 자주 쓰는 읽기 전용 명령이 허용 목록에 추가된다.)
 - **.claude/statusline.js** — 터미널 하단 상태줄 스크립트(Node). 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 보여준다.
   `.claude/settings.json` 의 `statusLine` 항목이 이 파일을 실행한다. Node.js 가 설치돼 있어야 동작하며, 없어도 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
