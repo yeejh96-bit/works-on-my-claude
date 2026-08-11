@@ -99,6 +99,22 @@
 
 ## 끝난 일
 
+- [x] `plan-feature` 검증 절에 「실패했을 때 되돌아가는 경로」를 명시 (v2.2.4) — **2026-08-12**
+  - 근거: 「5. 검증(verify 위임)」 절이 verify 의 **"실패" 뒤에 무엇을 할지**를 적어 두지 않았다.
+    그래서 실패했을 때의 처리가 매번 즉흥 판단이었고, 몇 번까지 다시 시켜 보는지도 정해져 있지 않았다.
+  - 손댄 파일: `skills/plan-feature/SKILL.md`(「5. 검증(verify 위임)」 절) · `PLAN.md` · 이 파일 · `.claude-plugin/plugin.json`
+  - 남긴 것:
+    - **되돌아가는 경로가 절차문에 박혔다**: verify 실패 → verify 가 짚은 원인을 `implement` 에 넘겨 고치고 **다시 verify**.
+    - **재위임 상한은 한 작업 항목당 2회다.** 2회를 쓰고도 실패하면 **멈추고** 사용자에게 무엇이 왜 실패했는지 보고한 뒤
+      "계획을 다시 짜 볼까요?"라고 되묻는다. 사용자가 좋다고 하면 **3단계(`plan` 위임)로 되돌아가** 설계부터 다시 하며
+      **실패 원인을 `plan` 에 함께 넘긴다**(같은 설계로 또 두들기지 않게 하는 것이 이 조항의 요점이다).
+    - **실패한 채로 6·7절로 넘어가지 않고, `TASKS.md` 항목도 `[x]` 로 닫지 않는다.** 실패가 「끝난 일」로 둔갑하는 것을 막는 안전장치다.
+    - 버전은 2.2.3 → **2.2.4**(`.claude-plugin/plugin.json`).
+  - 확인 방법: `skills/plan-feature/SKILL.md` 5절에 「실패했을 때 — 되돌아가는 경로」 소절이 있고
+    **2회 상한**·**`plan` 복귀** 문구가 들어 있는지 읽어 확인. `.claude-plugin/plugin.json` 의 `version` 이 `2.2.4` 인지 확인.
+    **스크립트로는 문구를 못 잡는다** — 스킬 파일은 `commands/womc.md` 에 임베드되지 않아 `check-sync.py` 의 대조 대상이 아니다
+    (`PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 는 버전 표식 6곳이 `2.2.4` 로 맞는지만 확인해 준다).
+
 - [x] 「설명 방식」 절 판정이 아주 옛 골격 판을 못 잡던 빈틈을 메움 (v2.2.3) — **2026-08-11**
   - 근거: 같은 날 `pay` 폴더 실측. v2.2.2 의 지문 두 개(`womc:brevity=` · `answer-style.js`)는 **그 표식이 생기기 전 판본을 못 잡아**,
     `- 모든 설명은 한국어로 한다.` 한 줄뿐인 v1.10 이하 원문을 「사용자 커스텀」으로 오판해 보존했다.
@@ -177,30 +193,6 @@
     - 버전은 `py scripts/bump-version.py 2.2.0` 한 줄로 6곳을 올렸다.
   - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.2.0`.
     **갱신 모드의 옛 4줄 청소가 실제로 도는지는 스크립트로 못 잡는다** — 위 「할 일」의 남은 항목에서 사람이 확인한다.
-
-- [x] 말투가 한 번도 안 켜지던 버그 수정 — A안 (v2.1.1) — **검증까지 완료 (2026-08-10)**
-  - ✅ **육안 검증 통과** — 재시작 뒤 메인 답변이 실제로 원시인 말투로 나왔다. `womc:explore` 서브에이전트 보고는 평문 한국어였다.
-    시험 폴더에 `/womc update` 를 돌렸을 때도 `outputStyle` 이 `"womc:womc-caveman"` 으로 들어갔다(갱신 모드 3번의 자동 교정이 동작).
-  - 손댈 파일: `.claude/settings.json` · `commands/womc.md`(3자리) · `HARNESS.md` · `README.md` · `PLAN.md` · `TASKS.md` · `.claude-plugin/plugin.json`
-  - **버그의 정체**: 플러그인이 제공하는 출력 스타일은 레지스트리에 **`플러그인이름:스타일이름`**(`womc:womc-caveman`)으로 등록되고,
-    조회는 **키 정확일치**다(정규화가 콜론을 제거하지 않는다). 그런데 골격이 넣던 값은 `"womc-caveman"` 이라 **아무것도 못 찾고 조용히 무시**됐다.
-    경고도 안 뜬다. **v1.20.0 이후 지금까지 케이브맨 말투는 한 번도 켜진 적이 없다.**
-    근거는 `docs/HARNESS-AUDIT.md` v2.1.0 기록 2번(문서 URL + 설치 바이너리 실측 + 이 세션 자체가 원시인 말투가 아니었다는 실측).
-  - 남긴 것:
-    - **값 3자리를 `"womc:womc-caveman"` 으로**: `.claude/settings.json:2` · `commands/womc.md` 5번 절 JSON 임베드 · 그 설명 불릿.
-      **파일명과 frontmatter `name` 은 안 바꿨다** — `output-styles/womc-caveman.md` / `name: womc-caveman` 그대로다. 접두는 **등록 키에만** 붙는다(헷갈리기 쉬운 자리).
-    - **갱신 모드 3번에 자동 교정을 넣은 것이 절반의 핵심이다** (`commands/womc.md` 갱신 모드 3번) —
-      `outputStyle` 값이 **정확히 `"womc-caveman"`** 이면 옛 골격의 깨진 값으로 보고 `"womc:womc-caveman"` 으로 **고친다.**
-      그 둘 말고 다른 값이면 사용자가 고른 말투이므로 **그대로 둔다.** 이 예외가 없으면 이미 깔린 프로젝트가 영영 안 고쳐진다.
-    - `HARNESS.md:47` 안내를 "`/config` 에서 이름 확인" → "**`outputStyle` 값이 `womc:womc-caveman` 인지 확인**"으로 바꿨다.
-      **이 줄은 `commands/womc.md` HARNESS 임베드 사본과 글자 그대로 같아야 한다**(어긋나면 `check-sync.py` 가 DRIFT 로 잡는다).
-    - 버전은 `py scripts/bump-version.py 2.1.1` 한 줄로 6곳을 올렸다.
-    - **A안을 고른 이유**: B안(`force-for-plugin: true`)은 womc 가 켜진 **모든** 프로젝트에 말투를 강제하고 사용자의 `outputStyle` 을 덮어써서
-      "프로젝트별로 켠다"는 설계 결정과 어긋난다. C안(프로젝트로 복사)은 "말투 규칙은 한 곳에만" 원칙과 어긋난다.
-      B안은 「할 일」의 「닫힌 것 · 보류」 소절에 `[-]` 보류로 있다(집지 않는다).
-  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.1.1`.
-    **말투가 실제로 켜지는지는 스크립트로 못 잡는다** — 커밋·push → 플러그인 재설치 → **Claude Code 재시작** 후
-    메인 답변이 원시인 말투인지 육안 확인해야 한다(위 「지금 하는 일」의 통과 조건 ④).
 
 > 최근 작업만 여기 남긴다. **v2.1.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
