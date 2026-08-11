@@ -5,7 +5,7 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 실행:  py scripts/check-sync.py     (Windows)
        python3 scripts/check-sync.py (Mac/Linux)
 
-검사 네 가지:
+검사 다섯 가지:
 1) commands/womc.md 안에 박힌 "원본" 텍스트와, 이 저장소가 실제로 dogfood 하는
    라이브 파일(CLAUDE.md, HARNESS.md, settings.json, statusline.js)이 글자 그대로 일치하는지.
    (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
@@ -15,6 +15,9 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
    **모든** 표식을 전수 검사한다. (이 표식은 /womc update 의 "옛 캐시" 판정 기준이라 어긋나면 캐시 감지가 조용히 오작동한다.
    예전에는 첫 표식 하나만 봐서, 뒤쪽 표식이 옛 버전으로 남아도 통과하는 구멍이 있었다.)
 4) README.md 본문에 서브에이전트 4종 이름이 모두 등장하는지. (문서가 옛 구성에 멈춰 있는 걸 잡는다.)
+5) 열린 확인(open-checks) 대조 — TASKS.md 의 열린 항목에 붙은 ID 주석과 docs/HARNESS-AUDIT.md 의
+   앵커 구획 안 목록이 같은지. (한쪽만 고쳐 두 목록이 조용히 어긋나는 걸 막는다.
+   ID 주석이 닫힌 항목에 남아 있는 것도 함께 잡는다.)
 
 하나라도 어긋나면 종료코드 1 로 끝난다.
 """
@@ -103,6 +106,54 @@ if not missing:
 else:
     print(f"DRIFT  README 에 빠진 서브에이전트: {', '.join(missing)}")
     problems.append("README agents")
+
+# 5) 열린 확인(open-checks) 대조 — TASKS.md 의 ID 주석 ↔ docs/HARNESS-AUDIT.md 앵커 구획
+#    앵커는 "정확히 그 줄"이 아니라 "그 문자열이 들어 있는 줄"로 찾는다(앵커 줄에 다른 글자가 붙어도 잡히게).
+OPEN_BEGIN = "womc:open-checks:begin"
+OPEN_END = "womc:open-checks:end"
+open_comment_re = re.compile(r"<!--\s*open:([a-z0-9-]+)\s*-->")
+open_tick_re = re.compile(r"`open:([a-z0-9-]+)`")
+
+# 5-1) TASKS.md — HTML 주석 형태만 센다(본문의 백틱 언급은 ID 가 아니다)
+tasks_ids = set()
+for lineno, line in enumerate((ROOT / "TASKS.md").read_text(encoding="utf-8").splitlines(), 1):
+    ids = open_comment_re.findall(line)
+    if not ids:
+        continue
+    tasks_ids.update(ids)
+    if not line.lstrip().startswith("- [ ]"):
+        shown = ", ".join(f"open:{i}" for i in ids)
+        print(f"DRIFT  TASKS.md:{lineno} 닫힌/보류 항목에 ID 주석이 남아 있음 ({shown})  [ID 주석은 열린 '- [ ]' 항목에만]")
+        problems.append(f"open-checks:TASKS.md:{lineno}")
+
+# 5-2) docs/HARNESS-AUDIT.md — 앵커 구획 안쪽만 센다
+audit_lines = (ROOT / "docs/HARNESS-AUDIT.md").read_text(encoding="utf-8").splitlines()
+begins = [i for i, line in enumerate(audit_lines) if OPEN_BEGIN in line]
+ends = [i for i, line in enumerate(audit_lines) if OPEN_END in line]
+audit_ids = None
+if len(begins) != 1 or len(ends) != 1:
+    print(
+        f"DRIFT  docs/HARNESS-AUDIT.md 의 열린 확인 앵커가 짝이 안 맞음"
+        f"  [begin {len(begins)}개 / end {len(ends)}개, 각각 1개여야 함]"
+    )
+    problems.append("open-checks anchor")
+elif begins[0] > ends[0]:
+    print("DRIFT  docs/HARNESS-AUDIT.md 의 열린 확인 앵커 순서가 뒤집힘 (begin 이 end 보다 뒤)")
+    problems.append("open-checks anchor")
+else:
+    audit_ids = set(open_tick_re.findall("\n".join(audit_lines[begins[0] + 1 : ends[0]])))
+
+# 5-3) 두 목록 대조
+if audit_ids is not None:
+    if tasks_ids == audit_ids:
+        print(f"OK     열린 확인 ID {len(tasks_ids)}개 일치 (TASKS.md == docs/HARNESS-AUDIT.md)")
+    else:
+        only_tasks = sorted(tasks_ids - audit_ids)
+        only_audit = sorted(audit_ids - tasks_ids)
+        print("DRIFT  열린 확인 목록 불일치 (TASKS.md != docs/HARNESS-AUDIT.md)")
+        print(f"       TASKS 에만: {', '.join('open:' + i for i in only_tasks) if only_tasks else '(없음)'}")
+        print(f"       AUDIT 에만: {', '.join('open:' + i for i in only_audit) if only_audit else '(없음)'}")
+        problems.append("open-checks")
 
 if problems:
     print(f"\n[!] 어긋난 항목 {len(problems)}개 — 커밋 전에 맞춰 주세요.")

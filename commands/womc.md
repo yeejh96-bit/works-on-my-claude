@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.2.0 -->
+<!-- womc:skeleton-version=2.2.1 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.2.0 -->
+<!-- womc:skeleton-version=2.2.1 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -345,7 +345,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.2.0 -->
+<!-- womc:skeleton-version=2.2.1 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -462,6 +462,7 @@ process.stdin.on("end", () => {
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.)
    **`allow` 에 옛 골격의 PowerShell 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)이 있으면 그 4개만 지운다** — v2.2.0 에서 뺀 옛 기본값이다. 읽기 전용 명령은 Bash·PowerShell 모두 Claude Code 가 기본으로 프롬프트 없이 허용하므로 필요 없다(Windows 실측, 2026-08-10). **그 4개 말고 `allow` 에 들어 있는 항목은 사용자가 직접 넣은 것이므로 한 줄도 건드리지 않는다.**
+   **옛 4줄을 실제로 지웠는지, 아니면 애초에 없어서 지울 게 없었는지를 완료 보고(6번)에 반드시 한 줄 적는다** — 이 청소는 한 번뿐이라 지금이 실제로 지워졌는지 확인할 유일한 기회이고, 아래 7번이 그 결과를 열린 확인 `open:allow-cleanup` 을 닫는 근거로 쓴다.
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
    `outputStyle` 키가 없으면 `"womc:womc-caveman"` 으로 추가한다. **값이 정확히 `"womc-caveman"`(접두 `womc:` 가 빠진 옛 골격의 값)이면 `"womc:womc-caveman"` 으로 고친다** — 그 값은 어떤 스타일과도 매칭되지 않아 말투가 조용히 안 켜지던 버그이므로, 사용자가 고른 말투로 보지 않는다(v2.1.1 에서 고쳤다). 그 둘 말고 **다른 값이 들어 있으면 덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 어느 쪽이었는지 완료 보고에 한 줄만 알린다.
    `hooks` 는 이렇게 다룬다 — 위 2번에서 `answer-style.js` 를 지웠으면 `node .claude/answer-style.js` 를 실행하는 `UserPromptSubmit` 항목도 함께 뺀다(스크립트가 없는데 훅만 남으면 매 입력마다 실패한다). 그 결과 `hooks` 가 비면 키째 지운다. 사용자가 직접 넣은 다른 훅은 건드리지 않는다.
@@ -475,7 +476,8 @@ process.stdin.on("end", () => {
    `.claude/` 는 Claude Code 가 보호하는 자리라 쓸 때마다 권한을 묻는다는 것, 말투는 Claude Code 를 껐다 켜야 적용된다는 것도 한 줄씩 덧붙인다.
 7. **하네스 감사 (자동).** 위 1~6번으로 골격 갱신을 마쳤으면 곧바로 이어서 한다 — 사용자가 따로 부르지 않아도 된다.
    - `docs/HARNESS-AUDIT.md` 의 맨 위 기록에 적힌 「마지막 감사 기준 버전」과 지금 `claude --version` 을 비교한다. 파일이 없으면 이번이 첫 감사다 — 그냥 진행한다.
-   - **두 버전이 같으면 건너뛴다** — "지난 감사 이후 Claude Code 가 안 올라갔음" 한 줄만 알리고 끝낸다.
+   - **두 버전이 같으면 감사 본체만 건너뛴다** — "지난 감사 이후 Claude Code 가 안 올라갔음" 한 줄을 알린다. **건너뛰더라도 `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획(`womc:open-checks:begin` 이 들어 있는 줄부터 `womc:open-checks:end` 가 들어 있는 줄까지)은 반드시 읽어, 열린 확인 항목이 있으면 한 줄씩 사용자에게 알린다.** 그 항목의 전문(조건·확인 방법)은 `TASKS.md` 「할 일」에 있으니 필요하면 거기서 읽어 온다.
+     위 3번에서 옛 `allow` 4줄을 **실제로 지웠다면 그 사실이 열린 확인 `open:allow-cleanup` 의 확인 결과**이므로 함께 알리고, `TASKS.md` 의 그 항목을 닫아도 되는지 사용자에게 묻는다. (`TASKS.md` 를 말없이 고치지 않는다 — 사용자가 좋다고 할 때만 닫는다.)
    - 다르면 `harness-audit` 스킬을 그 자리에서 실행한다. (스킬 절차를 여기 베껴 적지 않는다 — 절차의 진실은 `skills/harness-audit/SKILL.md` 한 곳에만 둔다.)
    - 스킬이 「뺄 수 있음」을 하나라도 찾으면 **파일을 바로 고치지 말고 사용자에게 한 번 묻는다.** 쉬운 말 예: "지금 골격에서 빼도 되는 게 N개 나왔음. 지금 정리할까요, 기록만 남길까요?" 사용자가 좋다고 하면 `plan-feature` 로 넘어가 정리한다.
      **묻지 않고 지우는 일은 없다** — 골격을 지우는 건 되돌리기 번거롭고, 근거가 틀리면 잘 돌던 세팅이 깨지기 때문이다.
