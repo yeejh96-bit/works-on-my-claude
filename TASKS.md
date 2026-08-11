@@ -8,6 +8,39 @@
 (이 파일과 `PLAN.md` 는 기록용으로 남겨 두며 지우지 않는다. **git 에 올린다** — 다른 PC 에서 이어 작업할 때
 진행 상태와 「끝난 일」의 결정 이유를 그대로 볼 수 있어야 하기 때문이다. 커밋할 때 이 두 파일도 함께 넣는다.)
 
+- [ ] **재시작 뒤 열린 확인 3건 닫기 — 새 세션에서 이 항목부터 집는다 (2026-08-11 남김)**
+  - **아래 1번을 건너뛰면 나머지가 전부 무의미하다.** 지금 돌고 있는 `/womc update` 절차문은 플러그인 **캐시**에서 읽히므로,
+    캐시가 옛 2.2.0 이면 2.2.1 이 넣은 청소·알림 지시가 아예 없는 절차로 돈다.
+  - **순서대로 한다:**
+    1. `claude plugin update` 실행 → **Claude Code 를 껐다 켠다.** (이게 안 되면 아래 2·3 은 옛 2.2.0 절차문으로 돌아 증거가 안 된다.)
+    2. **시험대 폴더 하나를 열고** `/womc update` 실행 → 그 폴더 `.claude/settings.json` 의 옛 `allow` 4줄이 **실제로 지워지는지** 본다.
+       지워졌으면 `open:allow-cleanup` 을 닫는다. 안 지워지면 **그것이 버그**이므로 「할 일」에 고칠 것으로 새로 적는다.
+    3. **이 저장소(`worksonmyclaude`) 폴더에서** `/womc update` 실행 → 화면에 **열린 확인 목록이 뜨는지** 본다.
+       뜨면 `open:audit-open-notice` 를 닫는다.
+    4. 남는 `open:statusline-v2` 는 **측정이 아니라 결정**이다. `subagentStatusLine`·`/statusline` 을 조사해 **넣을지 말지 정하면 끝난다.**
+  - **2026-08-11 새로 알아낸 것 ①  — 옛 4줄이 그대로 남은 시험대 폴더를 찾았다.** 넷 다 옛 4줄만 있고 사용자가 더한 줄은 없다(깨끗한 시험대):
+    `C:\Users\s2\Documents\project\ax` (권장) · `C:\Users\s2\Documents\project\easy-welfare` ·
+    `C:\Users\s2\Documents\project\pay` · `C:\Users\s2\Documents\project\easy-welfare\reference\pay`.
+    4줄 내용: `PowerShell(git status:*)` · `PowerShell(git diff:*)` · `PowerShell(git log:*)` · `PowerShell(Get-ChildItem:*)`.
+    → **전용 시험 폴더를 새로 만들 필요가 없다.**
+  - **새로 알아낸 것 ② — `open:audit-open-notice` 는 다른 프로젝트에서는 확인되지 않는다.**
+    열린 확인 목록은 **womc 저장소 자기 `docs/HARNESS-AUDIT.md`** 에만 있고, 다른 프로젝트는 자기 감사 기록을 따로 갖기 때문이다.
+    그래서 3번은 반드시 **`worksonmyclaude` 폴더에서** 돌려야 한다.
+  - **새로 알아낸 것 ③ — 2026-08-11 에 다른 프로젝트에서 돌린 `/womc update` 는 옛 2.2.0 절차문(플러그인 캐시)으로 돌았고,
+    그 폴더엔 옛 4줄이 없어서 두 항목 다 확인이 성립하지 않았다.** 그래서 3건이 아직 열려 있다.
+  - **⚠ 항목을 닫을 때는 두 파일을 같이 고친다** — `TASKS.md` 의 `<!-- open:이름 -->` 주석과
+    `docs/HARNESS-AUDIT.md` 앵커 구획(`womc:open-checks`)의 해당 줄을 **둘 다** 지운다.
+    **한쪽만 지우면 `scripts/check-sync.py` 가 DRIFT 로 잡는다.**
+  - 손댈 파일: `TASKS.md`(이 파일 — 「할 일」의 해당 항목과 ID 주석) · `docs/HARNESS-AUDIT.md`(앵커 구획).
+    2번에서 버그가 나오면 그때 `commands/womc.md` 갱신 모드 3번이 추가된다.
+  - 이어 쓸 것: 열린 확인 ID 3개(`open:allow-cleanup` · `open:audit-open-notice` · `open:statusline-v2`)와
+    각 항목의 전문 — 아래 「할 일」 → 「열려 있는 것」 소절. `docs/HARNESS-AUDIT.md` 머리의
+    `<!-- womc:open-checks:begin -->` ~ `<!-- womc:open-checks:end -->` 구획.
+  - 끝난 것으로 보는 조건: 열린 확인 3건이 전부 닫히거나(각각 두 파일에서 제거) 결론이 나서,
+    「할 일」 → 「열려 있는 것」 소절에 `[ ]` 항목이 남지 않는다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 전 항목 OK(두 파일의 ID 집합이 맞는지 이걸로 본다).
+    **목록이 화면에 뜨는지는 스크립트로 못 잡는다** — 3번은 사람이 눈으로 본다.
+
 - ✅ **2026-08-11 — 열린 확인을 「정본 규약」으로 다시 짰다 (기록 파일 재설계).**
   바로 아래 항목이 남긴 장치가 **전문을 두 파일에 복제**하는 방식이라 곧 어긋났다. 그래서 규약을 바꿨다.
   - **정본은 이 파일 「할 일」 한 곳뿐이다** — 배경·조건·경고·확인 방법 전문은 여기에만 쓴다. **지우지 말 것**(다른 곳에 사본이 없다).
@@ -207,6 +240,7 @@
 > 전부 아래 「닫힌 것 · 보류」 소절에 있다. **지금 열려 있는 일은 3건**이다:
 > v2.2.0 갱신 모드 확인(`open:allow-cleanup`) · `subagentStatusLine` 판단(`open:statusline-v2`) ·
 > 열린 확인 알림이 실제로 뜨는지(`open:audit-open-notice`, 2026-08-11 재설계가 새로 만든 것).
+> **「열린 확인」 3건과 별개로, 아래 「그 밖의 할 일」 소절에 보통 할 일이 따로 있다** — 그건 확인이 아니라 고칠 것이라 ID 주석이 없다.
 > **감사 기록의 파생 자리는 항목마다 다르다**: `open:statusline-v2` 는 `docs/HARNESS-AUDIT.md` v2.1.1 기록
 > **4번 절 「새로 챙길 만한 것 2가지」**, `open:allow-cleanup` 은 같은 기록 **5번③ 의 「이후 이력 ②」**
 > (①은 v2.2.0 완료 기록이고, **②가 열린 확인**이다).
@@ -261,6 +295,20 @@
   - 끝난 것으로 보는 조건: 재설치+재시작 뒤 `/womc update` 를 돌렸을 때, Claude Code 버전이 지난 감사와 같아도
     **열린 확인 3건이 화면에 표시된다.**
   - 확인 방법: 아무 womc 프로젝트에서 `/womc update` 를 실행하고 화면을 본다.
+
+### 그 밖의 할 일 (열린 확인 아님 — 고칠 것)
+
+- [ ] **감사 스킬이 `womc:open-checks` 구획을 「새로 만들」 줄 모른다**
+  - `skills/harness-audit/SKILL.md` **6단계**는 `docs/HARNESS-AUDIT.md` 가 없으면 새로 만들라고 하지만,
+    그때 **`<!-- womc:open-checks:begin -->` ~ `<!-- womc:open-checks:end -->` 앵커 구획을 만들라는 지시가 없다.**
+    **5단계**는 「구획에 한 줄 더한다」고만 해서, 구획이 없는 프로젝트에서는 **더할 자리가 없다.**
+  - 지금은 다른 프로젝트에 열린 항목이 없어 무해하지만, **생기면 걸린다.**
+  - 손댈 파일: `skills/harness-audit/SKILL.md`
+  - 이어 쓸 것: 앵커 문자열 `womc:open-checks`(begin/end). `scripts/check-sync.py` 5번 검사가 이 구획을 읽는다.
+  - 끝난 것으로 보는 조건: 6단계에 **파일이 없을 때 앵커 구획까지 만드는 지시**가 들어가고,
+    5단계에 **「구획이 없으면 그때 만든다」** 가 들어감.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 전 항목 OK
+    (이 검사가 직접 잡지는 못하므로 **문구 확인으로 대신한다**).
 
 ### 닫힌 것 · 보류 (집지 않는다)
 
