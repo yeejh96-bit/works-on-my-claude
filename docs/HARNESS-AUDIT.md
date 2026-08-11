@@ -3,19 +3,63 @@
 > `harness-audit` 스킬이 매번 읽고 이어 쓰는 기록부다. "Claude Code 가 새 버전에서
 > 기본 제공하게 된 기능"을 골격에서 걷어낸 이력을 남긴다. 다음 감사는 **맨 위 기록의
 > 「마지막 감사 기준 버전」부터** 시작하고, 같은 조사를 반복하지 않는다.
-> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.226` (2026-08-10).
-> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.1.1 기록의 5번을 본다 — 5건은 전부 닫혔다(②는 「보류」로 닫음).
+> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.228` (2026-08-12).
+> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.2.4 기록의 5번을 본다.
 > **③에서 파생됐던 열린 확인(`open:allow-cleanup`)도 2026-08-11 에 통과·닫혔다** — 남은 열린 확인은 아래 목록을 본다.
 > ③의 결론(골격에서 `allow` 4줄을 뺄 수 있다)은 **v2.2.0 으로 실행됐다 (2026-08-10).**
 
 <!-- womc:open-checks:begin -->
-> **다음 감사가 먼저 볼 것 — 열린 확인 2건**
+> **다음 감사가 먼저 볼 것 — 열린 확인 3건**
 > (정본은 `TASKS.md` 「할 일」. 조건·확인 방법을 여기 베껴 적지 않는다.)
-> - `open:statusline-v2` — `subagentStatusLine`·`/statusline` 을 골격에 들일지 (파생 자리: 아래 4번 절 「새로 챙길 만한 것 2가지」)
+> - `open:statusline-v2` — `subagentStatusLine`·`/statusline` 을 골격에 들일지 (파생 자리: v2.1.1 기록 4번 절 「새로 챙길 만한 것 2가지」)
 > - `open:audit-open-notice` — 버전이 안 올라가도 갱신·감사가 이 목록을 알리는지 (v2.2.1 수정의 동작 확인)
+> - `open:outputstyle-force-plugin` — 출력 스타일의 `force-for-plugin` 으로 settings.json 의 `outputStyle` 한 줄을 뺄 수 있는지 (파생 자리: v2.2.4 기록 5번)
 > **다음 감사는 이 항목들을 새 「실측 필요」로 다시 만들지 말고 `TASKS.md` 의 해당 항목을 갱신한다.**
 > (allow 청소 확인은 2026-08-11 에 통과·닫혔다 — 아래 5번③ 「이후 이력」 참고. **닫힌 ID 를 이 구획에 백틱으로 남기지 말 것** — 대조 스크립트가 열린 것으로 센다.)
 <!-- womc:open-checks:end -->
+
+## v2.2.4 — 2026-08-12 / Claude Code `2.1.228` 기준
+
+### 1. 무엇을 확인했나
+- **`/womc update` 7번 단계가 자동으로 부른 감사다** — 사람이 따로 부르지 않았다.
+- 지난 감사 기준(`2.1.226`)부터 현재(`2.1.228`)까지의 CHANGELOG 를 훑고,
+  골격이 손으로 떠안고 있는 8항목을 공식 문서와 대조했다 — 상태줄 · `.env` 차단 · `allow` 목록 ·
+  서브에이전트 4종 · `CLAUDE.md` 상속 · `outputStyle` · `.claude/rules/` · `PLAN.md`·`TASKS.md`.
+- 조사 분담: 웹(공식 문서·CHANGELOG)은 `general-purpose`, 로컬 실태는 메인이 직접 확인했다 —
+  골격 파일 5개가 최신 `2.2.4` 판과 **글자 그대로 일치**했다.
+
+### 2. 뒤집힌 전제
+- **없음.** 지난 기록의 전제 8개가 이번 문서 대조에서 모두 그대로 유효했다.
+
+### 3. 무엇을 뺐나 (근거)
+- **뺀 것 없음.** `2.1.226`~`2.1.228` 구간에 골격 8항목과 맞닿는 변경이 CHANGELOG 에 기재되지 않았다.
+  근거: https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md
+
+### 4. 무엇을 왜 남겼나
+- **상태줄 스크립트** — 상태줄은 여전히 「사용자가 설정한 셸 스크립트를 실행하는 바」이고 기본 상태줄이 대체하지 않는다.
+  `rate_limits.five_hour`·`seven_day` 는 스크립트에 넘어오는 입력 필드일 뿐 자동 표시가 아니다. https://code.claude.com/docs/en/statusline
+- **`.env` 읽기 차단** — 문서의 `Read(./.env)` 는 예시 deny 규칙일 뿐, 기본 차단이라는 기재가 없다. https://code.claude.com/docs/en/settings
+- **`allow` 빈 목록** — 읽기 전용 파일 접근은 무승인이고, Bash 의 내장 읽기전용 명령 집합은 모든 모드에서 무프롬프트라
+  allow 를 채울 이유가 없다(정책 유지). https://code.claude.com/docs/en/permissions#read-only-commands
+- **서브에이전트 4종** — 기본 제공에 `implement`·`verify` 대응이 없다. `explore`·`plan` 은 이름이 겹치지만
+  같은 이름의 프로젝트 에이전트가 내장을 덮어쓰며 `model` 을 유지하므로 haiku 지정을 살리려면 남긴다. https://code.claude.com/docs/en/sub-agents
+- **`CLAUDE.md` 상속** — 내장 Explore·Plan 만 `CLAUDE.md` 를 건너뛰고 그 밖의 내장·커스텀 서브에이전트는 모두 읽는다
+  (SPEC 기술 그대로 유효). https://code.claude.com/docs/en/sub-agents
+- **`outputStyle`** — 설정 자체는 현역이고 폐기 예고가 없다(폐기된 것은 `/output-style` **명령** 쪽으로 v2.1.91 에 이미 제거됨). https://code.claude.com/docs/en/output-styles
+- **`.claude/rules/`** — 자동 인식 유지. `paths` 없으면 시작 시 로드, 있으면 매칭 파일 접근 시 로드. https://code.claude.com/docs/en/memory
+- **`PLAN.md`·`TASKS.md`** — 플랜 모드는 세션 내 승인 흐름일 뿐 계획을 파일로 남겨 세션을 잇는 기능이 아니다.
+  auto memory 는 Claude 가 스스로 남기는 학습 노트라 사용자 주도 작업 대장을 대신하지 못한다. https://code.claude.com/docs/en/memory
+
+### 5. 실측 필요
+- **새로 하나 나왔다** — 출력 스타일 프론트매터 `force-for-plugin: true` 로 플러그인 스타일을 강제 적용할 수 있다는 기재가 있다
+  (근거: https://code.claude.com/docs/en/output-styles). 사실이면 골격 `settings.json` 의 `outputStyle` 한 줄을 뺄 수 있다.
+  이번 구간의 신규 기능은 아니고, 아직 실측하지 않았다.
+  → 열린 확인 `open:outputstyle-force-plugin` (정본: `TASKS.md` 「할 일」)
+- **지난 열린 확인 2건은 그대로 열려 있다.**
+  → `open:statusline-v2` · `open:audit-open-notice` (정본: `TASKS.md` 「할 일」)
+- **확인 못 한 것 2건**:
+  `2.1.226` 의 세부 수정 내역(CHANGELOG 가 "Bug fixes and reliability improvements" 한 줄뿐) ·
+  기본 permissions deny 목록의 존재 여부(문서에 서술 자체가 없어 없다고 단정할 근거도 못 찾음).
 
 ## v2.1.1 — 2026-08-10 / Claude Code `2.1.226` 기준
 
