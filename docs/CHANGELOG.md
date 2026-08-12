@@ -5,6 +5,23 @@
 > 각 항목의 형식은 `TASKS.md` 와 같다 — 손댈 파일 · 남긴 것 · 확인 방법.
 > 한 줄 요약만 필요하면 `PLAN.md` 의 「만든 것(버전 이력)」을 본다.
 
+## v2.2.0 — 골격에서 `permissions.allow` 의 PowerShell 4줄을 뺌 (2026-08-10)
+
+- 근거: 같은 날 실측(위 「지금 하는 일」의 2) · `docs/HARNESS-AUDIT.md` v2.1.1 기록 5번③). **다시 실측하지 말 것.**
+- 손댄 파일: `.claude/settings.json` · `commands/womc.md`(3자리) · `HARNESS.md` · `README.md`(2자리) · `SPEC.md` · `PLAN.md` · 이 파일 · `.claude-plugin/plugin.json`
+- 남긴 것:
+  - `allow` 는 이제 **빈 배열**이다(키는 남겼다 — 사용자가 나중에 채울 자리). `.claude/settings.json` 과
+    `commands/womc.md` 5번 절 임베드 **두 곳을 같은 값으로** 고쳤다. 한쪽만 고치면 `check-sync.py` 가 DRIFT 로 잡는다.
+  - **갱신 모드 3번에 옛 4줄 청소를 넣은 것이 절반의 핵심이다** (`commands/womc.md` 갱신 모드 3번) —
+    `allow` 에 옛 기본값 4줄이 **그대로** 있으면 그 4개만 지운다. **다른 항목은 사용자가 넣은 것이라 안 건드린다.**
+    이 예외가 없으면 이미 깔린 프로젝트가 영영 옛 4줄을 안고 간다(v2.1.1 의 `outputStyle` 자동 교정과 같은 패턴이다).
+  - 문구를 고친 자리는 **`HARNESS.md` ↔ `commands/womc.md` HARNESS 임베드 사본이 글자 그대로 같아야 한다** — 둘 다 같이 고쳤다.
+  - 버전은 `py scripts/bump-version.py 2.2.0` 한 줄로 6곳을 올렸다.
+- 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 8항목 전부 OK, 버전 `2.2.0`.
+  **갱신 모드의 옛 4줄 청소가 실제로 도는지는 스크립트로 못 잡는다** — 위 「할 일」의 남은 항목에서 사람이 확인한다.
+- ✅ **실사용 검증 통과 (2026-08-11, `ax` 폴더)** — 사용자 항목 `Bash(npm test:*)` 를 한 줄 넣어 두고 `/womc update` 를 돌렸더니
+  **옛 4줄만 사라지고 그 한 줄은 남았다.** 이로써 열린 확인 `open:allow-cleanup` 을 닫았다(`TASKS.md` 「할 일」의 「닫힌 것 · 보류」).
+
 ## v2.1.1 — 말투가 한 번도 안 켜지던 버그 수정, A안 (검증까지 완료, 2026-08-10)
 
 - ✅ **육안 검증 통과** — 재시작 뒤 메인 답변이 실제로 원시인 말투로 나왔다. `womc:explore` 서브에이전트 보고는 평문 한국어였다.

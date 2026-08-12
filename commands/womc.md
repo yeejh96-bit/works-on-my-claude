@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.2.4 -->
+<!-- womc:skeleton-version=2.3.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.2.4 -->
+<!-- womc:skeleton-version=2.3.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -345,7 +345,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.2.4 -->
+<!-- womc:skeleton-version=2.3.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -491,9 +491,11 @@ process.stdin.on("end", () => {
    `.claude/` 는 Claude Code 가 보호하는 자리라 쓸 때마다 권한을 묻는다는 것, 말투는 Claude Code 를 껐다 켜야 적용된다는 것도 한 줄씩 덧붙인다.
 7. **하네스 감사 (자동).** 위 1~6번으로 골격 갱신을 마쳤으면 곧바로 이어서 한다 — 사용자가 따로 부르지 않아도 된다.
    - `docs/HARNESS-AUDIT.md` 의 맨 위 기록에 적힌 「마지막 감사 기준 버전」과 지금 `claude --version` 을 비교한다. 파일이 없으면 이번이 첫 감사다 — 그냥 진행한다.
-   - **두 버전이 같으면 감사 본체만 건너뛴다** — "지난 감사 이후 Claude Code 가 안 올라갔음" 한 줄을 알린다. **건너뛰더라도 `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획(`womc:open-checks:begin` 이 들어 있는 줄부터 `womc:open-checks:end` 가 들어 있는 줄까지)은 반드시 읽어, 열린 확인 항목이 있으면 한 줄씩 사용자에게 알린다.** 그 항목의 전문(조건·확인 방법)은 `TASKS.md` 「할 일」에 있으니 필요하면 거기서 읽어 온다.
+     **비교는 앞 두 자리(`major.minor`)로만 한다.** 예: 기준 `2.1.226` vs 현재 `2.1.228` 이면 **같은 것으로 본다**(패치만 오름). `2.2.0` 이나 `3.0.0` 이면 다른 것이다. 세 번째 자리(패치)는 대개 버그 수정이라 골격을 바꿀 만한 신기능이 없어서다.
+   - **앞 두 자리가 같으면 감사 본체만 건너뛴다** — 한 줄로 알리되 두 경우를 구분한다: 버전이 완전히 같으면 "지난 감사 이후 Claude Code 가 안 올라갔음", 패치만 다르면 "패치만 올랐음(2.1.226 → 2.1.228) — 버그 수정 위주라 신기능 조사는 건너뜀". 이어서 **"그래도 지금 조사할까요?" 한 줄을 덧붙인다** — 사용자가 좋다고 하면 아래 「다르면」과 똑같이 `harness-audit` 스킬을 그 자리에서 실행한다.
+     **건너뛰더라도 `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획(`womc:open-checks:begin` 이 들어 있는 줄부터 `womc:open-checks:end` 가 들어 있는 줄까지)은 반드시 읽어, 열린 확인 항목이 있으면 한 줄씩 사용자에게 알린다.** 그 항목의 전문(조건·확인 방법)은 `TASKS.md` 「할 일」에 있으니 필요하면 거기서 읽어 온다.
      위 3번에서 옛 `allow` 4줄을 **실제로 지웠다면 그 사실이 열린 확인 `open:allow-cleanup` 의 확인 결과**이므로 함께 알리고, `TASKS.md` 의 그 항목을 닫아도 되는지 사용자에게 묻는다. (`TASKS.md` 를 말없이 고치지 않는다 — 사용자가 좋다고 할 때만 닫는다.)
-   - 다르면 `harness-audit` 스킬을 그 자리에서 실행한다. (스킬 절차를 여기 베껴 적지 않는다 — 절차의 진실은 `skills/harness-audit/SKILL.md` 한 곳에만 둔다.)
+   - **앞 두 자리가 다르면** `harness-audit` 스킬을 그 자리에서 실행한다. 이때 조사 구간은 패치까지 포함한 **「마지막 감사 기준 버전 ~ 현재 버전」 전체**다. (스킬 절차를 여기 베껴 적지 않는다 — 절차의 진실은 `skills/harness-audit/SKILL.md` 한 곳에만 둔다.)
    - 스킬이 「뺄 수 있음」을 하나라도 찾으면 **파일을 바로 고치지 말고 사용자에게 한 번 묻는다.** 쉬운 말 예: "지금 골격에서 빼도 되는 게 N개 나왔음. 지금 정리할까요, 기록만 남길까요?" 사용자가 좋다고 하면 `plan-feature` 로 넘어가 정리한다.
      **묻지 않고 지우는 일은 없다** — 골격을 지우는 건 되돌리기 번거롭고, 근거가 틀리면 잘 돌던 세팅이 깨지기 때문이다.
    - `harness-audit` 스킬이 없거나(플러그인 캐시가 옛 판) 실행이 안 되면 **조용히 건너뛰고** 갱신 자체는 성공으로 끝낸다 — 감사 때문에 갱신이 실패해서는 안 된다.
