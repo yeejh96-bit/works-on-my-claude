@@ -5,6 +5,32 @@
 > 각 항목의 형식은 `TASKS.md` 와 같다 — 손댈 파일 · 남긴 것 · 확인 방법.
 > 한 줄 요약만 필요하면 `PLAN.md` 의 「만든 것(버전 이력)」을 본다.
 
+## v2.2.1 — 열린 확인을 「정본 규약」으로 다시 짬 + 서브에이전트 모델 조정 (2026-08-11)
+
+- 근거: `/code-review` 가 기록 파일에서 확정한 결함 10건. 전문을 두 파일에 복제하던 옛 방식이 곧 어긋났다(`TASKS.md` 「지금 하는 일」의 「정본 규약」 항목).
+- 손댄 파일: `TASKS.md` · `docs/HARNESS-AUDIT.md` · `skills/plan-feature/SKILL.md` ·
+  `skills/harness-audit/SKILL.md` · `commands/womc.md`(갱신 모드 3번·7번) · `scripts/check-sync.py` ·
+  `agents/implement.md` · `agents/verify.md` · `SPEC.md` · `PLAN.md` · `.claude-plugin/plugin.json`
+- 남긴 것:
+  - **정본은 `TASKS.md` 「할 일」 한 곳이다.** 배경·조건·경고·확인 방법 전문은 여기에만 쓰고,
+    `docs/HARNESS-AUDIT.md` 머리의 앵커 구획 **`<!-- womc:open-checks:begin -->` ~ `<!-- womc:open-checks:end -->`** 에는
+    ID 한 줄 + 링크만 둔다. **두 파일은 항상 같이 고친다** — 한쪽만 고치면 아래 대조 검사가 DRIFT 로 잡는다.
+  - **열린 확인 ID 3개**: `open:allow-cleanup` · `open:statusline-v2` · `open:audit-open-notice`(이번 장치의 동작 확인용 신설).
+    ID 는 항목 제목 줄 끝에 HTML 주석으로 붙이고 **`- [ ]` 항목에만** 붙인다. 닫거나 보류로 내릴 때 주석도 함께 지운다.
+  - **보류 표기 `[-]` 신설** — `[x]` 에 각주를 달아 뜻을 뒤집던 방식을 폐기했다(`skills/plan-feature/SKILL.md` 표기 어휘 + 뜻 뒤집기 금지 문장).
+  - **`scripts/check-sync.py` 에 5번째 검사 「열린 확인 ID 대조」 추가** — 상수 `OPEN_BEGIN`/`OPEN_END` 로 AUDIT 앵커 구획을 잘라
+    백틱 ID 집합을 뽑고, `TASKS.md` 의 ID 주석 집합과 대조한다. 어긋나면 DRIFT + 양쪽 차집합 출력.
+    ID 주석이 `- [ ]` 아닌 줄에 있어도 DRIFT.
+  - **알림 장치**: `skills/harness-audit/SKILL.md` 1단계와 `commands/womc.md` 갱신 모드 7번은
+    Claude Code 버전이 지난 감사와 **같아도** 앵커 구획을 읽어 열린 확인 목록을 화면에 알린다(멈추기 전에 알린다).
+    감사 5단계에 중복 생성 금지·ID 주석·전문은 TASKS 에만, 6단계에 구획 갱신 의무를 못 박았다.
+  - 갱신 모드 3번은 옛 `allow` 4줄 청소 결과를 **완료 보고에 적어야** 하고, 7번은 그 결과를 `open:allow-cleanup` 의 근거로 사용자에게 확인받는다.
+  - **서브에이전트 모델**: `agents/implement.md` · `agents/verify.md` 를 `sonnet` → **`opus`**.
+    현재 4종 = explore `haiku` · plan `opus` · implement `opus` · verify `opus` (`SPEC.md` 3항 3번도 같이 갱신).
+  - 버전은 `py scripts/bump-version.py 2.2.1` 한 줄로 6곳을 올렸다(손으로 세지 말 것).
+- 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 9항목 전부 OK, 버전 `2.2.1`.
+  **알림이 실제로 화면에 뜨는지는 스크립트로 못 잡는다** — `TASKS.md` 「할 일」의 `open:audit-open-notice` 에서 사람이 확인한다.
+
 ## v2.2.0 — 골격에서 `permissions.allow` 의 PowerShell 4줄을 뺌 (2026-08-10)
 
 - 근거: 같은 날 실측(위 「지금 하는 일」의 2) · `docs/HARNESS-AUDIT.md` v2.1.1 기록 5번③). **다시 실측하지 말 것.**

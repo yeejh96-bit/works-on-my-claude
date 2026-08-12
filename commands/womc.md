@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.3.0 -->
+<!-- womc:skeleton-version=2.4.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.3.0 -->
+<!-- womc:skeleton-version=2.4.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -79,6 +79,8 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 - `SPEC.md` 가 거의 비어 있는데 기능 요청이 오면, 먼저 SPEC 을 같이 채우자고 쉬운 말로 안내한다.
 - `TASKS.md` 에 하는 중(`[~]`) 항목이 있는데 다른 기능 요청이 오면, 하던 것부터 끝내자고 먼저 권한다. (사용자가 그래도 새 걸 원하면 따르되, 하던 항목이 중단됐다고 `TASKS.md` 에 표시한다.)
 - 검증을 건너뛰고 다음으로 가자고 하면, 방금 만든 게 실제로 동작하는지 먼저 확인하자고 한 번 권한다.
+- **되돌리기 어려운 일은 하기 전에 사용자에게 한 줄로 묻고, 좋다는 답을 받은 뒤에 한다.** 대상: 파일·폴더 지우기 / 폴더 밖으로 옮기기 / `git push`·`git reset --hard`·브랜치 지우기 / 배포하기·외부로 보내기 / 데이터베이스 내용 지우기. 물을 때는 무엇이 사라지는지 쉬운 말로 함께 알린다(사용자는 코딩을 모른다).
+- 한 번 좋다고 한 것이 **다음번까지 이어지지 않는다** — 되돌리기 어려운 일은 그때그때 다시 묻는다.
 
 ## 프로젝트 상세
 이 프로젝트의 구체적인 내용(스택, 무엇을 만드는지 등)은 아래 파일에 있다.
@@ -345,7 +347,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.3.0 -->
+<!-- womc:skeleton-version=2.4.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
