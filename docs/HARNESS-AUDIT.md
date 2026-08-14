@@ -9,11 +9,12 @@
 > ③의 결론(골격에서 `allow` 4줄을 뺄 수 있다)은 **v2.2.0 으로 실행됐다 (2026-08-10).**
 
 <!-- womc:open-checks:begin -->
-> **다음 감사가 먼저 볼 것 — 열린 확인 3건**
+> **다음 감사가 먼저 볼 것 — 열린 확인 4건**
 > (정본은 `TASKS.md` 「할 일」. 조건·확인 방법을 여기 베껴 적지 않는다.)
 > - `open:statusline-v2` — `subagentStatusLine`·`/statusline` 을 골격에 들일지 (파생 자리: v2.1.1 기록 4번 절 「새로 챙길 만한 것 2가지」)
 > - `open:audit-open-notice` — 버전이 안 올라가도 갱신·감사가 이 목록을 알리는지 (v2.2.1 수정의 동작 확인)
 > - `open:outputstyle-force-plugin` — 출력 스타일의 `force-for-plugin` 으로 settings.json 의 `outputStyle` 한 줄을 뺄 수 있는지 (파생 자리: v2.2.4 기록 5번)
+> - `open:ask-gate` — 골격 `permissions.ask` 가 실제로 「항상 허용」을 이기는지, `PowerShell(...)` 표기가 매칭되는지 (v2.5.0 이 기댄 미실측 전제)
 > **다음 감사는 이 항목들을 새 「실측 필요」로 다시 만들지 말고 `TASKS.md` 의 해당 항목을 갱신한다.**
 > (allow 청소 확인은 2026-08-11 에 통과·닫혔다 — 아래 5번③ 「이후 이력」 참고. **닫힌 ID 를 이 구획에 백틱으로 남기지 말 것** — 대조 스크립트가 열린 것으로 센다.)
 <!-- womc:open-checks:end -->

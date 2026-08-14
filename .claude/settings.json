@@ -6,6 +6,18 @@
   },
   "permissions": {
     "allow": [],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git branch -d:*)",
+      "Bash(git branch -D:*)",
+      "Bash(rm:*)",
+      "PowerShell(git push:*)",
+      "PowerShell(git reset --hard:*)",
+      "PowerShell(git branch -d:*)",
+      "PowerShell(git branch -D:*)",
+      "PowerShell(Remove-Item:*)"
+    ],
     "deny": [
       "Read(**/.env)",
       "Read(**/.env.local)",

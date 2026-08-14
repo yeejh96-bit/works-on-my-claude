@@ -5,7 +5,7 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 실행:  py scripts/check-sync.py     (Windows)
        python3 scripts/check-sync.py (Mac/Linux)
 
-검사 다섯 가지:
+검사 여섯 가지:
 1) commands/womc.md 안에 박힌 "원본" 텍스트와, 이 저장소가 실제로 dogfood 하는
    라이브 파일(CLAUDE.md, HARNESS.md, settings.json, statusline.js)이 글자 그대로 일치하는지.
    (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
@@ -18,6 +18,10 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 5) 열린 확인(open-checks) 대조 — TASKS.md 의 열린 항목에 붙은 ID 주석과 docs/HARNESS-AUDIT.md 의
    앵커 구획 안 목록이 같은지. (한쪽만 고쳐 두 목록이 조용히 어긋나는 걸 막는다.
    ID 주석이 닫힌 항목에 남아 있는 것도 함께 잡는다.)
+6) 파일 사이 문자열 결합 대조 — 「안 고른 길」·「확실하지 않은 가정」·PLAN.md 절 제목처럼 여러 파일에 글자 그대로
+   같이 있어야 성립하는 이름이, 각 파일에 최소 횟수만큼 남아 있는지(LINKED_LITERALS). 임베드 대상이 아니라
+   1번이 못 보는 agents/·skills/·PLAN.md 사이의 결합을 잡는다.
+   한계: 글자만 보지 뜻은 못 보므로, 양쪽을 동시에 같은 이름으로 다듬으면 그대로 통과한다.
 
 하나라도 어긋나면 종료코드 1 로 끝난다.
 """
@@ -45,6 +49,20 @@ EMBEDDED_FILES = [
     "HARNESS.md",
     ".claude/settings.json",
     ".claude/statusline.js",
+]
+
+# 여러 파일에 "글자 그대로" 같이 있어야 성립하는 결합들
+# (한쪽 이름만 다듬으면 조용히 어긋나는 자리 — 각 파일에 최소 몇 번 나와야 하는지로 적는다)
+LINKED_LITERALS = [
+    # 「안 고른 길」·「확실하지 않은 가정」: plan 의 출력 계약 ↔ plan-feature 3절이 그 이름으로 받는다
+    ("안 고른 길", {"agents/plan.md": 1, "skills/plan-feature/SKILL.md": 1}),
+    ("확실하지 않은 가정", {"agents/plan.md": 1, "skills/plan-feature/SKILL.md": 1}),
+    # PLAN.md 절 제목: SKILL.md 는 0절 빈 템플릿의 절 제목 + 3절 지시문 안 인용 두 자리라 최소 2
+    ("나중에 / 안 할 것", {"skills/plan-feature/SKILL.md": 2, "PLAN.md": 1}),
+    (
+        "설계 결정 (계속 유효 — 앞으로도 지킨다)",
+        {"skills/plan-feature/SKILL.md": 2, "PLAN.md": 1},
+    ),
 ]
 
 # 버전 표식(womc:skeleton-version=x.y.z)이 들어 있는 파일들 — 전수 검사한다
@@ -154,6 +172,25 @@ if audit_ids is not None:
         print(f"       TASKS 에만: {', '.join('open:' + i for i in only_tasks) if only_tasks else '(없음)'}")
         print(f"       AUDIT 에만: {', '.join('open:' + i for i in only_audit) if only_audit else '(없음)'}")
         problems.append("open-checks")
+
+# 6) 파일 사이 문자열 결합 대조 — 같은 이름이 양쪽에 그대로 남아 있는지
+for literal, expected in LINKED_LITERALS:
+    ok = True
+    for rel, minimum in expected.items():
+        path = ROOT / rel
+        if not path.exists():
+            print(f"DRIFT  {rel} 파일이 없음  [「{literal}」이 최소 {minimum}번 있어야 함]")
+            problems.append(f"linked-literal:{literal}:{rel}")
+            ok = False
+            continue
+        count = path.read_text(encoding="utf-8").count(literal)
+        if count < minimum:
+            print(f"DRIFT  {rel} 에 「{literal}」이 최소 {minimum}번 필요한데 {count}번")
+            problems.append(f"linked-literal:{literal}:{rel}")
+            ok = False
+    if ok:
+        where = ", ".join(f"{rel}×{n}" for rel, n in expected.items())
+        print(f"OK     「{literal}」 결합 유지 ({where} 이상)")
 
 if problems:
     print(f"\n[!] 어긋난 항목 {len(problems)}개 — 커밋 전에 맞춰 주세요.")

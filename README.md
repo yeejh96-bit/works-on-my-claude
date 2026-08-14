@@ -1,4 +1,4 @@
-# works-on-my-claude v2.4.0
+# works-on-my-claude v2.5.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
