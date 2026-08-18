@@ -63,6 +63,23 @@ LINKED_LITERALS = [
         "설계 결정 (계속 유효 — 앞으로도 지킨다)",
         {"skills/plan-feature/SKILL.md": 2, "PLAN.md": 1},
     ),
+    # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 4절이 그 이름으로 넘김 → implement 의 입력 계약
+    # (v2.6.0. 한 곳만 이름을 다듬으면 종료 조건이 조용히 안 넘어간다)
+    # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v2.6.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
+    #   (plan-feature 4회 = TASKS 템플릿 1 + 3절 1 + 4절 2. 그중 4절 2개가 v2.6.0 이 더한 것이다.)
+    (
+        "끝난 것으로 보는 조건",
+        {
+            "agents/plan.md": 1,
+            "agents/implement.md": 2,
+            "skills/plan-feature/SKILL.md": 4,
+        },
+    ),
+    # 「새로 들일 것」: 감사 판정 축 ↔ /womc update 7번이 그 이름으로 사용자에게 묻는다 (v2.6.0)
+    (
+        "새로 들일 것",
+        {"skills/harness-audit/SKILL.md": 7, "commands/womc.md": 2},
+    ),
 ]
 
 # 버전 표식(womc:skeleton-version=x.y.z)이 들어 있는 파일들 — 전수 검사한다
