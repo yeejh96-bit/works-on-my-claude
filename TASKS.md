@@ -115,6 +115,56 @@
 
 ## 끝난 일
 
+- [x] **v2.7.0 — 하네스 감사(모델 축 첫 실행): 검증을 고정 단계에서 조건부로 내림 (2026-08-18)**
+  - 계기: `/womc update` 7번이 자동으로 부른 감사. Claude Code 앞 두 자리는 같았고(`2.1.228` → `2.1.234`),
+    **지난 기록에 기준 모델이 없어(모름 → 다름) 모델 축으로 처음 훑었다** — v2.6.0 이 만든 모델 트리거의 첫 실행이다.
+    조사 분담: 웹 2갈래는 `general-purpose`, 로컬 1갈래는 `explore`.
+  - **가장 큰 것 — 전제가 뒤집혔다.** 공식 프롬프팅 문서가 못박았다: "Claude Opus 5 verifies its own work without being
+    told to ... **The same applies to legacy harness scaffolding that adds separate verification steps.**"
+    (https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)
+    womc 의 「구현 → 검증」 고정 흐름이 정확히 그 legacy scaffolding 이었다.
+  - 손댄 파일: `commands/womc.md` · `CLAUDE.md` · `HARNESS.md` · `skills/plan-feature/SKILL.md` · `agents/verify.md` ·
+    `SPEC.md` · `PLAN.md` · `README.md` · `.claude-plugin/plugin.json` · `docs/HARNESS-AUDIT.md` · 이 파일.
+  - 남긴 것:
+    - **검증이 고정 단계에서 조건부로 내려갔다** — 네 자리를 함께 고쳤다: `CLAUDE.md` 「절차 지키기」의
+      "검증을 건너뛰고 다음으로 가자고 하면 ... 한 번 권한다" 줄 삭제 · `CLAUDE.md` 「적극 위임」의 "동작 검증은 `verify` 에" 를
+      「고정 단계 아님」으로 교체 · `skills/plan-feature/SKILL.md` **5절**을 「동작 확인 (고정 단계 아님 — 필요할 때만)」으로 교체 ·
+      `agents/verify.md` 의 `description` 을 조건부로 좁힘. **`CLAUDE.md` 는 `commands/womc.md` 의 임베드 사본과 쌍이다 —
+      한쪽만 고치면 check-sync 1번이 DRIFT 로 잡는다.**
+    - **`verify` 에이전트 자체는 남아 있다** — 테스트·실행 로그를 메인 대화에서 떼어내는 값은 모델과 무관하다.
+      **뺀 것은 「매번 돈다」는 강제이지 도구가 아니다.** 다시 「매번」으로 되돌리지 말 것(근거는 위 문서).
+    - **`HARNESS.md` 에 권한 한계 사실 2줄** — ⓐ `Read` deny 가 Claude Code `2.1.228` 부터 **쓰기까지 함께 막는다** ·
+      ⓑ PowerShell 규칙은 별칭까지 잡지만 **Python·Node 스크립트가 대신 읽고 쓰는 건 못 막는다**.
+      근거 https://code.claude.com/docs/en/permissions
+    - **열린 확인은 4건 닫히고 2건이 새로 열렸다** — 닫힌 넷은 바로 아래 항목, 새 둘은 「할 일」의 「열려 있는 것」 소절.
+      `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획도 그 2건으로 다시 썼다(**두 파일을 항상 같이 고친다**).
+    - 감사 기록 본체는 `docs/HARNESS-AUDIT.md` 의 **v2.7.0 기록**(절 6개). 머리 인용문의 기준 버전·기준 모델도 이번 값으로 올렸다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 전 항목 OK(열린 확인 ID **2개** 일치 포함).
+  - **아직 사람이 봐야 하는 것**: 검증을 안 돌려도 품질이 안 떨어지는지 · 위임이 실제로 도는지는 스크립트가 못 본다 —
+    뒤쪽은 열린 확인 `open:delegation-vs-preset` 으로 넘겼다.
+
+- [x] **열린 확인 4건 닫음 — 2026-08-18 v2.7.0 감사에서 전부 결론이 났다**
+  - 넷 다 **골격을 그대로 둔다**는 결론이다. 다시 열지 말 것 — 다시 열려면 아래 근거를 먼저 뒤집어야 한다.
+  - [x] ~~`subagentStatusLine`·`/statusline` 을 골격에 들일지~~ → **기각.** 둘 다 실재하나 골격을 대체하지 않는다.
+    `subagentStatusLine` 은 서브에이전트 패널의 **행 모양**이고 기본 행이 이미 이름·설명·토큰수를 보여준다.
+    `/statusline` 은 `~/.claude/` **전역**에 스크립트를 생성해 주는 명령이라 프로젝트별 고정 산출물인 골격과 역할이 다르다
+    (오히려 골격 설정을 덮어쓸 위험). 근거 https://code.claude.com/docs/en/statusline
+  - [x] ~~출력 스타일 `force-for-plugin` 으로 `outputStyle` 한 줄을 뺄 수 있는지~~ → **기각(문서 확인).**
+    기능은 실재하지만 문서가 "Overrides the user's `outputStyle` setting" 이라고 못박아 **womc 가 켜진 모든 프로젝트에**
+    원시인 말투가 강제된다. womc 는 "이 프로젝트에서만" 이 설계이므로 `settings.json` 한 줄을 유지한다.
+    근거 https://code.claude.com/docs/en/output-styles
+  - [x] ~~골격 `permissions.ask` 가 실제로 「항상 허용」을 이기는지~~ → **통과.**
+    "Rules are evaluated in order: **deny, then ask, then allow.**" + "a matching ask rule prompts even when a more
+    specific allow rule also matches the same call." 「항상 허용」은 `settings.local.json` 에 allow 로 저장되므로
+    `ask` 목록은 눌러도 **다시 묻는다.** `PowerShell(...)` 표기도 문서에 정식 기재다(`:*` 접미사 = 뒤 ` *`).
+    근거 https://code.claude.com/docs/en/permissions  → **v2.5.0 의 전제가 확인됐다. 되돌릴 것 없음.**
+  - [x] ~~버전이 안 올라가도 `/womc update`·감사가 열린 확인 목록을 알리는지~~ → **통과.**
+    이번 실행에서 **버전이 안 올라간 상태로도** `/womc update` 가 열린 확인 4건을 한 줄씩 알렸다(2026-08-18 실측).
+    v2.2.1 「정본 규약」 재설계가 만든 장치가 실제로 돈다.
+  - 남긴 것: 넷 다 `docs/HARNESS-AUDIT.md` **v2.7.0 기록 5번**에 근거 원문과 함께 있다.
+    v2.2.4 기록 5번의 `force-for-plugin` 「실측 필요」 자리도 「확인됨(v2.7.0 에서 기각)」으로 고쳐 뒀다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 열린 확인 ID 가 **2개**로 줄고 두 파일이 일치.
+
 - [x] **v2.6.0 — 감사 트리거에 모델 추가 + 신기능 채택 축 신설 + 종료조건 전달 (2026-08-18)**
   - 계기: Boris Cherny 인터뷰 요약 영상의 스크립트. 사용자가 검토를 요청해 womc 에 적용할 것을 가려냈다.
     **원문은 저장소에 없다** — 외부에서 받아온 글이라 `reference/` 를 `.gitignore` 에 넣었다(사용자 결정, 2026-08-18).
@@ -228,46 +278,7 @@
     **v2.5.0 부터는 이 대조가 자동이다** — `check-sync.py` 6번 검사(`LINKED_LITERALS`)가 매번 본다.
     **실제로 되묻는지·관문이 걸리는지는 스크립트로 못 잡는다** — 위 「지금 하는 일」의 실사용 검증 항목에서 사람이 본다.
 
-- [x] 하네스 감사 트리거를 `major.minor` 로 바꿈 (v2.3.0) — **2026-08-12**
-  - 근거: Claude Code 는 패치(세 번째 자리)가 자주 오른다. 지금까지는 버전이 **조금이라도** 다르면 `/womc update` 뒤
-    감사 본체(신기능 조사)가 돌아, 버그 수정뿐인 패치 갱신에도 매번 오래 걸렸다.
-    **전례가 이 파일에 남아 있다** — 2026-08-11 에 기준 `2.1.226` → 현재 `2.1.227` 패치 하나 차이로 감사가 뜨자
-    사용자가 ⓑ(건너뛰기)를 골랐다(위 「지금 하는 일」의 2026-08-11 항목 4번).
-  - 손댄 파일: `skills/harness-audit/SKILL.md`(1단계) · `commands/womc.md`(갱신 모드 7번) · `PLAN.md` · 이 파일 ·
-    `.claude-plugin/plugin.json`(버전 표식은 `py scripts/bump-version.py 2.3.0` 한 줄로 6곳 — 손으로 세지 말 것).
-  - 남긴 것:
-    - **버전 대조는 앞 두 자리(`major.minor`)로만 한다.** 앞 두 자리가 같으면(= 패치만 올랐거나 아예 같으면)
-      감사 본체를 건너뛰고, `a` 나 `b` 가 올랐을 때만 신기능을 조사한다. 같은 규칙이 **두 파일에 다 들어갔다** —
-      `skills/harness-audit/SKILL.md` 1단계와 `commands/womc.md` 갱신 모드 7번. **한쪽만 고치면 흐름이 어긋난다.**
-    - **건너뛸 때도 열린 확인 목록 알림은 그대로 뜬다**(`docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획).
-      이건 v2.2.1 이 만든 장치라 이번 변경이 끊지 않도록 두 파일 모두에 명시했다.
-    - **"그래도 지금 조사할까요?" 한 줄을 덧붙인다** — 건너뛰기가 강제가 아니라 기본값일 뿐이다.
-      사용자가 좋다고 하면 그 자리에서 감사를 돌린다.
-    - **감사를 돌릴 때 조사 구간은 패치까지 포함한 「마지막 감사 기준 버전 ~ 현재 버전」 전체다** —
-      건너뛴 패치들의 변경도 그때 함께 훑으므로 빠뜨리는 구간이 없다(이 조항이 건너뛰기의 안전장치다).
-    - 버전은 2.2.4 → **2.3.0**(`.claude-plugin/plugin.json`).
-  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → 전 항목 OK, 버전 `2.3.0`.
-    **문구 자체는 스크립트가 못 잡는다** — 스킬 파일은 `commands/womc.md` 에 임베드되지 않아 대조 대상이 아니다.
-    두 파일에 「앞 두 자리」 문구가 있는지 읽어 확인한다.
-    **실제 동작(패치만 오른 상태에서 감사가 안 도는지)은 다음 `/womc update` 때 사람이 본다** — 위 「지금 하는 일」.
-
-- [x] `plan-feature` 검증 절에 「실패했을 때 되돌아가는 경로」를 명시 (v2.2.4) — **2026-08-12**
-  - 근거: 「5. 검증(verify 위임)」 절이 verify 의 **"실패" 뒤에 무엇을 할지**를 적어 두지 않았다.
-    그래서 실패했을 때의 처리가 매번 즉흥 판단이었고, 몇 번까지 다시 시켜 보는지도 정해져 있지 않았다.
-  - 손댄 파일: `skills/plan-feature/SKILL.md`(「5. 검증(verify 위임)」 절) · `PLAN.md` · 이 파일 · `.claude-plugin/plugin.json`
-  - 남긴 것:
-    - **되돌아가는 경로가 절차문에 박혔다**: verify 실패 → verify 가 짚은 원인을 `implement` 에 넘겨 고치고 **다시 verify**.
-    - **재위임 상한은 한 작업 항목당 2회다.** 2회를 쓰고도 실패하면 **멈추고** 사용자에게 무엇이 왜 실패했는지 보고한 뒤
-      "계획을 다시 짜 볼까요?"라고 되묻는다. 사용자가 좋다고 하면 **3단계(`plan` 위임)로 되돌아가** 설계부터 다시 하며
-      **실패 원인을 `plan` 에 함께 넘긴다**(같은 설계로 또 두들기지 않게 하는 것이 이 조항의 요점이다).
-    - **실패한 채로 6·7절로 넘어가지 않고, `TASKS.md` 항목도 `[x]` 로 닫지 않는다.** 실패가 「끝난 일」로 둔갑하는 것을 막는 안전장치다.
-    - 버전은 2.2.3 → **2.2.4**(`.claude-plugin/plugin.json`).
-  - 확인 방법: `skills/plan-feature/SKILL.md` 5절에 「실패했을 때 — 되돌아가는 경로」 소절이 있고
-    **2회 상한**·**`plan` 복귀** 문구가 들어 있는지 읽어 확인. `.claude-plugin/plugin.json` 의 `version` 이 `2.2.4` 인지 확인.
-    **스크립트로는 문구를 못 잡는다** — 스킬 파일은 `commands/womc.md` 에 임베드되지 않아 `check-sync.py` 의 대조 대상이 아니다
-    (`PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 는 버전 표식 6곳이 `2.2.4` 로 맞는지만 확인해 준다).
-
-> 최근 작업만 여기 남긴다. **v2.2.2 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
+> 최근 작업만 여기 남긴다. **v2.3.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
 
 ## 할 일
@@ -275,21 +286,19 @@
 > **이 절이 열린 확인의 정본이다.** 배경·조건·경고·확인 방법 **전문은 여기에만** 쓴다.
 > `docs/HARNESS-AUDIT.md` 에는 ID 한 줄과 링크만 둔다. **전문은 여기 한 곳뿐 — 지우지 말 것**(다른 곳에 사본이 없다).
 >
-> 2026-08-10 하네스 감사 2회(`/womc update` 가 자동 실행)가 넘긴 4건은 **③④⑤ 가 닫혔고, ②는 보류다** —
-> 전부 아래 「닫힌 것 · 보류」 소절에 있다. **지금 열려 있는 확인은 4건**이다:
-> `subagentStatusLine` 판단(`open:statusline-v2`) ·
-> 열린 확인 알림이 실제로 뜨는지(`open:audit-open-notice`, 2026-08-11 재설계가 새로 만든 것) ·
-> 출력 스타일 `force-for-plugin` 판단(`open:outputstyle-force-plugin`, 2026-08-12 감사가 새로 연 것) ·
-> `permissions.ask` 가 실제로 「항상 허용」을 이기는지(`open:ask-gate`, 2026-08-14 v2.5.0 이 새로 연 것).
-> (`open:allow-cleanup` 은 **2026-08-11 에 통과·닫았다** — 「닫힌 것 · 보류」 소절 참고.)
-> **「열린 확인」 4건과 별개로, 아래 「그 밖의 할 일」 소절에 보통 할 일이 따로 있다** — 그건 확인이 아니라 고칠 것이라 ID 주석이 없다.
+> **2026-08-18 v2.7.0 감사에서 그때까지 열려 있던 확인 4건이 전부 닫혔다** — 넷의 결론(통과인지 기각인지)과
+> 근거 URL 은 「끝난 일」의 「열린 확인 4건 닫음」 항목에 있다. **지금 열려 있는 확인은 2건**이고, 둘 다 그 감사가 새로 연 것이다:
+> 입력 리다이렉션(`cat < .env` 류)이 `.env` deny 를 우회하는지(`open:env-deny-redirect`) ·
+> 「적극 위임」이 하네스의 「Agent tool 을 부르지 마라」를 이기는지(`open:delegation-vs-preset`).
+> (`open:allow-cleanup` 은 2026-08-11 에 통과·닫았다 — 「닫힌 것 · 보류」 소절 참고.)
+> **「열린 확인」 2건과 별개로, 아래 「그 밖의 할 일」 소절에 보통 할 일이 따로 있다** — 그건 확인이 아니라 고칠 것이라 ID 주석이 없다.
 > **2026-08-11 — 갱신 모드 버그 ①②④는 v2.2.2·v2.2.3 으로 다 고쳤다. 여기 남은 것은 ③ 하나다.**
 > **지금 집을 것은 이 소절이 아니라 「지금 하는 일」의 맨 위 열린 항목이다** — 2026-08-14 현재 v2.4.0 확인, 그다음이 v2.3.0 확인이다.
 > (버전 이름 대신 **맨 위 열린 항목**으로 가리킨다 — 이름을 박아 두면 새 항목이 생길 때마다 이 줄이 낡는다. 실제로 그렇게 낡아 리뷰에 걸렸다.)
-> **감사 기록의 파생 자리는 항목마다 다르다**: `open:statusline-v2` 는 `docs/HARNESS-AUDIT.md` v2.1.1 기록
-> **4번 절 「새로 챙길 만한 것 2가지」**다. (닫힌 `open:allow-cleanup` 의 파생 자리는 같은 기록 **5번③ 의 「이후 이력 ②」**였다.)
+> **감사 기록의 파생 자리**: 지금 열린 2건은 **둘 다 `docs/HARNESS-AUDIT.md` v2.7.0 기록의 6번 절**이다
+> (`open:env-deny-redirect` = 6번①, `open:delegation-vs-preset` = 6번②).
 >
-> **열린 확인은 전부 「급하지 않음」이다** (2026-08-11 판단 · 2026-08-14 현재 4건). 전부 확인일 뿐이고 실패해도 세팅이 깨지지 않는다.
+> **열린 확인은 전부 「급하지 않음」이다** (2026-08-18 현재 2건). 전부 확인일 뿐이고 실패해도 세팅이 깨지지 않는다.
 > 전용 시험 폴더를 만들어 붙잡지 않고, 다음에 `/womc update` 나 상태줄을 손볼 일이 생겼을 때 겸사 확인한다.
 > 그래서 지금은 **새 기능을 시작해도 되는 상태다** — 하던 것부터 끝내라고 말릴 항목이 없다.
 >
@@ -303,57 +312,35 @@
 > 그 구획을 읽어 열린 확인 목록을 화면에 알린다. 두 파일의 ID 집합이 어긋나면 `scripts/check-sync.py` 가 DRIFT 로 잡는다.
 > **한쪽만 고치면 이 장치가 끊긴다** — 두 파일을 항상 같이 고친다.
 
-### 열려 있는 것 (넷 다 급하지 않음)
+### 열려 있는 것 (둘 다 급하지 않음)
 
-- [ ] **`subagentStatusLine`·`/statusline` 을 골격에 들일지 판단 — 급하지 않음 · 생각날 때 (감사 v2.1.1 기록 4번 절 「새로 챙길 만한 것 2가지」)** <!-- open:statusline-v2 -->
-  - 2026-08-11 결정: 지금 `statusline.js` 가 잘 돌고 있어 급할 이유가 없다. 상태줄을 손볼 일이 생기면 그때 함께 본다.
-  - `subagentStatusLine`(v2.1.205+)은 서브에이전트 패널 행을 따로 꾸민다. `/statusline` 은 상태줄 스크립트를 자동 생성해 준다.
-    후자가 쓸 만하면 골격이 `.claude/statusline.js` 를 직접 들고 갈 필요가 줄어든다.
-  - 확인 방법: 시험 폴더에서 `/statusline` 을 한 번 돌려 무엇이 생기는지 보고, 지금 `statusline.js` 가 보여 주는
-    5시간·주간 한도까지 나오는지 비교한다. 안 나오면 지금 것을 유지한다.
-  - **2026-08-12 감사**: `subagentStatusLine` 은 서브에이전트 행(기본 `name · description · token count`) 커스터마이즈용이고
-    메인 상태줄을 대체하지 않음. 플러그인이 기본값을 실을 수 있다는 점만 새 활용 여지.
-
-- [ ] **버전이 안 올라가도 `/womc update`·감사가 열린 확인 목록을 화면에 알리는지 확인 — 급하지 않음 · 다음 `/womc update` 때 겸사 확인** <!-- open:audit-open-notice -->
-  - 2026-08-11 「정본 규약」 재설계가 만든 장치 자체의 동작 확인이다. **관찰만 하는 항목이라 손댈 파일이 없다.**
-  - 무엇을 보는가: `/womc update` 갱신 모드 **7번**과 `harness-audit` **1단계**는 Claude Code 버전이 지난 감사와 **같아도**
-    `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획을 읽어 열린 확인 목록을 알려야 한다.
-    (버전이 벌어졌을 때만 감사가 돌던 옛 흐름에서는, 버전이 그대로면 열린 확인이 영영 눈에 안 걸렸다.)
-  - 이어 쓸 것: `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획(`<!-- womc:open-checks:begin -->` ~ `:end`).
-  - **⚠ 여기도 플러그인 재설치 + Claude Code 재시작 뒤라야 의미가 있다** — 옛 캐시의 `commands/womc.md`·스킬에는 이 지시가 없다.
-  - 끝난 것으로 보는 조건: 재설치+재시작 뒤 `/womc update` 를 돌렸을 때, Claude Code 버전이 지난 감사와 같아도
-    **그때 열려 있는 확인 항목이 전부 화면에 표시된다.**
-  - 확인 방법: 아무 womc 프로젝트에서 `/womc update` 를 실행하고 화면을 본다.
-  - **2026-08-11 1차 관찰 — 절반만 봤다.** 이 저장소에서 재시작 뒤 `/womc update` 를 돌렸고 열린 확인 3건이 화면에 떴다.
-    다만 그때 **버전이 같지 않았다**(감사 기준 `2.1.226`, 현재 `2.1.227`). 이 항목이 묻는 「같아도 뜨는가」는 아직 못 봤다.
-    → `docs/HARNESS-AUDIT.md` 의 기준 버전을 `2.1.227` 로 올리는 감사를 한 번 돌리고 나면 그다음 `/womc update` 가 곧 이 확인이 된다.
-
-- [ ] **출력 스타일 `force-for-plugin` 으로 골격 `settings.json` 의 `outputStyle` 한 줄을 뺄 수 있는지 확인 — 급하지 않음 (감사 v2.2.4 기록 5번)** <!-- open:outputstyle-force-plugin -->
-  - 2026-08-12 감사가 새로 연 항목이다. 문서에 프론트매터 `force-for-plugin: true` 로 **플러그인이 켜져 있으면 스타일이 자동 적용**된다는 기재가 있다.
-    사실이면 프로젝트마다 `outputStyle` 을 박을 필요가 없어진다. **이번 구간의 신규 기능은 아니고, 아직 실측하지 않았다.**
-  - 손댈 파일: `output-styles/womc-caveman.md` · `commands/womc.md`(settings.json 템플릿 부분)
-  - 이어 쓸 것: 근거 문서 https://code.claude.com/docs/en/output-styles ·
-    현행 값은 `.claude/settings.json` 의 `"outputStyle": "womc:womc-caveman"`
-  - 끝난 것으로 보는 조건: `force-for-plugin: true` 만으로 말투가 켜지는지 실측으로 판명되고,
-    켜지면 골격 템플릿에서 `outputStyle` 한 줄을 뺄지 **결정까지 마친** 상태.
-  - 확인 방법: **사람이 새 시험 폴더에서 확인해야 한다.** `output-styles/womc-caveman.md` 프론트매터에 `force-for-plugin: true` 를 넣고
-    플러그인을 갱신한 뒤, `.claude/settings.json` 에 `outputStyle` 키가 **없는** 폴더에서 Claude Code 를 새로 켜
-    답변이 원시인 말투로 나오면 통과. 평소 말투로 나오면 실패이므로 골격의 `outputStyle` 한 줄은 그대로 둔다.
-
-- [ ] **골격 `permissions.ask` 가 실제로 「항상 허용」을 이기는지 실측 — 급하지 않음 · 다음에 되돌리기 어려운 명령을 쓸 때 겸사** <!-- open:ask-gate -->
-  - 2026-08-14 v2.5.0 이 연 항목이다. **v2.5.0 의 핵심 변경이 통째로 이 전제 위에 서 있다** — 틀리면 그 단계를 되돌린다.
-  - 무엇을 보는가 — **두 가지다.**
-    ① `ask` 가 `allow` 를 이기는가: 권한 창에서 「항상 허용」을 눌러 `settings.local.json` 에 allow 가 저장된 뒤에도,
-    같은 명령을 다시 시키면 **또 물어야** 한다. 문서 기재만 보고 넣었고 이 저장소에서 실측하지 않았다.
-    ② **`PowerShell(...)` 표기가 매칭되는가**: Windows 에서 git 명령이 `Bash(...)` 로 도는지 `PowerShell(...)` 로 도는지 확정 못 해
-    둘 다 넣어 뒀다. 둘 다 아닌 표기면 아무것도 안 잡힌다.
-  - 손댈 파일: 없음(관찰만 한다). 실패로 판명되면 그때 `commands/womc.md` 의 settings.json 템플릿과 `.claude/settings.json` 을 함께 고친다.
-  - 이어 쓸 것: `ask` 목록 10개의 정본은 `commands/womc.md` 의 골격 `.claude/settings.json` 템플릿, 라이브 사본은 `.claude/settings.json`.
-    **둘은 `check-sync.py` 1번이 글자 단위로 대조하므로 한쪽만 고치면 DRIFT 다.** 갱신 모드의 `ask` 병합 규칙도 같은 파일에 있다.
-  - 끝난 것으로 보는 조건: ①②를 **둘 다** 사람이 화면으로 확인. 안 먹으면 대안(넓은 패턴 `Bash(git reset:*)` 등)까지 정해 놓은 상태.
-  - 확인 방법: 시험 폴더에서 `git push` 나 파일 삭제를 시켜 권한 창이 뜨면 「항상 허용」을 누르고, **같은 명령을 한 번 더** 시켜 또 묻는지 본다.
+- [ ] **입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 실측 — 급하지 않음 · 다음에 `.env` 를 쓰는 폴더에서 겸사** <!-- open:env-deny-redirect -->
+  - 2026-08-18 v2.7.0 감사가 연 항목이다. Claude Code `2.1.232` 가 Bash **입력 리다이렉션**을 권한 검사 대상에 넣었다가
+    `2.1.233` 에서 되돌렸다("Reverted 2.1.232 Bash permission changes for Cygwin symlinks and input redirections").
+    **되돌린 지금 `cat < .env` 가 골격의 `.env` deny 를 우회하는지 확인 못 했다.**
+  - 손댈 파일: 없음(관찰만 한다). 우회로 판명되면 `HARNESS.md` 의 **권한 한계 설명**을 고친다 —
+    골격 `deny` 목록 자체는 그대로다(리다이렉션은 경로 규칙으로 막을 수 있는 것이 아니다).
+  - 이어 쓸 것: `HARNESS.md` 에 v2.7.0 이 더한 한계 2줄(ⓐ `Read` deny 가 `2.1.228` 부터 쓰기까지 막는다 ·
+    ⓑ 프로그램이 대신 읽고 쓰는 건 못 막는다)이 고칠 자리다. deny 목록의 정본은 `commands/womc.md` 의
+    `.claude/settings.json` 템플릿, 라이브 사본은 `.claude/settings.json`(한쪽만 고치면 check-sync 1번이 DRIFT 로 잡는다).
+    근거 문서 https://code.claude.com/docs/en/permissions
+  - 끝난 것으로 보는 조건: 막히는지 안 막히는지 사람이 화면으로 확인하고, **안 막히면 `HARNESS.md` 문구까지 고친** 상태.
+  - 확인 방법: 아무 프로젝트에 더미 `.env`(가짜 값만 넣는다)를 두고 Bash 로 `cat < .env` 를 시켜 차단되는지 본다.
     `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 로는 못 잡는다(설정이 파일에 있는지만 본다).
-  - ⚠ **플러그인 재설치 + Claude Code 재시작 뒤라야 의미가 있다** — 옛 캐시의 `commands/womc.md` 에는 `ask` 가 없다.
+
+- [ ] **「적극 위임」이 하네스의 「Agent tool 을 부르지 마라」를 이기는지 관찰 — 급하지 않음 · 다음 기능 작업 때 겸사** <!-- open:delegation-vs-preset -->
+  - 2026-08-18 v2.7.0 감사가 연 항목이다. **womc 의 위임 설계 전체가 이 대결의 결과에 걸려 있다.**
+  - 무엇이 맞서는가: Claude Code 의 `claude_code` 프리셋은 모델이 Opus 5 일 때 시스템 프롬프트에
+    "시키지 않으면 Agent tool 을 부르지 마라" 한 줄을 **자동으로 넣는다**(https://code.claude.com/docs/en/agent-sdk/subagents).
+    `CLAUDE.md` 「적극 위임」은 정반대를 시킨다. **어느 쪽이 이기는지, 실제 위임률이 어떤지 못 봤다.**
+  - 손댈 파일: 없음(관찰만 한다). 위임이 안 돌면 `CLAUDE.md` 「적극 위임」 문구를 더 강하게 쓰거나
+    `skills/plan-feature/SKILL.md` 에 명시적 위임 지시를 넣는다. **그때 `commands/womc.md` 의 임베드 사본도 함께 고친다**(한쪽만 고치면 DRIFT).
+  - 이어 쓸 것: `CLAUDE.md` 「적극 위임」의 문턱값 3가지(파일 3개 이상 · 긴 로그 · 독립 갈래 2개 이상) ·
+    근거 원문은 `docs/HARNESS-AUDIT.md` v2.7.0 기록 **2번②**.
+  - 끝난 것으로 보는 조건: 파일 3개 이상을 뒤져야 하는 작업에서 `explore` 가 실제로 불리는지 사람이 화면으로 확인하고,
+    안 불리면 문구를 어떻게 고칠지 **결정까지 마친** 상태.
+  - 확인 방법: 새 세션에서 파일 3개 이상을 뒤져야 하는 일을 시키고 서브에이전트가 실제로 뜨는지 본다.
+    **`check-sync.py` 는 못 잡는다** — 문구가 파일에 있는지만 보지 실행 중에 불리는지는 못 본다.
 
 ### 그 밖의 할 일 (열린 확인 아님 — 고칠 것)
 
@@ -403,6 +390,9 @@
   A안으로 고쳤으므로 지금은 필요 없다. 나중에 "프로젝트마다 `outputStyle` 을 박지 않게" 하고 싶어질 때 **새 항목으로 다시 연다.**
   - 다시 열 때의 확인 방법(보관): `output-styles/womc-caveman.md` frontmatter 에 넣고 플러그인 재설치 → 재시작 →
     **settings.json 에 `outputStyle` 이 아예 없는 폴더**에서 메인 답변이 원시인 말투로 나오는지 본다.
+  - **2026-08-18 — 다시 열 이유가 없어졌다.** v2.7.0 감사가 문서로 기각했다: 이 옵션은 "Overrides the user's
+    `outputStyle` setting" 이라 **womc 가 켜진 모든 프로젝트에** 말투를 강제한다("이 프로젝트에서만"이 womc 설계다).
+    결론은 「끝난 일」의 「열린 확인 4건 닫음」 항목. 보류 표기는 기록으로 남겨 둔다.
 
 <!-- 끝난 항목은 이렇게 적는다:
 - [x] 항목 이름

@@ -4,23 +4,118 @@
 > 지금 모델이 알아서 하는 것)과 **새로 들인** 이력(그 사이 생긴 기능 중 골격이 쓸 만한 것)을 함께 남긴다.
 > 다음 감사는 **맨 위 기록의 「마지막 감사 기준 버전」·「마지막 감사 기준 모델」부터** 시작하고, 같은 조사를 반복하지 않는다.
 > **감사 본체는 둘 중 하나만 달라도 돈다 — Claude Code 앞 두 자리(`major.minor`) 또는 모델.** (v2.6.0 에서 모델 트리거를 더했다.)
-> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.228` (2026-08-12).
-> 맨 위 기록의 **마지막 감사 기준 모델**: 없음(모델 트리거가 생기기 전 기록이다) —
-> **다음 감사는 이것을 「다름」으로 보고 모델 기준으로 한 번 훑는다.**
-> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.2.4 기록의 5번을 본다.
+> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.234` (2026-08-18).
+> 맨 위 기록의 **마지막 감사 기준 모델**: `Opus 5`.
+> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.7.0 기록의 6번을 본다.
 > **③에서 파생됐던 열린 확인(`open:allow-cleanup`)도 2026-08-11 에 통과·닫혔다** — 남은 열린 확인은 아래 목록을 본다.
 > ③의 결론(골격에서 `allow` 4줄을 뺄 수 있다)은 **v2.2.0 으로 실행됐다 (2026-08-10).**
 
 <!-- womc:open-checks:begin -->
-> **다음 감사가 먼저 볼 것 — 열린 확인 4건**
+> **다음 감사가 먼저 볼 것 — 열린 확인 2건**
 > (정본은 `TASKS.md` 「할 일」. 조건·확인 방법을 여기 베껴 적지 않는다.)
-> - `open:statusline-v2` — `subagentStatusLine`·`/statusline` 을 골격에 들일지 (파생 자리: v2.1.1 기록 4번 절 「새로 챙길 만한 것 2가지」)
-> - `open:audit-open-notice` — 버전이 안 올라가도 갱신·감사가 이 목록을 알리는지 (v2.2.1 수정의 동작 확인)
-> - `open:outputstyle-force-plugin` — 출력 스타일의 `force-for-plugin` 으로 settings.json 의 `outputStyle` 한 줄을 뺄 수 있는지 (파생 자리: v2.2.4 기록 5번)
-> - `open:ask-gate` — 골격 `permissions.ask` 가 실제로 「항상 허용」을 이기는지, `PowerShell(...)` 표기가 매칭되는지 (v2.5.0 이 기댄 미실측 전제)
+> - `open:env-deny-redirect` — 입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 (파생 자리: v2.7.0 기록 6번①)
+> - `open:delegation-vs-preset` — 하네스가 Opus 5 에 심는 「Agent tool 을 시키지 마라」와 womc 「적극 위임」 중 어느 쪽이 이기는지 (파생 자리: v2.7.0 기록 6번②)
 > **다음 감사는 이 항목들을 새 「실측 필요」로 다시 만들지 말고 `TASKS.md` 의 해당 항목을 갱신한다.**
-> (allow 청소 확인은 2026-08-11 에 통과·닫혔다 — 아래 5번③ 「이후 이력」 참고. **닫힌 ID 를 이 구획에 백틱으로 남기지 말 것** — 대조 스크립트가 열린 것으로 센다.)
+> (2026-08-18 v2.7.0 감사에서 그 앞의 열린 확인 4건이 **전부 닫혔다** — 결론은 아래 v2.7.0 기록 5번.
+> **닫힌 ID 를 이 구획에 백틱으로 남기지 말 것** — 대조 스크립트가 열린 것으로 센다.)
 <!-- womc:open-checks:end -->
+
+## v2.7.0 — 2026-08-18 / Claude Code `2.1.234` · 모델 `Opus 5` 기준
+
+### 1. 무엇을 확인했나
+- **`/womc update` 7번 단계가 자동으로 부른 감사다** — 사람이 따로 부르지 않았다.
+- **모델 축으로 처음 훑은 감사다.** Claude Code 앞 두 자리는 같았고(`2.1.228` → `2.1.234`),
+  지난 기록에 기준 모델이 없어(모름 → 다름) 트리거가 성립했다. v2.6.0 이 만든 모델 트리거의 첫 실행이다.
+- 조사 분담: 웹 2갈래는 `general-purpose`(ⓐ Opus 5 프롬프팅 문서와 골격 대조 / ⓑ CHANGELOG 훑기 + 열린 확인 4건),
+  로컬 1갈래는 `explore`.
+- 골격 파일 4개(`CLAUDE.md`·`HARNESS.md`·`.claude/statusline.js`·`.claude/settings.json`)가
+  갱신 전 최신 `2.6.0` 판과 **글자 그대로 일치**했다.
+- 열린 확인 4건의 답을 전부 얻었다 — **4건 모두 닫혔다**(아래 5번).
+
+### 2. 뒤집힌 전제 — **있음. 이번 감사의 가장 큰 수확이다.**
+
+**① 「구현이 끝나면 검증 단계를 돈다」가 지금 모델에서 역효과다.**
+- 근거 원문: "Claude Opus 5 verifies its own work without being told to. If your prompt contains explicit
+  verification instructions ... remove them: instructions like these cause over-verification on Claude Opus 5,
+  and removing them reduces wasted tokens with no loss in quality.
+  **The same applies to legacy harness scaffolding that adds separate verification steps.**"
+  및 "do not use subagents to verify or double-check your own work"
+  https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
+- womc 의 「구현 → 검증」 고정 흐름이 바로 그 legacy harness scaffolding 에 해당한다. 아래 3번에서 걷어냈다.
+
+**② 하네스가 Opus 5 에 「Agent tool 을 시키지 않으면 부르지 마라」를 심는다 — 전제가 뒤집힌 게 아니라 남길 이유가 강해졌다.**
+- 근거 원문: "**`claude_code` preset**: when the model is Opus 5, Claude Code adds a line to its system prompt
+  telling Claude not to call the Agent tool unless it's asked to." https://code.claude.com/docs/en/agent-sdk/subagents
+- 즉 womc 의 「적극 위임」은 **모델 기본과 겹치는 잉여가 아니라 하네스 기본을 상쇄하는 규칙**이다.
+  지금까지 「그냥 좋은 습관」으로 보이던 것이 사실은 **없으면 위임 자체가 안 도는 규칙**이었다.
+  다만 어느 쪽이 실제로 이기는지는 못 봤다 → 아래 6번②.
+
+### 3. 무엇을 뺐나 (근거)
+- **매번 도는 검증 단계** — 근거는 위 2번①. 네 자리를 고쳤다:
+  - `CLAUDE.md` 「절차 지키기」의 "검증을 건너뛰고 다음으로 가자고 하면 ... 한 번 권한다" 줄 **삭제**.
+  - `CLAUDE.md` 「적극 위임」의 "동작 검증은 `verify` 에" 를 **「고정 단계 아님」으로 교체**.
+  - `skills/plan-feature/SKILL.md` 5절을 **「동작 확인 (고정 단계 아님 — 필요할 때만)」으로 교체**.
+  - `agents/verify.md` 의 `description` 을 **조건부로 좁힘**(부를 조건이 맞을 때만 걸리게).
+- **`verify` 에이전트 자체는 남겼다.** 테스트·실행 로그를 메인 대화에서 떼어내는 값은 모델과 무관하게 유효하다.
+  **뺀 것은 「매번 돈다」는 강제이지 도구가 아니다.**
+
+### 4. 무엇을 새로 들였나 (근거)
+- **골격 파일을 바꿔야 하는 신기능은 `2.1.228`~`2.1.234` 구간에 없었다.**
+- 대신 `HARNESS.md` 에 **사실 2줄**을 더했다(골격 동작이 아니라 「무엇이 안 막히는가」를 적는 자리다):
+  - ⓐ `Read` deny 가 Claude Code **`2.1.228` 부터 파일 쓰기까지 함께 막는다** — 원문 "v2.1.228 or later on writes".
+    골격이 손댈 것 없이 구멍이 메워진 건이다. https://code.claude.com/docs/en/permissions
+  - ⓑ PowerShell 규칙은 **별칭까지 정규화해 잡지만**("A rule written for the cmdlet name also matches its aliases"),
+    **Python·Node 스크립트처럼 프로그램이 대신 읽고 쓰는 것은 못 막는다**
+    ("arbitrary subprocesses that read or write files indirectly"). 같은 URL
+
+### 5. 무엇을 왜 남겼나
+- **「적극 위임」** — 위 2번②. 하네스가 심는 「부르지 마라」 줄을 상쇄한다.
+  문턱값(파일 3개·긴 로그·독립 갈래 2개)도 공식 권장과 같은 방향이다:
+  "Do not delegate work you can finish yourself in a handful of tool calls."
+- **「한 번에 한 기능만」·「범위를 넓히지 마라」류** — 공식이 권하는 대응책 그 자체다:
+  "Claude Opus 5 can also expand the scope of a task ... For narrow tasks, constrain scope explicitly."
+- **「필요한 만큼만 보여준다」** — 잉여이기는커녕 **강화 대상**이다:
+  "Claude Opus 5's default user-facing responses run longer than prior Opus models'. ...
+  To control response length, prompt for it explicitly."
+- **「확실하지 않으면 되묻지 말고 먼저 조사」** — 공식이 덧붙이라고 권하는 지시다:
+  "Make routine judgment calls yourself, and check in only when different readings of the request
+  would lead to materially different work."
+- **서브에이전트 보고 규약** — 도구 출력 격리는 하네스가 보장하지만 **최종 메시지의 길이·형식은 지시로만 잡힌다.**
+- **`PLAN.md`·`TASKS.md` 파일 방식** — Claude Code `2.1.233` 에서 "Todo/task-tracking tools no longer available on newer models".
+  **세션 간 작업 이어가기의 유일한 수단이 됐다**(v2.1.1 기록 5번⑤ 의 판정이 이걸로 더 굳었다).
+- **`.claude/statusline.js`** — 모델명·컨텍스트·5시간/주간 한도를 스크립트 없이 보여주는 내장 수단이 문서에 없다.
+- **서브에이전트 fork 기본값 켜짐(`2.1.232`)은 채택하지 않았다** — fork 는 부모 컨텍스트를 통째로 물려받아,
+  토큰 절약이 목적인 4종과 방향이 반대다.
+
+**열린 확인 4건 — 전부 닫혔다.**
+- `open:statusline-v2` → **닫음(기각).** `/statusline`·`subagentStatusLine` 둘 다 실재하나 골격을 대체하지 않는다.
+  `subagentStatusLine` 은 서브에이전트 패널의 **행 모양**이고 기본 행이 이미 이름·설명·토큰수를 보여준다.
+  `/statusline` 은 `~/.claude/` **전역**에 스크립트를 생성해 주는 명령이라 프로젝트별 고정 산출물인 골격과 역할이 다르다
+  (오히려 골격 설정을 덮어쓸 위험). https://code.claude.com/docs/en/statusline
+- `open:outputstyle-force-plugin` → **닫음(문서 확인 후 기각).** `force-for-plugin: true` 는 실재한다.
+  그러나 문서가 "**Overrides the user's `outputStyle` setting**" 이라고 못박아, womc 플러그인이 켜진 **모든** 프로젝트에
+  원시인 말투가 강제된다. womc 는 "이 프로젝트에서만" 이 설계이므로 **`settings.json` 한 줄 유지가 맞다.**
+  https://code.claude.com/docs/en/output-styles
+- `open:ask-gate` → **닫음(통과).** "Rules are evaluated in order: **deny, then ask, then allow.**" +
+  "a matching ask rule prompts even when a more specific allow rule also matches the same call."
+  「항상 허용」은 `settings.local.json` 에 allow 로 저장되므로 **`ask` 목록은 눌러도 다시 묻는다.**
+  `PowerShell(...)` 표기도 문서에 정식 기재다(`:*` 접미사 = 뒤 ` *`). https://code.claude.com/docs/en/permissions
+- `open:audit-open-notice` → **닫음(통과).** 이번 실행에서 **버전이 안 올라간 상태로도** `/womc update` 가
+  열린 확인 4건을 사용자에게 한 줄씩 알렸다(2026-08-18 실측).
+
+### 6. 실측 필요 — **새로 2건**
+① **입력 리다이렉션이 `.env` deny 를 우회하는지** — Claude Code `2.1.232` 가 Bash 입력 리다이렉션을 권한 검사 대상에
+   넣었다가 `2.1.233` 에서 되돌렸다("Reverted 2.1.232 Bash permission changes for Cygwin symlinks and input redirections").
+   **`cat < .env` 류가 골격의 `.env` deny 를 지금 우회하는지 확인 못 함.**
+   확인 방법: 아무 프로젝트에 더미 `.env` 를 두고 Bash 로 `cat < .env` 를 시켜 차단되는지 본다.
+   우회되면 `HARNESS.md` 의 한계 설명을 고친다.
+   → 열린 확인 `open:env-deny-redirect` (정본: `TASKS.md` 「할 일」)
+② **「적극 위임」과 하네스 프리셋 중 어느 쪽이 이기는지** — 하네스가 Opus 5 세션에 심는
+   「Agent tool 을 시키지 않으면 부르지 마라」 줄과 womc 「적극 위임」이 정면으로 맞선다(위 2번②).
+   **어느 쪽이 이기는지, 실제 위임률이 어떤지 확인 못 함.**
+   확인 방법: 파일 3개 이상을 뒤져야 하는 작업을 새 세션에서 시켜 `explore` 가 실제로 불리는지 관찰한다.
+   안 불리면 「적극 위임」 문구를 더 강하게 쓰거나 `plan-feature` 에 명시적 위임 지시를 넣는다.
+   → 열린 확인 `open:delegation-vs-preset` (정본: `TASKS.md` 「할 일」)
 
 ## v2.2.4 — 2026-08-12 / Claude Code `2.1.228` 기준
 
@@ -55,10 +150,11 @@
   auto memory 는 Claude 가 스스로 남기는 학습 노트라 사용자 주도 작업 대장을 대신하지 못한다. https://code.claude.com/docs/en/memory
 
 ### 5. 실측 필요
-- **새로 하나 나왔다** — 출력 스타일 프론트매터 `force-for-plugin: true` 로 플러그인 스타일을 강제 적용할 수 있다는 기재가 있다
-  (근거: https://code.claude.com/docs/en/output-styles). 사실이면 골격 `settings.json` 의 `outputStyle` 한 줄을 뺄 수 있다.
-  이번 구간의 신규 기능은 아니고, 아직 실측하지 않았다.
-  → 열린 확인 `open:outputstyle-force-plugin` (정본: `TASKS.md` 「할 일」)
+- ~~**새로 하나 나왔다** — 출력 스타일 프론트매터 `force-for-plugin: true` 로 플러그인 스타일을 강제 적용할 수 있다.~~
+  → **확인됨 (v2.7.0 에서 기각으로 닫혔다, 2026-08-18).** 기능은 실재하지만 문서가
+  "Overrides the user's `outputStyle` setting" 이라고 못박아 **womc 가 켜진 모든 프로젝트에 말투가 강제된다.**
+  "이 프로젝트에서만" 이 womc 설계이므로 골격 `settings.json` 의 `outputStyle` 한 줄은 그대로 둔다.
+  판정 전문은 위 v2.7.0 기록 5번. https://code.claude.com/docs/en/output-styles
 - **지난 열린 확인 2건은 그대로 열려 있다.**
   → `open:statusline-v2` · `open:audit-open-notice` (정본: `TASKS.md` 「할 일」)
 - **확인 못 한 것 2건**:
