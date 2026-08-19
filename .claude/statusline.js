@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Claude Code statusline (jq-free, Node-based)
-// Format: <model> │ <used>k/<ctx>k │ S:<5h>% W:<week>%
+// Format: 1줄째 <model> │ <used>k/<ctx>k │ S:<5h>% W:<week>% │ <folder> / 2줄째 <session-id>
 
 let raw = "";
 process.stdin.setEncoding("utf8");
@@ -26,6 +26,9 @@ process.stdin.on("end", () => {
     ? dir.replace(/[\\/]+$/, "").split(/[\\/]/).pop()
     : "";
 
+  // Session id (useful for `claude --resume <id>`)
+  const sid = d.session_id || "";
+
   const cw = d.context_window || {};
   const usedK = Math.round((cw.total_input_tokens || 0) / 1000);
   const ctxK = Math.round((cw.context_window_size || 0) / 1000);
@@ -49,5 +52,7 @@ process.stdin.on("end", () => {
 
   let line = `${model} │ ${usedK}k/${ctxK}k │ ${colorPct("S", five)} ${colorPct("W", week)}`;
   if (folder) line += ` │ \x1b[36m${folder}\x1b[0m`;
+  // Session id on its own second row
+  if (sid) line += `\n\x1b[90m${sid}\x1b[0m`;
   process.stdout.write(line);
 });

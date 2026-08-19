@@ -115,6 +115,25 @@
 
 ## 끝난 일
 
+- [x] **v2.10.0 — 상태줄에 세션 ID 표시 추가 (2026-08-19)**
+  - 근거: 사용자가 「모델명·컨텍스트·5시간/주간 한도·폴더명 옆에 세션 ID 도 나오게 해달라」고 요청했다.
+    표시 형태는 물어서 **전체 UUID** 로 골랐다(앞 8글자만 자르는 안은 안 골랐다 — `claude --resume <id>` 에 그대로 못 쓴다).
+  - 손댄 파일: `commands/womc.md`(임베드 statusline.js 사본 + 설명 3곳: 파일 목록·6번 절 머리말·마무리 안내) ·
+    `.claude/statusline.js`(라이브 사본) · `HARNESS.md` · `README.md` · `SPEC.md` · `PLAN.md` · 이 파일 ·
+    버전 표식 6곳(`py scripts/bump-version.py 2.10.0` 한 줄 — 손으로 세지 말 것).
+  - 남긴 것:
+    - `statusline.js` 의 **`const sid = d.session_id || "";`** — stdin JSON 의 `session_id` 를 읽는다.
+      출력은 `if (sid) line += ...` 한 줄인데 **앞에 줄바꿈(`
+`)이 붙어 상태줄이 2줄이 된다** — 1줄째는 기존 그대로,
+      2줄째는 세션 ID 만 **회색(ANSI 90)** 으로 찍는다(폴더명은 1줄째 청록 36). 여러 줄 상태줄은 Claude Code 가 공식 지원한다
+      (`https://code.claude.com/docs/en/statusline` 의 「Display multiple lines」 — 2026-08-19 확인).
+      값이 없으면(옛 Claude Code 등) 그 칸만 조용히 빠지고 나머지는 그대로 나온다.
+    - **정본은 `commands/womc.md` 의 임베드 사본, 라이브 사본은 `.claude/statusline.js`.**
+      `scripts/check-sync.py` 1번이 글자 단위로 대조하므로 한쪽만 고치면 DRIFT 다.
+    - 최종 형식: 1줄째 `<model> │ <used>k/<ctx>k │ S:<5h>% W:<week>% │ <folder>`, 2줄째 `<session-id>` (파일 3행 주석과 같다).
+  - 확인 방법: 샘플 JSON 을 `node .claude/statusline.js` 에 흘려 넣어 세션 ID 가 맨 끝에 붙는지 봤고,
+    `{}` 만 넣었을 때 다른 칸이 안 깨지고 2줄째도 안 나오는지 봤다 — 둘 다 통과. `py scripts/check-sync.py` 전 항목 OK.
+    **실제 터미널 상태줄에 뜨는 것은 사용자가 Claude Code 를 다시 켜 봐야 확인된다.**
 - [x] **v2.9.0 — 하네스 감사가 올린 「새로 들일 것」 후보 3건 반영 (2026-08-19)**
   - 근거: 2026-08-19 하네스 감사(`docs/HARNESS-AUDIT.md` **v2.8.0 기록 4번**)가 후보 3건을 올렸고 사용자가 「반영하자」라고 했다.
     감사 스킬은 반영을 직접 하지 않고 `plan-feature` 로 넘기게 되어 있다 — 그 넘어온 일이 이 항목이다.

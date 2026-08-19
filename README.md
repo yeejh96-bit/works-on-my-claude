@@ -1,4 +1,4 @@
-# works-on-my-claude v2.9.0
+# works-on-my-claude v2.10.0
 
 코딩을 몰라도, Claude Code가 **꾸준히 잘 일하게 만드는 최소 운영체계**를 빈 폴더에 깐다 — `/womc` 한 번으로.
 
@@ -56,7 +56,7 @@ Claude Code 안에서 두 줄이면 끝이다.
 ├─ .gitignore         # node_modules / .env / dist 등 (견본 .env.example 은 예외)
 └─ .claude/
    ├─ settings.json      # 하네스: 비밀 .env 읽기 차단(견본 .env.example 은 읽힘) + 답변 말투(outputStyle) 지정
-   └─ statusline.js      # 터미널 하단 상태줄 — 모델명·토큰·5시간/주간 한도·폴더명 (Node 필요, settings.json 의 statusLine 이 실행)
+   └─ statusline.js      # 터미널 하단 상태줄 — 모델명·토큰·5시간/주간 한도·폴더명 + 둘째 줄 세션 ID (Node 필요, settings.json 의 statusLine 이 실행)
 ```
 > `.mcp.json` 은 **만들지 않는다.** MCP는 프로젝트마다 다르므로 필요할 때 직접 추가한다.
 > `.claude/rules/` 폴더도 미리 만들지 않는다 — 규칙 파일은 **매 세션 자동 로드**되므로 빈 자리로 두고,

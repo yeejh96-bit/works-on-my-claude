@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=2.9.0 -->
+<!-- womc:skeleton-version=2.10.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.9.0 -->
+<!-- womc:skeleton-version=2.10.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -160,7 +160,7 @@ disable-model-invocation: true
   권한을 묻는 일이 잦아지면 `/fewer-permission-prompts` 를 한 번 돌리면 자주 쓰는 읽기 전용 명령이 허용 목록에 추가된다.)
   되돌리기 어려운 명령(`git push`·`git reset --hard`·브랜치 지우기·파일 지우기)은 `ask` 에 적혀 있어,
   권한 창에서 **「항상 허용」을 눌러도 다음번에 또 묻는다** — 실수로 영영 풀어버리는 일이 없게 하려는 것이다.
-- **.claude/statusline.js** — 터미널 하단 상태줄 스크립트(Node). 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 보여준다.
+- **.claude/statusline.js** — 터미널 하단 상태줄 스크립트(Node). 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 첫 줄에, 세션 ID 를 둘째 줄에 보여준다(2줄).
   `.claude/settings.json` 의 `statusLine` 항목이 이 파일을 실행한다. Node.js 가 설치돼 있어야 동작하며, 없어도 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
 - **.claude/rules/** — 특정 작업에만 적용할 세부 규칙 자리. 여기 둔 규칙 파일은 **자동으로 인식된다** —
   맨 위 `paths` 에 적은 경로를 건드릴 때만 켜지고, `paths` 가 없으면 항상 켜진다(항상 토큰을 쓰므로 진짜 전역 규칙만).
@@ -292,13 +292,13 @@ Thumbs.db
 
 ### 6) `.claude/statusline.js` (하네스 — 상태줄, Node 필요)
 아래 내용을 그대로, 한 글자도 바꾸지 않고 쓴다. Node.js 내장 모듈만 쓰고 하드코딩된 경로가 없어 어떤 프로젝트에도 그대로 쓸 수 있다.
-stdin 으로 들어오는 JSON 을 읽어 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 한 줄로 만들어 출력한다.
+stdin 으로 들어오는 JSON 을 읽어 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 첫 줄에, 세션 ID 를 둘째 줄에 찍는다(여러 줄 상태줄은 Claude Code 가 지원한다).
 Node.js 가 설치돼 있어야 동작한다 — 없으면 이 파일은 그냥 아무것도 안 찍고, 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
 
 ```javascript
 #!/usr/bin/env node
 // Claude Code statusline (jq-free, Node-based)
-// Format: <model> │ <used>k/<ctx>k │ S:<5h>% W:<week>%
+// Format: 1줄째 <model> │ <used>k/<ctx>k │ S:<5h>% W:<week>% │ <folder> / 2줄째 <session-id>
 
 let raw = "";
 process.stdin.setEncoding("utf8");
@@ -324,6 +324,9 @@ process.stdin.on("end", () => {
     ? dir.replace(/[\\/]+$/, "").split(/[\\/]/).pop()
     : "";
 
+  // Session id (useful for `claude --resume <id>`)
+  const sid = d.session_id || "";
+
   const cw = d.context_window || {};
   const usedK = Math.round((cw.total_input_tokens || 0) / 1000);
   const ctxK = Math.round((cw.context_window_size || 0) / 1000);
@@ -347,6 +350,8 @@ process.stdin.on("end", () => {
 
   let line = `${model} │ ${usedK}k/${ctxK}k │ ${colorPct("S", five)} ${colorPct("W", week)}`;
   if (folder) line += ` │ \x1b[36m${folder}\x1b[0m`;
+  // Session id on its own second row
+  if (sid) line += `\n\x1b[90m${sid}\x1b[0m`;
   process.stdout.write(line);
 });
 ```
@@ -369,7 +374,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.9.0 -->
+<!-- womc:skeleton-version=2.10.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -430,7 +435,7 @@ process.stdin.on("end", () => {
 > ※ PLAN.md·TASKS.md 는 지금 만들지 않습니다. 필요한 순간에만 생겨 평소 컨텍스트를 가볍게 둡니다.
 > ※ 기존 프로젝트에 깐 경우, 구조가 어질러져 보이면 "구조 정리해줘"라고 하세요 — `plan-feature` 가 단계별로, 되돌릴 수 있게(커밋) 정리합니다.
 > ※ MCP가 필요한 프로젝트라면 그때 `.mcp.json` 을 직접 추가하세요.
-> ※ 터미널 하단 상태줄(모델명·토큰·5시간/주간 한도·폴더명 표시)은 Node.js 가 설치돼 있어야 보여요. 없어도 다른 기능엔 지장 없습니다.
+> ※ 터미널 하단 상태줄(모델명·토큰·5시간/주간 한도·폴더명 + 둘째 줄 세션 ID 표시)은 Node.js 가 설치돼 있어야 보여요. 없어도 다른 기능엔 지장 없습니다.
 > ※ `.claude/` 폴더는 Claude Code 가 보호하는 자리라, 여기에 파일을 쓸 때는 권한 모드와 상관없이 **매번 물어봅니다** — 허용을 누르시면 됩니다.
 > ※ 답변 말투(쉬운 말 말투 — 코딩을 모르는 사람도 알아듣게 쉬운 말로, 짧게)는 **Claude Code 를 껐다 켠 뒤부터** 적용돼요. 출력 스타일은 세션이 시작될 때 한 번만 읽히기 때문입니다.
 
