@@ -7,7 +7,7 @@
 ## 1. 기술 스택
 - Claude Code 플러그인. 코드가 아니라 **마크다운 지시문 파일**로 이루어진다.
 - 슬래시 명령: `commands/womc.md`
-- 플러그인이 직접 제공하는 것(프로젝트로 복사되지 않음): `agents/`(4종) · `skills/`(2종) · `output-styles/womc-caveman.md`
+- 플러그인이 직접 제공하는 것(프로젝트로 복사되지 않음): `agents/`(4종) · `skills/`(2종) · `output-styles/womc-plain.md`
 - 플러그인/마켓플레이스 메타데이터: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
 - 배포: GitHub 저장소 `yeejh96-bit/works-on-my-claude` → `/plugin` 으로 설치.
 
@@ -18,7 +18,7 @@
 
 ## 3. 핵심 기능 (3~5개)
 1. `/womc` — 고정 골격 생성(이미 있는 파일은 덮어쓰지 않고 건너뜀). 신규 빈 폴더면 빈 SPEC 템플릿, **기존 코드가 있는 폴더면 온보딩**: `explore` 로 훑어 SPEC 초안을 채우고, 이미 있는 `CLAUDE.md`·`.claude/settings.json` 은 건너뛰지 않고 womc 규칙을 **덧붙여 병합**(사용자 내용 보존, `<!-- womc:begin/end -->` 구획), 코드 관례를 `.claude/rules/` 로 **캡처**(제안 후), 구조 정리가 필요해 보이면 `plan-feature` 리팩터를 **제안**한다(womc 자체는 코드를 옮기지 않음). 골격에는 `.claude/statusline.js`(터미널 하단 상태줄 — 모델명·토큰·5시간/주간 한도·폴더명, Node.js 필요)도 포함되며 `settings.json` 의 `statusLine` 이 실행한다. `/womc update` 는 불변 골격만 최신으로 교체(사용자가 채운 파일은 보존)하며, 그 전에 먼저 `claude plugin update` 로 플러그인 자체도 함께 갱신한다. 갱신 전에 `womc:skeleton-version` 을 최신 버전과 대조해, **옛 캐시면 GitHub 에서 최신 골격을 직접 받아 적용하고, 받지 못할 때만 멈추고 플러그인 업데이트+재시작을 안내**한다. `/womc eject <이름>` 은 플러그인이 제공하는 서브에이전트·스킬·출력 스타일을 그 프로젝트 안으로 복사해 고쳐 쓰게 한다.
-2. 항상 로드되는 규칙(CLAUDE.md) + 프로젝트 명세(SPEC.md, `@import`)만 always-on으로 유지. 대화 답변은 원시인 말투(케이브맨, 고정 — 단계 없음)로 강제되며, 말투 규칙은 출력 스타일 `output-styles/womc-caveman.md` **한 곳**에만 두고 `.claude/settings.json` 의 `outputStyle` 이 프로젝트별로 켠다. 파일 문서와 서브에이전트 보고는 대상 아니다(출력 스타일은 서브에이전트에 적용되지 않는다).
+2. 항상 로드되는 규칙(CLAUDE.md) + 프로젝트 명세(SPEC.md, `@import`)만 always-on으로 유지. 대화 답변은 쉬운 말 말투(코딩을 몰라도 알아듣게, 한 문장 한 뜻·기본 5줄 안)로 강제되며, 말투 규칙은 출력 스타일 `output-styles/womc-plain.md` **한 곳**에만 두고 `.claude/settings.json` 의 `outputStyle` 이 프로젝트별로 켠다. 파일 문서와 서브에이전트 보고는 대상 아니다(출력 스타일은 서브에이전트에 적용되지 않는다).
 3. 오케스트레이션 서브에이전트 4종: `explore`(조사·haiku) · `plan`(설계·opus) · `implement`(구현·opus, 유일하게 파일 직접 수정) · `verify`(검증·opus — 매번 도는 고정 단계가 아니라 사용자가 확인을 부탁했거나 테스트 로그가 길 때만). 메인은 지휘자로 얇게 유지하고 무거운 일을 병렬 위임. 서브에이전트도 CLAUDE.md 를 물려받으므로(Explore·Plan 내장 2종만 예외) 공통 규칙은 CLAUDE.md 한 곳에 두고, 각 파일에는 상속되지 않는 것(역할·입력계약·출력계약)만 적는다. 코드 검토 전용 에이전트는 두지 않는다 — Claude Code 기본 `/code-review` 를 쓴다.
 4. 운영 스킬 3종: `plan-feature`(기능 추가·수정 겸용 — 큰 작업은 쪼개 PLAN/TASKS 관리, 작은 변경·버그수정·리팩터는 가벼운 경로, 조사→설계→구현 위임(동작 확인은 필요할 때만), 검토는 `/code-review` 권유. 세션이 바뀌어도 이어지도록 각 작업 항목에 손댈 파일·이어 쓸 것·완료 조건·확인 방법을 남긴다) · `make-rule`(규칙 자동 생성) · `harness-audit`(Claude Code 버전 **또는 모델**이 바뀌면 골격에서 뺄 것·**새로 들일 것** 점검·기록).
 5. 안전 기본값(settings.json): 비밀 `.env` 읽기 차단(견본 `.env.example` 은 읽힘). `allow` 는 비워 둔다 — 읽기 전용 명령은 Claude Code 가 기본으로 허용한다(Bash·PowerShell 모두).

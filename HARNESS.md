@@ -46,8 +46,8 @@
 - **스킬 3종** — `plan-feature` 는 기능을 새로 만들거나 고칠 때(버그수정·리팩터 포함) 쓴다 — 큰 작업은 작게 쪼개 계획(PLAN.md)·진행상태(TASKS.md)로 한 번에 하나씩, 작은 변경은 바로 고친 뒤 동작을 같이 확인한다.
   `make-rule` 은 "앞으로 ○○하게 해줘"라고 하면 적용 범위를 알아서 판단해 `.claude/rules/` 에 규칙 파일을 만든다.
   `harness-audit` 은 **Claude Code 가 업데이트됐거나 모델이 바뀌었을 때** 골격에서 뺄 것과 **새로 들일 것**을 가려내 `docs/HARNESS-AUDIT.md` 에 기록한다. `/womc update` 를 돌리면 이 감사가 자동으로 이어진다.
-- **답변 말투** — 원시인 말투 출력 스타일(`womc-caveman`). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
-  말투가 안 켜지면 `.claude/settings.json` 의 `outputStyle` 값이 `womc:womc-caveman` 인지 확인한다 — 플러그인이 주는 스타일이라 앞에 `womc:` 가 꼭 붙고, 빼면 조용히 무시된다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
+- **답변 말투** — 쉬운 말 출력 스타일(`womc-plain`). 코딩을 몰라도 알아듣게 쉬운 말로, 한 문장 한 뜻으로 짧게 답한다(기본 5줄 안). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
+  말투가 안 켜지면 `.claude/settings.json` 의 `outputStyle` 값이 `womc:womc-plain` 인지 확인한다 — 플러그인이 주는 스타일이라 앞에 `womc:` 가 꼭 붙고, 빼면 조용히 무시된다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
 - 이 셋 중 무엇이든 이 프로젝트에서만 고쳐 쓰고 싶으면 `/womc eject <이름>` 으로 프로젝트 안에 꺼내 놓고 편집한다.
 
 ## 왜 스택·MCP 같은 건 비워 뒀나

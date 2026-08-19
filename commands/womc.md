@@ -4,7 +4,7 @@ argument-hint: [update | eject <이름>]
 allowed-tools: Write, Edit, Read, Glob, Task, Bash
 ---
 
-<!-- womc:skeleton-version=2.7.0 -->
+<!-- womc:skeleton-version=2.8.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -33,7 +33,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.7.0 -->
+<!-- womc:skeleton-version=2.8.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -48,7 +48,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 
 ## 설명 방식
 - 모든 설명·보고는 한국어로 한다.
-- 대화 답변의 말투는 womc 출력 스타일(`womc-caveman`)이 정한다 — 이 절에 말투 규칙을 다시 적지 않는다. (출력 스타일은 서브에이전트에는 적용되지 않는다. 서브에이전트 보고는 아래 「서브에이전트 보고 규약」을 따른다.)
+- 대화 답변의 말투는 womc 출력 스타일(`womc-plain`)이 정한다 — 이 절에 말투 규칙을 다시 적지 않는다. (출력 스타일은 서브에이전트에는 적용되지 않는다. 서브에이전트 보고는 아래 「서브에이전트 보고 규약」을 따른다.)
 
 ## 서브에이전트 보고 규약 (서브에이전트로 호출됐을 때만)
 - 네가 서브에이전트면 아래를 따른다. **메인 대화면 이 절을 무시한다.**
@@ -177,8 +177,8 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 - **스킬 3종** — `plan-feature` 는 기능을 새로 만들거나 고칠 때(버그수정·리팩터 포함) 쓴다 — 큰 작업은 작게 쪼개 계획(PLAN.md)·진행상태(TASKS.md)로 한 번에 하나씩, 작은 변경은 바로 고친 뒤 동작을 같이 확인한다.
   `make-rule` 은 "앞으로 ○○하게 해줘"라고 하면 적용 범위를 알아서 판단해 `.claude/rules/` 에 규칙 파일을 만든다.
   `harness-audit` 은 **Claude Code 가 업데이트됐거나 모델이 바뀌었을 때** 골격에서 뺄 것과 **새로 들일 것**을 가려내 `docs/HARNESS-AUDIT.md` 에 기록한다. `/womc update` 를 돌리면 이 감사가 자동으로 이어진다.
-- **답변 말투** — 원시인 말투 출력 스타일(`womc-caveman`). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
-  말투가 안 켜지면 `.claude/settings.json` 의 `outputStyle` 값이 `womc:womc-caveman` 인지 확인한다 — 플러그인이 주는 스타일이라 앞에 `womc:` 가 꼭 붙고, 빼면 조용히 무시된다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
+- **답변 말투** — 쉬운 말 출력 스타일(`womc-plain`). 코딩을 몰라도 알아듣게 쉬운 말로, 한 문장 한 뜻으로 짧게 답한다(기본 5줄 안). `.claude/settings.json` 의 `outputStyle` 이 이 프로젝트에서만 켠다.
+  말투가 안 켜지면 `.claude/settings.json` 의 `outputStyle` 값이 `womc:womc-plain` 인지 확인한다 — 플러그인이 주는 스타일이라 앞에 `womc:` 가 꼭 붙고, 빼면 조용히 무시된다. 출력 스타일은 세션이 시작될 때 한 번만 읽히므로, 방금 켰다면 Claude Code 를 껐다 켜야 적용된다.
 - 이 셋 중 무엇이든 이 프로젝트에서만 고쳐 쓰고 싶으면 `/womc eject <이름>` 으로 프로젝트 안에 꺼내 놓고 편집한다.
 
 ## 왜 스택·MCP 같은 건 비워 뒀나
@@ -250,14 +250,14 @@ Thumbs.db
   목록을 **좁게 두는 것이 중요하다** — `Bash(git:*)` 처럼 넓히면 `git status` 같은 안전한 명령까지 묻게 된다.
 - `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(프로젝트 루트 기준 상대 경로, 6번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
 - `outputStyle` 은 womc 플러그인이 제공하는 답변 말투를 이 프로젝트에서만 켠다. 다른 폴더에서는 평소 말투 그대로다.
-  **값은 반드시 `womc:womc-caveman` 이다** — 플러그인이 주는 출력 스타일은 `플러그인이름:스타일이름` 으로 등록되고 이름을 정확일치로 찾기 때문에,
-  접두 `womc:` 를 빼면 **경고 한 줄 없이 조용히 무시된다**(v2.1.1 에서 고친 버그다. 파일 이름 `output-styles/womc-caveman.md` 자체는 접두가 없다 — 헷갈리지 말 것).
+  **값은 반드시 `womc:womc-plain` 이다** — 플러그인이 주는 출력 스타일은 `플러그인이름:스타일이름` 으로 등록되고 이름을 정확일치로 찾기 때문에,
+  접두 `womc:` 를 빼면 **경고 한 줄 없이 조용히 무시된다**(v2.1.1 에서 고친 버그다. 파일 이름 `output-styles/womc-plain.md` 자체는 접두가 없다 — 헷갈리지 말 것).
   **바뀐 말투는 Claude Code 를 껐다 켜거나 `/clear` 한 뒤에 적용된다** — 출력 스타일은 세션이 시작될 때 한 번만 읽히기 때문이다.
-  스타일이 안 먹으면 `/config` 의 Output style 목록에서 womc 의 원시인 말투를 직접 골라도 된다.
+  스타일이 안 먹으면 `/config` 의 Output style 목록에서 womc 의 쉬운 말 말투를 직접 골라도 된다.
 
 ```json
 {
-  "outputStyle": "womc:womc-caveman",
+  "outputStyle": "womc:womc-plain",
   "statusLine": {
     "type": "command",
     "command": "node .claude/statusline.js"
@@ -368,7 +368,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.7.0 -->
+<!-- womc:skeleton-version=2.8.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -421,7 +421,7 @@ process.stdin.on("end", () => {
 > ※ MCP가 필요한 프로젝트라면 그때 `.mcp.json` 을 직접 추가하세요.
 > ※ 터미널 하단 상태줄(모델명·토큰·5시간/주간 한도·폴더명 표시)은 Node.js 가 설치돼 있어야 보여요. 없어도 다른 기능엔 지장 없습니다.
 > ※ `.claude/` 폴더는 Claude Code 가 보호하는 자리라, 여기에 파일을 쓸 때는 권한 모드와 상관없이 **매번 물어봅니다** — 허용을 누르시면 됩니다.
-> ※ 답변 말투(원시인 말투)는 **Claude Code 를 껐다 켠 뒤부터** 적용돼요. 출력 스타일은 세션이 시작될 때 한 번만 읽히기 때문입니다.
+> ※ 답변 말투(쉬운 말 말투 — 코딩을 모르는 사람도 알아듣게 쉬운 말로, 짧게)는 **Claude Code 를 껐다 켠 뒤부터** 적용돼요. 출력 스타일은 세션이 시작될 때 한 번만 읽히기 때문입니다.
 
 안내를 내보내기 전에 **이 폴더가 git 저장소인지 확인한다**(`git rev-parse --git-dir`). 저장소가 아니면 위 안내 끝에 한 줄 덧붙인다:
 "※ 아직 git 저장소가 아니에요. `git init` 을 해 두면 기능이 하나 끝날 때마다 되돌릴 지점(커밋)을 남길 수 있어요 — 해 드릴까요?"
@@ -482,18 +482,21 @@ process.stdin.on("end", () => {
      **`## 설명 방식` 절은 따로 판정한다(ⓐ·ⓑ 모두 해당).** 덮기 전에 기존 `CLAUDE.md` 의 그 절 본문을 먼저 읽고 넷 중 하나로 가른다:
      - 절 안에 `womc:brevity=` 또는 `answer-style.js` 가 보이면 **옛 골격 판이므로 최신 것으로 교체한다.** 사용자가 고른 말투가 아니라, 이미 지워진 훅과 폐기된 강도 체계를 가리키는 죽은 문장이다(그냥 두면 파일 머리의 버전 표식만 최신이고 이 절만 옛 판으로 영영 굳는다).
      - 절 본문이 `- 모든 설명은 한국어로 한다.` **한 줄뿐이면 v1.10 이하의 골격 원문이므로 최신 것으로 교체한다.** 그 한 줄만 있고 다른 불릿이 없을 때만 해당한다 — 사용자가 거기에 자기 줄을 더해 뒀다면 한 줄이 아니므로 이 조건에 걸리지 않고 아래대로 보존된다. (표식이 생기기 전 판본이라 위 두 표식으로는 못 잡힌다. 실측 2026-08-11: 이 지문이 없어 옛 골격 원문을 「사용자가 고친 것」으로 오판해 말투 안내가 빠진 채 남았다.)
+     - 절 안에 `womc-caveman` 이 보이면 **v2.0.0~v2.7.0 골격 판이므로 최신 것으로 교체한다.** 사용자가 고른 말투가 아니라, 이미 사라진 스타일 이름을 가리키는 죽은 문장이다(스타일이 `womc-plain` 으로 개명돼 `womc-caveman` 이라는 이름은 더 이상 없다 — 그냥 두면 CLAUDE.md 만 없는 스타일을 계속 가리킨다).
      - 그 표식이 없는데 최신 골격 문구와도 다르면 **사용자가 고친 것으로 보고 원래 내용을 그대로 되돌려 놓는다.** 사용자가 말투를 바꿨을 수 있는 유일한 자리이고(`make-rule` 스킬이 문체 요청을 이 절로 보낸다), 덮어버리면 코딩을 모르는 사용자는 되돌리지 못한다.
      - 절을 아예 찾지 못했을 때만 이 문서의 기본 「설명 방식」을 쓴다.
-     판정 근거 — 이 저장소 git 히스토리에서 `commands/womc.md` 의 모든 커밋을 훑어 「설명 방식」 절의 **역대 판본 6개를 전수 확인했다**(v1.10 이하 한 줄짜리 · v1.11 · v1.12 · v1.13~v1.18 · v1.19~v1.20 · v2.0.0 이후 현행). 표식이 없는 것은 v1.10 이하의 한 줄짜리뿐이고 **과거는 더 늘지 않으므로**, 위 세 지문(`womc:brevity=` · `answer-style.js` · 한 줄짜리)이면 옛 골격을 빠짐없이 가려낸다. **다시 조사하지 않아도 된다.**
+     판정 근거 — 이 저장소 git 히스토리에서 `commands/womc.md` 의 모든 커밋을 훑어 「설명 방식」 절의 **역대 판본 7개를 전수 확인했다**(v1.10 이하 한 줄짜리 · v1.11 · v1.12 · v1.13~v1.18 · v1.19~v1.20 · v2.0.0~v2.7.0(`womc-caveman` 을 가리키던 판) · 그 뒤 현행(`womc-plain`)). 표식이 없는 것은 v1.10 이하의 한 줄짜리뿐이고 **과거는 더 늘지 않으므로**, 위 네 지문(`womc:brevity=` · `answer-style.js` · 한 줄짜리 · `womc-caveman`)이면 옛 골격을 빠짐없이 가려낸다. **다시 조사하지 않아도 된다.**
+     **단, 말투 스타일 이름을 또 바꾸면 옛 이름을 가리키는 판본이 하나 더 생기므로 그때는 같은 작업에서 지문을 하나 더 늘리고 이 문장의 판본 수도 함께 고친다.** (이번에 이 문장이 낡은 채 남아 `womc-caveman` 판을 「사용자가 고친 것」으로 오판할 뻔했다.)
      **교체했는지 보존했는지를 완료 보고에 한 줄 적는다.**
    - `HARNESS.md`
    - `.claude/statusline.js` — 코드 자체는 항상 최신으로 덮어쓴다(사용자가 직접 고칠 일이 없는 스크립트라서). 단, `settings.json` 의 `statusLine` 키를 켜고 끄는 건 아래 3번을 따른다.
 
 2. **레거시 정리 — 옛 버전이 만든 골격 파일을 지운다.** (v2.0.0 부터 이것들은 womc 플러그인이 직접 제공하므로, 프로젝트에 남아 있으면 옛 정의가 플러그인 것을 가려 버린다.)
-   대상: `.claude/agents/explore.md`·`plan.md`·`implement.md`·`verify.md`·`review.md` · `.claude/skills/plan-feature/` · `.claude/skills/make-rule/` · `.claude/answer-style.js`
+   대상: `.claude/agents/explore.md`·`plan.md`·`implement.md`·`verify.md`·`review.md` · `.claude/skills/plan-feature/` · `.claude/skills/make-rule/` · `.claude/answer-style.js` · `.claude/output-styles/womc-caveman.md`
    - 판정은 **위 1번의 「덮기 전 공통 확인」을 그대로 쓴다** — 각 파일을 먼저 읽어 womc 원본인지 사용자가 고친 것인지 가른다.
    - **womc 원본이면 지운다.** 완료 보고에 "이제 womc 플러그인이 직접 제공해서 지웠다. git 저장소라면 되돌릴 수 있다"고 한 줄 알린다.
    - **사용자가 고친 것이면 그대로 둔다** — 프로젝트 정의가 플러그인 것을 이기는 게 곧 커스터마이즈다(의도된 동작). 완료 보고에 "당신이 고친 것으로 보여 그대로 뒀다. 플러그인 기본으로 돌아가려면 그 파일을 지우면 된다"고 알린다.
+   - `.claude/output-styles/womc-caveman.md` 를 **보존한 경우에만** 완료 보고에 한 줄 더 알린다: "이 파일은 이름이 바뀌어 이제 안 쓰인다. 고쳐 둔 내용을 살리려면 `/womc eject womc-plain` 으로 새로 꺼내 옮겨 담아라." (개명 전에 `/womc eject womc-caveman` 을 한 프로젝트에만 있는 파일이다.)
    - `.claude/agents/`·`.claude/skills/` 폴더가 비게 되면 폴더도 지운다. 사용자 파일이 남아 있으면 폴더는 그대로 둔다.
    - `.claude/answer-style.js` 를 지웠으면 아래 3번에서 `settings.json` 의 그 훅 항목도 함께 뺀다.
 3. `.claude/settings.json` 은 통째로 덮어쓰지 않는다. 기존 파일을 먼저 읽고,
@@ -504,7 +507,9 @@ process.stdin.on("end", () => {
    **`ask` 키가 없으면 이 문서의 기본 `ask` 목록을 통째로 추가한다.** 되돌리기 어려운 명령을 「항상 허용」으로 풀어버리지 못하게 막는 자리다(위 「5) `.claude/settings.json`」 참고).
    **이미 `ask` 가 있으면 사용자가 넣은 항목은 한 줄도 지우지 않고, 이 문서의 기본 항목 중 빠진 것만 더한다.**
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
-   `outputStyle` 키가 없으면 `"womc:womc-caveman"` 으로 추가한다. **값이 정확히 `"womc-caveman"`(접두 `womc:` 가 빠진 옛 골격의 값)이면 `"womc:womc-caveman"` 으로 고친다** — 그 값은 어떤 스타일과도 매칭되지 않아 말투가 조용히 안 켜지던 버그이므로, 사용자가 고른 말투로 보지 않는다(v2.1.1 에서 고쳤다). 그 둘 말고 **다른 값이 들어 있으면 덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 어느 쪽이었는지 완료 보고에 한 줄만 알린다.
+   `outputStyle` 키가 없으면 `"womc:womc-plain"` 으로 추가한다. **값이 `"womc:womc-caveman"` 또는 `"womc-caveman"` 이면 `"womc:womc-plain"` 으로 고친다** — 둘 다 옛 womc 골격이 넣던 값이지 사용자가 고른 말투가 아니다(스타일 이름 자체가 `womc-plain` 으로 바뀌었다). **무엇에서 무엇으로 고쳤는지 완료 보고에 한 줄 알린다.** 접두 `womc:` 가 빠진 쪽은 어떤 스타일과도 매칭되지 않아 말투가 조용히 안 켜지던 값이다(v2.1.1 에서 고쳤다) — 접두를 빼면 **경고 한 줄 없이 조용히 무시된다**는 함정은 지금도 그대로다.
+   **값이 `"womc-plain"`(접두 `womc:` 없음)이면 `.claude/output-styles/womc-plain.md` 파일이 없을 때만 `"womc:womc-plain"` 으로 고친다.** 그 파일이 있으면 사용자가 `/womc eject womc-plain` 으로 꺼낸 것이고, 그때는 **접두 없는 이름이 오히려 맞는 값**이므로 건드리지 않는다(꺼낸 파일은 접두 없이 등록된다 — 아래 「꺼내기 모드」 4-b 참고). 이 조건 없이 고치면 갱신이 사용자의 eject 를 매번 되돌려 버린다.
+   위에서 다룬 값들 말고 **다른 값이 들어 있으면 덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 어느 쪽이었는지 완료 보고에 한 줄만 알린다.
    `hooks` 는 이렇게 다룬다 — 위 2번에서 `answer-style.js` 를 지웠으면 `node .claude/answer-style.js` 를 실행하는 `UserPromptSubmit` 항목도 함께 뺀다(스크립트가 없는데 훅만 남으면 매 입력마다 실패한다). 그 결과 `hooks` 가 비면 키째 지운다. 사용자가 직접 넣은 다른 훅은 건드리지 않는다.
 4. 다음은 **절대 덮어쓰지도 지우지도 않는다**: `SPEC.md` · `PLAN.md` · `TASKS.md` · `.claude/rules/` 전체 · `.gitignore` ·
    그 외 이 문서에 없는 모든 파일. (`.gitignore` 는 사용자가 항목을 추가했을 수 있어 갱신 대상에서 뺀다.)
@@ -533,7 +538,7 @@ process.stdin.on("end", () => {
 꺼낼 수 있는 이름:
 - 서브에이전트 — `explore` · `plan` · `implement` · `verify` → `.claude/agents/<이름>.md`
 - 스킬 — `plan-feature` · `make-rule` · `harness-audit` → `.claude/skills/<이름>/SKILL.md`
-- 말투 — `womc-caveman` → `.claude/output-styles/womc-caveman.md`
+- 말투 — `womc-plain` → `.claude/output-styles/womc-plain.md`
 
 절차:
 1. 이름을 안 줬으면 위 목록을 보여주고 무엇을 꺼낼지 한 줄로 묻는다. 목록에 없는 이름이면 목록을 보여주고 멈춘다.
@@ -542,7 +547,10 @@ process.stdin.on("end", () => {
    못 찾으면 GitHub 에서 받는다: `https://raw.githubusercontent.com/yeejh96-bit/works-on-my-claude/main/<원본경로>` (갱신 모드 0-b 와 같은 `curl` 방식).
 3. 대상 경로에 파일이 **이미 있으면 덮어쓰지 않고 멈춘 뒤** 알린다 — 사용자가 이미 고쳐 둔 것일 수 있다.
 4. 그대로 복사한다. 내용을 요약하거나 손대지 않는다.
+4-b. **말투(`womc-plain`)를 꺼냈을 때만** `.claude/settings.json` 의 `outputStyle` 값을 접두 없는 `"womc-plain"` 으로 바꾼다 — 안 바꾸면 꺼낸 파일이 안 쓰인다(이유는 5번 「말투」). `.claude/settings.json` 은 쓸 때마다 권한을 묻는 자리이므로 **바꾸기 전에 사용자에게 한 줄 알린다.** 값이 `"womc:womc-plain"` 이 아닌 다른 값(사용자가 고른 말투)이면 건드리지 않고 알리기만 한다.
 5. 무엇을 어디로 꺼냈는지, 앞으로 어떻게 되는지 한국어로 짧게 알린다:
-   - **서브에이전트·말투**: 프로젝트 파일이 플러그인 것을 **이긴다**. 이제 이 프로젝트에서는 꺼낸 파일이 쓰이니 마음대로 고치면 된다. 플러그인 기본으로 돌아가려면 꺼낸 파일을 지운다.
+   - **서브에이전트**: 프로젝트 파일이 플러그인 것을 **이긴다**. 이제 이 프로젝트에서는 꺼낸 파일이 쓰이니 마음대로 고치면 된다. 플러그인 기본으로 돌아가려면 꺼낸 파일을 지운다.
+   - **말투**: 파일만 꺼내면 안 쓰인다. 출력 스타일은 **등록 키 정확일치**로 찾는데(위 「5) `.claude/settings.json`」 참고), 꺼낸 파일은 접두 없는 `womc-plain` 으로 등록되고 `.claude/settings.json` 의 `outputStyle` 값은 여전히 플러그인 키 `"womc:womc-plain"` 이라 서로 안 맞기 때문이다. 그래서 그 값을 **접두 없는 `"womc-plain"` 으로 바꿔야** 꺼낸 파일이 쓰인다(위 4-b 에서 바꾼다). 플러그인 기본으로 되돌리려면 값을 `"womc:womc-plain"` 으로 되돌리고 꺼낸 파일을 지운다.
+     **이 등록 이름은 실측으로 확인한 것이 아니다** — 값을 바꿔도 말투가 안 먹으면 `/config` 의 Output style 목록에서 꺼낸 스타일을 직접 골라도 된다.
    - **스킬**: 다르다. 플러그인 스킬은 항상 `womc:` 이름표를 달고 있어서 **꺼내도 원본이 사라지지 않고 둘 다 살아남는다**(같은 이름 두 개가 보인다). 이 프로젝트에서 꺼낸 쪽만 쓰고 싶으면 부를 때 이름표 없는 쪽을 고르거나, 꺼낸 파일의 이름을 알아보기 쉽게 바꾼다.
 6. 꺼낸 뒤에는 Claude Code 를 껐다 켜야 새 정의가 잡힌다고 한 줄 덧붙인다.
