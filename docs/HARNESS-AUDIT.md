@@ -51,22 +51,44 @@
   실제로는 `CLAUDE.md:31` 한 줄뿐이고, 두 번째로 짚은 자리는 `commands/womc.md` 의 임베드 사본이다
   (정본–사본 관계라 중복이 아니며 `scripts/check-sync.py` 가 일치를 강제한다).
 
-### 4. 무엇을 새로 들였나 (근거) — **없음. 후보 3건은 사용자 판단 대기.**
-반영은 이 스킬이 하지 않고 `plan-feature` 로 넘긴다. 후보:
+### 4. 무엇을 새로 들였나 (근거) — **후보 3건 전부 v2.9.0 으로 반영됐다 (2026-08-19).**
+반영은 이 스킬이 하지 않고 `plan-feature` 로 넘긴다. 사용자가 「반영하자」라고 해서 넘어갔고,
+넘긴 결과는 각 후보 끝의 **「→ 반영됨」** 줄에 적었다. 후보:
 - **① `commands/womc.md` 프론트매터에 `disable-model-invocation: true`** — `/womc` 는 파일을 새로 쓰는
   **부작용 워크플로**인데 지금 프론트매터(`commands/womc.md:1-5`)에 이 필드가 없어 모델이 문맥상 스스로 부를 여지가 남는다.
   공식 문서가 정확히 이런 경우("workflows with side effects")에 이 필드를 쓰라고 명시한다.
   https://code.claude.com/docs/en/skills
   → 바뀌는 자리: `commands/womc.md` 프론트매터 한 줄.
+  → **반영됨 (v2.9.0)**: `commands/womc.md:5` 에 그 한 줄이 들어갔다.
+  → 이번에 근거가 하나 더 확인됐다 — **커스텀 슬래시 명령은 스킬로 통합됐다**:
+  "Custom commands have been merged into skills. A file at `.claude/commands/deploy.md` and a skill at
+  `.claude/skills/deploy/SKILL.md` both create `/deploy` and work the same way."
+  → 스킬용 프론트매터 필드가 `commands/womc.md` 에도 유효하다. https://code.claude.com/docs/en/skills
+  → **실제 동작은 아직 화면으로 확인하지 않았다** (재시작 뒤 `/womc` 가 목록에 뜨고 손으로 실행되는지).
 - **② `agents/implement.md`·`agents/verify.md` 에 `effort: high`** — `agents/plan.md:6` 이 이미 채택한 패턴인데
   같은 opus 를 쓰는 둘에는 없다(구현·검증이 설계보다 쉬울 이유가 없다).
   https://code.claude.com/docs/en/sub-agents
   → 바뀌는 자리: 두 파일의 프론트매터 각 한 줄.
+  → **반영됨 (v2.9.0)**: `agents/implement.md:6` · `agents/verify.md:6`.
+  이제 **opus 3종이 모두 `high`** 고, haiku 인 `explore` 만 없다.
+  → 이번에 근거가 보강됐다 — **`effort` 는 서브에이전트 공식 프론트매터 필드다**:
+  "Effort level when this subagent is active. Overrides the session effort level. …
+  Options: `low`, `medium`, `high`, `xhigh`, `max`" https://code.claude.com/docs/en/sub-agents
+  → **실제 동작은 아직 화면으로 확인하지 않았다** (프론트매터가 거부되지 않는지만 보면 된다).
 - **③ 온보딩에 기존 `AGENTS.md` 감지 → `CLAUDE.md` 에서 `@AGENTS.md` import** — 지금 온보딩은
   `CLAUDE.md`·`.claude/settings.json` 만 병합하고 `AGENTS.md`(다른 코딩 에이전트가 쓰는 규칙 파일)는 안 본다.
   공식 문서는 그게 있으면 import 하고 Claude 전용 절만 덧붙이라고 권한다(중복 작성 방지).
   https://code.claude.com/docs/en/memory
   → 바뀌는 자리: `commands/womc.md` 「기존 프로젝트 온보딩」 2절.
+  → **반영됨 (v2.9.0) — 다만 이 감사의 원안대로가 아니다.** 「감지하면 import」가 아니라
+  **「제안 후 승낙」**으로 들어갔다(2026-08-19 사용자가 고른 길): 루트 `AGENTS.md` 의 줄 수를 세어 알려 주고,
+  좋다고 할 때만 `CLAUDE.md` 의 `@SPEC.md` 다음 줄에 `@AGENTS.md` 를 넣는다(멱등).
+  이유는 **그 파일이 몇 줄인지 모르는 채로 always-on 로드량을 늘릴 수 없어서다**(위 1번의 97줄 실측이 기준선).
+  → 실제로 손댄 자리는 `commands/womc.md` 의 온보딩 2-b 소절 · 마무리 안내 ·
+  **갱신 ⓐ(절 병합)ⓑ(구획 교체) 두 경로의 `@AGENTS.md` 이월 규칙** · 역방향 제안 · 완료 보고,
+  그리고 `HARNESS.md`·`SPEC.md` 의 설명 한 줄씩이다.
+  → **실제 기존 프로젝트에서 돌려보지는 않았다.** 안 고른 길(무조건 import · 줄 수 임계값 자동판단 ·
+  내용 복사 · 구획 밖 배치)과 그 기각 이유는 `PLAN.md` 「나중에 / 안 할 것」에 있다.
 
 ### 5. 무엇을 왜 남겼나
 - **`CLAUDE.md` 「적극 위임」 전체** — 위 3번 기각①. 프리셋을 상쇄하는 자리다.

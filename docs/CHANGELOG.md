@@ -5,6 +5,44 @@
 > 각 항목의 형식은 `TASKS.md` 와 같다 — 손댈 파일 · 남긴 것 · 확인 방법.
 > 한 줄 요약만 필요하면 `PLAN.md` 의 「만든 것(버전 이력)」을 본다.
 
+## v2.5.0 — 승인 관문을 산문에서 설정으로 옮김 + `/code-review` 지적 12건 (2026-08-14)
+  - 근거: v2.4.0 커밋에 `/code-review` 를 돌려 12건이 나왔고, **고치기 전에 12건을 전부 파일로 사실 확인했다**
+    (`explore` 2개 병렬 + 메인이 기록 파일 직접 대조). 확인 과정에서 **리뷰가 놓친 것 하나를 더 찾았다** —
+    `PLAN.md` 가 열린 확인을 「2건」이라 적었는데 실제로는 3건이었다(`open:outputstyle-force-plugin` 누락).
+  - **가장 큰 것 — 산문이 하네스에 지고 있었다.** v2.4.0 이 `CLAUDE.md` 에 넣은 "한 번 좋다고 한 것이 다음번까지
+    이어지지 않는다"는 **글일 뿐이라, 사용자가 권한 창에서 「항상 허용」을 누르면 `settings.local.json` 에 영구 allow 가
+    저장돼 그다음부터 안 묻는다.** 골격 `settings.json` 에 `ask` 키가 아예 없었기 때문이다.
+  - 손댄 파일: `commands/womc.md`(골격 settings.json 템플릿 · `ask` 설명 불릿 · 갱신 모드 병합 규칙 · 임베드 CLAUDE.md 2곳 ·
+    임베드 HARNESS.md · 온보딩 「7개 절」) · `.claude/settings.json` · `CLAUDE.md` · `HARNESS.md` ·
+    `agents/implement.md` · `agents/plan.md`(frontmatter 한 줄) · `scripts/check-sync.py` ·
+    `skills/plan-feature/SKILL.md`(93행 인용 한 줄) · `PLAN.md` · 이 파일 · `docs/HARNESS-AUDIT.md` ·
+    `.claude-plugin/plugin.json`(버전 표식은 `py scripts/bump-version.py 2.5.0` 한 줄로 6곳 — 손으로 세지 말 것).
+  - 남긴 것:
+    - **골격 `permissions.ask` 목록 10개** — `Bash(...)`·`PowerShell(...)` 각 5개(`git push` · `git reset --hard` ·
+      `git branch -d` · `git branch -D` · `rm`/`Remove-Item`). **정본은 `commands/womc.md` 의 골격 settings.json 템플릿,
+      라이브 사본은 `.claude/settings.json`. 둘은 check-sync 1번이 글자 단위로 대조하므로 한쪽만 고치면 DRIFT 다.**
+      `ask` 는 `allow` 를 이기므로 「항상 허용」을 눌러도 이 명령들은 다음번에 또 묻는다.
+    - **갱신 모드에 `ask` 병합 규칙**(`commands/womc.md`, 옛 `allow` 4줄 청소 규칙 바로 뒤): 키가 없으면 기본 목록을
+      통째로 추가, 이미 있으면 **사용자가 넣은 항목은 한 줄도 안 지우고** 빠진 기본 항목만 더한다.
+      **이 규칙이 없으면 새로 만드는 폴더에만 관문이 생기고 이미 깔린 폴더는 영영 안 생긴다.**
+    - **`implement` 의 관문 처리 경로** — `agents/implement.md` 「작업 규칙」에 불릿 하나, 「출력 형식」에 **`4) 멈춘 것`** 신설
+      (기존 「주의점」은 5번으로 내려갔다). 서브에이전트는 사용자에게 물을 채널이 없으므로 **하지 말고 멈춰서 메인에 넘긴다.**
+      v2.4.0 은 "관문이 implement 에도 걸린다"고 적었지만 걸린 뒤 무엇을 할지가 없었다.
+    - **`CLAUDE.md` 「적극 위임」에 「안 고른 길」 계약** — 지금까지 이 계약이 `skills/plan-feature/SKILL.md` 3절에만 있어,
+      스킬을 안 타고 `plan` 을 직접 부르면 대안이 그냥 버려졌다. **계약을 모든 호출자가 물려받는 자리로 올렸다.**
+    - **`check-sync.py` 6번 검사(`LINKED_LITERALS`)** — 임베드 대상이 아닌 `agents/`·`skills/`·`PLAN.md` 사이의
+      문자열 결합을 본다(「안 고른 길」·「확실하지 않은 가정」·`PLAN.md` 절 제목 2종). **새 결합이 생기면 그 상수에 한 줄만 더하면 된다.**
+      **한계: 글자만 보지 뜻은 못 본다** — 양쪽을 동시에 같은 이름으로 다듬으면 통과한다(docstring 에 적어 뒀다).
+    - **낡은 안내를 이름 대신 위치로 가리키게 바꿨다** — 「할 일」 머리말이 특정 버전 이름을 박아 두는 바람에 낡았다.
+      이제 「지금 하는 일」의 **맨 위 열린 항목**으로 가리킨다. 같은 이유로 `TASKS.md` 안의 `commands/womc.md:239`
+      줄번호 참조도 **문구로 찾는 방식**으로 바꿨다(그 줄번호는 이번 작업에서 또 밀렸다).
+    - 버전은 2.4.0 → **2.5.0**(`.claude-plugin/plugin.json`). **골격 동작이 바뀌므로 패치가 아니라 마이너다** —
+      패치로 올리면 하네스 감사 트리거(`major.minor`, v2.3.0)가 안 돈다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → **13항목 전부 OK, 버전 `2.5.0`**
+    (6번 검사 4줄과 「열린 확인 ID 4개 일치」 포함). 6번 검사는 **일부러 깨뜨려 작동을 확인했다** —
+    `agents/plan.md` 의 「안 고른 길」을 다른 말로 바꾸니 DRIFT 와 종료코드 1 이 떴고, 원상 복구 후 다시 OK.
+    **`ask` 가 실제로 「항상 허용」을 이기는지는 스크립트로 못 잡는다** — 새 열린 확인 `open:ask-gate` 로 넘겼다.
+
 ## v2.4.0 — 설계에 「안 고른 길」 + 되돌리기 어려운 일에 승인 관문 (2026-08-12)
   - 근거: 사용자가 가져온 '그래프 엔지니어링' 글(그렉 아이젠버그)과 womc 를 대조했다. 글이 말하는 잡·화살표·상태,
     병렬 갈래, 「가장 작은 그래프」는 womc 에 **이미 있었다**. 없던 것이 셋이었다:

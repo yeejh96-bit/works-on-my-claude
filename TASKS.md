@@ -115,6 +115,47 @@
 
 ## 끝난 일
 
+- [x] **v2.9.0 — 하네스 감사가 올린 「새로 들일 것」 후보 3건 반영 (2026-08-19)**
+  - 근거: 2026-08-19 하네스 감사(`docs/HARNESS-AUDIT.md` **v2.8.0 기록 4번**)가 후보 3건을 올렸고 사용자가 「반영하자」라고 했다.
+    감사 스킬은 반영을 직접 하지 않고 `plan-feature` 로 넘기게 되어 있다 — 그 넘어온 일이 이 항목이다.
+  - 손댄 파일: `commands/womc.md`(프론트매터 · 온보딩 2-b 소절 · 온보딩 마무리 안내 · 갱신 ⓐⓑ 이월 · 역방향 제안 ·
+    완료 보고 · 온보딩 설명 한 줄) · `agents/implement.md` · `agents/verify.md` · `HARNESS.md` · `SPEC.md` ·
+    `PLAN.md` · 이 파일 · `docs/HARNESS-AUDIT.md` · 버전 표식은 `py scripts/bump-version.py 2.9.0` 한 줄로 6곳
+    (`.claude-plugin/plugin.json` · `README.md` 제목 · `commands/womc.md` 3 · `CLAUDE.md` 1 — 손으로 세지 말 것).
+  - 남긴 것:
+    - **① `disable-model-invocation: true`** — `commands/womc.md:5` 프론트매터. `/womc` 는 파일을 새로 쓰는
+      **부작용 워크플로**라 모델이 스스로 부르면 안 된다. 근거로 **커스텀 슬래시 명령이 스킬로 통합됐다는 문서**를 확인했다:
+      "Custom commands have been merged into skills. A file at `.claude/commands/deploy.md` and a skill at
+      `.claude/skills/deploy/SKILL.md` both create `/deploy` and work the same way."
+      → 스킬용 프론트매터 필드가 `commands/womc.md` 에도 유효하다. https://code.claude.com/docs/en/skills
+    - **② `effort: high`** — `agents/implement.md:6` · `agents/verify.md:6`. `agents/plan.md:6` 이 이미 쓰던 패턴이다.
+      이제 **opus 3종이 모두 `high`** 고, haiku 인 `explore` 만 없다. 근거로 **`effort` 가 서브에이전트 공식
+      프론트매터 필드**임을 확인했다: "Effort level when this subagent is active. Overrides the session effort level.
+      … Options: `low`, `medium`, `high`, `xhigh`, `max`" https://code.claude.com/docs/en/sub-agents
+    - **③ `AGENTS.md` 감지·연결 — 감사 원안(무조건 import)과 다르게 「제안 후 승낙」으로 넣었다**(사용자가 고른 길).
+      **자리가 여섯이라 한 자리만 고치면 어긋난다**:
+      `commands/womc.md:384` 새 소절 「2-b) 기존 `AGENTS.md` 감지 (있을 때만)」 — 루트 `AGENTS.md` 만 보고,
+      줄 수를 세어 사용자에게 묻고, 좋다고 할 때만 `CLAUDE.md` 의 `@SPEC.md` **다음 줄**에 `@AGENTS.md` 를 넣는다(멱등) ·
+      `:404` 온보딩 마무리 안내 열거에 「AGENTS 연결」 · `:484`(갱신 ⓑ 구획 교체 경로)와 `:493`(갱신 ⓐ 절 병합 6단계)의
+      **`@AGENTS.md` 이월 규칙 — 이게 없으면 `/womc update` 한 번에 연결이 조용히 사라진다** ·
+      `:495` 역방향 제안(연결이 없으면 자동으로 넣지 않고 제안만) · `:496` 무엇을 했는지 완료 보고에 한 줄.
+    - **`HARNESS.md:21` ↔ `commands/womc.md:153` 은 온보딩 설명 한 줄을 글자 단위로 공유한다**(정본–사본).
+      이번에 양쪽을 같이 갱신했다 — 한쪽만 고치면 `scripts/check-sync.py` 1번이 DRIFT 로 잡는다.
+    - `SPEC.md:20` 3절 1번 열거에 「루트에 `AGENTS.md` 가 있으면 **물어본 뒤에만** `@AGENTS.md` 로 연결」 한 구절.
+    - **안 고른 길 6개와 새 설계 결정 3개**는 `PLAN.md` 의 「나중에 / 안 할 것」·「설계 결정」에 옮겨 적었다.
+    - 옛 `v2.5.0` 항목은 「끝난 일」 5개 초과 회전 규칙에 따라 `docs/CHANGELOG.md` 맨 위로 옮겼다.
+  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → **전 항목 OK, 버전 `2.9.0`**(열린 확인 ID 4개 일치 포함).
+  - **⚠ 아직 실측 안 된 것 — 셋 다 화면으로 확인한 적이 없다. 「동작한다」고 적지 말 것:**
+    - **①②는 문서 근거만으로 채택했다.** 확인 방법: Claude Code 를 껐다 켠 뒤 `/womc` 가 명령 목록에 뜨는지,
+      손으로 실행되는지 본다. **안 뜨면 `disable-model-invocation` 그 한 줄만 되돌리면 된다.**
+      `effort: high` 는 화면 표시가 없어, 프론트매터가 거부되지 않는지(두 에이전트가 정상 기동하는지)로만 본다.
+    - **③의 온보딩·갱신 이월도 실제 기존 프로젝트에서 돌려본 적이 없다.** 다음에 기존 코드가 있는 폴더에
+      `/womc` 를 깔 때, 이어서 같은 폴더에 `/womc update` 를 한 번 더 돌릴 때 겸사 본다
+      (**루트에 `AGENTS.md` 가 있는 폴더라야 시험대가 된다**).
+    - **`check-sync.py` 는 셋 다 못 잡는다** — 글자가 파일에 있는지만 보지 실행 중 동작은 못 본다.
+  - **열린 확인은 이번에 하나도 닫히지 않았다 — 4건 그대로다.** 다만 `open:import-command` 의 「이어 쓸 것」은
+    후보 ③ 이 처리됐다는 사실에 맞춰 고쳤다.
+
 - [x] **v2.8.0 — 답변 말투를 「원시인(케이브맨)」에서 「쉬운 말 + 짧게」로 교체 (2026-08-19)**
   - 근거: 사용자 요청. "케이브맨 규칙 없애자. 이용자가 쉽게 알아들을 수 있게, 최대한 간결하고 짧은 문장으로."
     옛 말투는 짧기는 했지만(2~5단어 명사형 단문) **쉽지는 않았다** — 코딩을 모르는 사용자가 읽는다는
@@ -237,46 +278,7 @@
   - **아직 사람이 봐야 하는 것**: 실제 감사 동작(모델이 달라 감사가 도는지 · 「새로 들일 것」을 실제로 찾아오는지)은
     다음 `/womc update` 때 화면으로 본다. `check-sync.py` 는 이름이 남아 있는지만 보지 동작은 못 본다.
 
-
-- [x] 승인 관문을 설정으로 옮김 + `/code-review` 지적 12건 (v2.5.0) — **2026-08-14**
-  - 근거: v2.4.0 커밋에 `/code-review` 를 돌려 12건이 나왔고, **고치기 전에 12건을 전부 파일로 사실 확인했다**
-    (`explore` 2개 병렬 + 메인이 기록 파일 직접 대조). 확인 과정에서 **리뷰가 놓친 것 하나를 더 찾았다** —
-    `PLAN.md` 가 열린 확인을 「2건」이라 적었는데 실제로는 3건이었다(`open:outputstyle-force-plugin` 누락).
-  - **가장 큰 것 — 산문이 하네스에 지고 있었다.** v2.4.0 이 `CLAUDE.md` 에 넣은 "한 번 좋다고 한 것이 다음번까지
-    이어지지 않는다"는 **글일 뿐이라, 사용자가 권한 창에서 「항상 허용」을 누르면 `settings.local.json` 에 영구 allow 가
-    저장돼 그다음부터 안 묻는다.** 골격 `settings.json` 에 `ask` 키가 아예 없었기 때문이다.
-  - 손댄 파일: `commands/womc.md`(골격 settings.json 템플릿 · `ask` 설명 불릿 · 갱신 모드 병합 규칙 · 임베드 CLAUDE.md 2곳 ·
-    임베드 HARNESS.md · 온보딩 「7개 절」) · `.claude/settings.json` · `CLAUDE.md` · `HARNESS.md` ·
-    `agents/implement.md` · `agents/plan.md`(frontmatter 한 줄) · `scripts/check-sync.py` ·
-    `skills/plan-feature/SKILL.md`(93행 인용 한 줄) · `PLAN.md` · 이 파일 · `docs/HARNESS-AUDIT.md` ·
-    `.claude-plugin/plugin.json`(버전 표식은 `py scripts/bump-version.py 2.5.0` 한 줄로 6곳 — 손으로 세지 말 것).
-  - 남긴 것:
-    - **골격 `permissions.ask` 목록 10개** — `Bash(...)`·`PowerShell(...)` 각 5개(`git push` · `git reset --hard` ·
-      `git branch -d` · `git branch -D` · `rm`/`Remove-Item`). **정본은 `commands/womc.md` 의 골격 settings.json 템플릿,
-      라이브 사본은 `.claude/settings.json`. 둘은 check-sync 1번이 글자 단위로 대조하므로 한쪽만 고치면 DRIFT 다.**
-      `ask` 는 `allow` 를 이기므로 「항상 허용」을 눌러도 이 명령들은 다음번에 또 묻는다.
-    - **갱신 모드에 `ask` 병합 규칙**(`commands/womc.md`, 옛 `allow` 4줄 청소 규칙 바로 뒤): 키가 없으면 기본 목록을
-      통째로 추가, 이미 있으면 **사용자가 넣은 항목은 한 줄도 안 지우고** 빠진 기본 항목만 더한다.
-      **이 규칙이 없으면 새로 만드는 폴더에만 관문이 생기고 이미 깔린 폴더는 영영 안 생긴다.**
-    - **`implement` 의 관문 처리 경로** — `agents/implement.md` 「작업 규칙」에 불릿 하나, 「출력 형식」에 **`4) 멈춘 것`** 신설
-      (기존 「주의점」은 5번으로 내려갔다). 서브에이전트는 사용자에게 물을 채널이 없으므로 **하지 말고 멈춰서 메인에 넘긴다.**
-      v2.4.0 은 "관문이 implement 에도 걸린다"고 적었지만 걸린 뒤 무엇을 할지가 없었다.
-    - **`CLAUDE.md` 「적극 위임」에 「안 고른 길」 계약** — 지금까지 이 계약이 `skills/plan-feature/SKILL.md` 3절에만 있어,
-      스킬을 안 타고 `plan` 을 직접 부르면 대안이 그냥 버려졌다. **계약을 모든 호출자가 물려받는 자리로 올렸다.**
-    - **`check-sync.py` 6번 검사(`LINKED_LITERALS`)** — 임베드 대상이 아닌 `agents/`·`skills/`·`PLAN.md` 사이의
-      문자열 결합을 본다(「안 고른 길」·「확실하지 않은 가정」·`PLAN.md` 절 제목 2종). **새 결합이 생기면 그 상수에 한 줄만 더하면 된다.**
-      **한계: 글자만 보지 뜻은 못 본다** — 양쪽을 동시에 같은 이름으로 다듬으면 통과한다(docstring 에 적어 뒀다).
-    - **낡은 안내를 이름 대신 위치로 가리키게 바꿨다** — 「할 일」 머리말이 특정 버전 이름을 박아 두는 바람에 낡았다.
-      이제 「지금 하는 일」의 **맨 위 열린 항목**으로 가리킨다. 같은 이유로 `TASKS.md` 안의 `commands/womc.md:239`
-      줄번호 참조도 **문구로 찾는 방식**으로 바꿨다(그 줄번호는 이번 작업에서 또 밀렸다).
-    - 버전은 2.4.0 → **2.5.0**(`.claude-plugin/plugin.json`). **골격 동작이 바뀌므로 패치가 아니라 마이너다** —
-      패치로 올리면 하네스 감사 트리거(`major.minor`, v2.3.0)가 안 돈다.
-  - 확인 방법: `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → **13항목 전부 OK, 버전 `2.5.0`**
-    (6번 검사 4줄과 「열린 확인 ID 4개 일치」 포함). 6번 검사는 **일부러 깨뜨려 작동을 확인했다** —
-    `agents/plan.md` 의 「안 고른 길」을 다른 말로 바꾸니 DRIFT 와 종료코드 1 이 떴고, 원상 복구 후 다시 OK.
-    **`ask` 가 실제로 「항상 허용」을 이기는지는 스크립트로 못 잡는다** — 새 열린 확인 `open:ask-gate` 로 넘겼다.
-
-> 최근 작업만 여기 남긴다. **v2.3.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
+> 최근 작업만 여기 남긴다. **v2.5.0 이하의 지난 기록은 `docs/CHANGELOG.md` 로 옮겼다** — 옛 결정 이유를 찾을 때는 그 파일을 본다.
 > 이 절이 다시 길어지면(대략 항목 5개 이상) 오래된 것부터 같은 형식 그대로 `docs/CHANGELOG.md` 맨 위로 옮긴다.
 
 ## 할 일
@@ -376,7 +378,9 @@
   - 손댈 파일: 겹치는 것으로 판명되면 `commands/womc.md` 의 「기존 프로젝트 온보딩」 2절에서 겹치는 단계를 빼고
     `/import` 를 먼저 돌리라고 안내한다. 안 겹치면 아무것도 안 고친다(관찰만).
   - 이어 쓸 것: 온보딩 병합 절차의 정본은 `commands/womc.md` 「기존 프로젝트 온보딩」 2절.
-    같은 감사가 올린 후보 ③(`AGENTS.md` 감지 → `@AGENTS.md` import)이 **같은 자리를 고친다** — 함께 처리한다.
+    같은 감사가 올린 후보 ③(`AGENTS.md` 감지 → `@AGENTS.md` import)은 **v2.9.0 에서 이미 처리됐다** —
+    무조건 import 가 아니라 **「제안 후 승낙」** 방식이고, 자리는 온보딩 2-b 소절이다(「끝난 일」의 v2.9.0 항목 참고).
+    **이 항목에 남은 것은 `/import` 와 겹치는지 하나뿐이다.**
   - 끝난 것으로 보는 조건: `/import` 가 무엇을 끌어오는지 화면으로 확인하고, 겹치면 `commands/womc.md` 문구까지 고친 상태.
   - 확인 방법: 기존 코드가 있는 아무 폴더에서 `/import` 를 돌려 무엇을 끌어오는지 보고,
     이어서 `/womc` 를 돌려 온보딩이 같은 일을 또 하는지 본다.
