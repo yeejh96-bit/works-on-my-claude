@@ -4,22 +4,96 @@
 > 지금 모델이 알아서 하는 것)과 **새로 들인** 이력(그 사이 생긴 기능 중 골격이 쓸 만한 것)을 함께 남긴다.
 > 다음 감사는 **맨 위 기록의 「마지막 감사 기준 버전」·「마지막 감사 기준 모델」부터** 시작하고, 같은 조사를 반복하지 않는다.
 > **감사 본체는 둘 중 하나만 달라도 돈다 — Claude Code 앞 두 자리(`major.minor`) 또는 모델.** (v2.6.0 에서 모델 트리거를 더했다.)
-> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.234` (2026-08-18).
+> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.235` (2026-08-19).
 > 맨 위 기록의 **마지막 감사 기준 모델**: `Opus 5`.
-> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.7.0 기록의 6번을 본다.
+> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.8.0 기록의 6번을 본다.
 > **③에서 파생됐던 열린 확인(`open:allow-cleanup`)도 2026-08-11 에 통과·닫혔다** — 남은 열린 확인은 아래 목록을 본다.
 > ③의 결론(골격에서 `allow` 4줄을 뺄 수 있다)은 **v2.2.0 으로 실행됐다 (2026-08-10).**
 
 <!-- womc:open-checks:begin -->
-> **다음 감사가 먼저 볼 것 — 열린 확인 3건**
+> **다음 감사가 먼저 볼 것 — 열린 확인 4건**
 > (정본은 `TASKS.md` 「할 일」. 조건·확인 방법을 여기 베껴 적지 않는다.)
 > - `open:env-deny-redirect` — 입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 (파생 자리: v2.7.0 기록 6번①)
 > - `open:delegation-vs-preset` — 하네스가 Opus 5 에 심는 「Agent tool 을 시키지 마라」와 womc 「적극 위임」 중 어느 쪽이 이기는지 (파생 자리: v2.7.0 기록 6번②)
-> - `open:eject-outputstyle` — `/womc eject womc-plain` 으로 꺼낸 출력 스타일이 접두 없는 이름(`womc-plain`)으로 등록되는지 (파생 자리: v2.8.0 `/code-review` 지적 ⑦)
+> - `open:eject-outputstyle` — `/womc eject womc-plain` 으로 꺼낸 출력 스타일이 접두 없는 이름(`womc-plain`)으로 등록되는지 (파생 자리: v2.8.0 `/code-review` 지적 ⑦ · **문서로 절반 확인됨** — v2.8.0 기록 6번)
+> - `open:import-command` — `/import` 가 womc 온보딩 병합과 겹치거나 충돌하는지 (파생 자리: v2.8.0 기록 6번)
 > **다음 감사는 이 항목들을 새 「실측 필요」로 다시 만들지 말고 `TASKS.md` 의 해당 항목을 갱신한다.**
 > (2026-08-18 v2.7.0 감사에서 그 앞의 열린 확인 4건이 **전부 닫혔다** — 결론은 아래 v2.7.0 기록 5번.
 > **닫힌 ID 를 이 구획에 백틱으로 남기지 말 것** — 대조 스크립트가 열린 것으로 센다.)
 <!-- womc:open-checks:end -->
+
+## v2.8.0 — 2026-08-19 / Claude Code `2.1.235` · 모델 `Opus 5` 기준
+
+### 1. 무엇을 확인했나
+- **트리거는 성립하지 않았다.** Claude Code 앞 두 자리는 같고(`2.1.234` → `2.1.235`, 패치만) 모델도 `Opus 5` 그대로였다.
+  `/womc update` 7번이 「그래도 조사할까요?」로 멈췄고, **사용자가 「진행해」라고 해서 돈 감사다.**
+- 조사 구간: `2.1.234` → `2.1.235`. 짧아서 `2.1.232`~`2.1.235` 를 함께 훑었다.
+- 조사 분담: 웹 2갈래는 `general-purpose`(ⓐ CHANGELOG 훑기 + 열린 확인 3건의 문서상 답 / ⓑ 「새로 들일 것」), 로컬 1갈래는 `explore`.
+- 직전 `/womc update` 가 골격 4개(`CLAUDE.md`·`HARNESS.md`·`.claude/statusline.js`·`.claude/settings.json`)가
+  최신 `2.8.0` 판과 **글자 그대로 일치**함을 확인했다 — 갱신에서 고친 파일 0개.
+- always-on 로드량 실측: `CLAUDE.md` 55줄 + `SPEC.md` 42줄 = **97줄.** 부풀지 않았다.
+
+### 2. 뒤집힌 전제 — **없음. 다만 v2.7.0 결론 하나가 보강됐다.**
+- v2.7.0 의 두 결론은 이번에도 유효했다: ⓐ Opus 5 는 시키지 않아도 스스로 검증한다 ⓑ `claude_code` 프리셋이
+  Opus 5 에 「시키지 않으면 Agent tool 을 부르지 마라」를 심는다.
+- ⓑ 의 원문은 지금도 문서에 그대로 있고, 같은 절에서 **"Either instruction only steers Claude, so set the limits as well"**
+  가 새로 확인됐다 — 그 줄이 **강제가 아니라 유도(steer)** 라는 뜻이다.
+  https://code.claude.com/docs/en/agent-sdk/subagents
+  → `CLAUDE.md` 「적극 위임」이 이길 여지가 문서로 뒷받침됐다. 실제 승부는 여전히 관찰 대상(`open:delegation-vs-preset`).
+
+### 3. 무엇을 뺐나 (근거) — **없음.**
+- 조사 구간의 CHANGELOG 변경은 권한 다이얼로그 문구 개선·GitLab MR 배지·Agent tool 인자 검증 등
+  **UI 개선과 버그 수정 위주**였다. 골격이 손으로 떠안은 일을 대신하게 된 기능은 없다.
+  https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
+- **기각 ①** — `explore` 가 「뺄 후보」로 올린 `CLAUDE.md:29` 의 위임 지시(조사는 `explore`, 설계는 `plan`…)는
+  위 2번ⓑ 의 프리셋을 **상쇄하는 자리**라 빼면 위임 자체가 안 돈다. v2.7.0 기록 2번②와 같은 판단이다.
+- **기각 ② (오보 정정)** — `explore` 가 "검증 지시가 `CLAUDE.md` 에 두 번 있다"고 보고했으나 틀렸다.
+  실제로는 `CLAUDE.md:31` 한 줄뿐이고, 두 번째로 짚은 자리는 `commands/womc.md` 의 임베드 사본이다
+  (정본–사본 관계라 중복이 아니며 `scripts/check-sync.py` 가 일치를 강제한다).
+
+### 4. 무엇을 새로 들였나 (근거) — **없음. 후보 3건은 사용자 판단 대기.**
+반영은 이 스킬이 하지 않고 `plan-feature` 로 넘긴다. 후보:
+- **① `commands/womc.md` 프론트매터에 `disable-model-invocation: true`** — `/womc` 는 파일을 새로 쓰는
+  **부작용 워크플로**인데 지금 프론트매터(`commands/womc.md:1-5`)에 이 필드가 없어 모델이 문맥상 스스로 부를 여지가 남는다.
+  공식 문서가 정확히 이런 경우("workflows with side effects")에 이 필드를 쓰라고 명시한다.
+  https://code.claude.com/docs/en/skills
+  → 바뀌는 자리: `commands/womc.md` 프론트매터 한 줄.
+- **② `agents/implement.md`·`agents/verify.md` 에 `effort: high`** — `agents/plan.md:6` 이 이미 채택한 패턴인데
+  같은 opus 를 쓰는 둘에는 없다(구현·검증이 설계보다 쉬울 이유가 없다).
+  https://code.claude.com/docs/en/sub-agents
+  → 바뀌는 자리: 두 파일의 프론트매터 각 한 줄.
+- **③ 온보딩에 기존 `AGENTS.md` 감지 → `CLAUDE.md` 에서 `@AGENTS.md` import** — 지금 온보딩은
+  `CLAUDE.md`·`.claude/settings.json` 만 병합하고 `AGENTS.md`(다른 코딩 에이전트가 쓰는 규칙 파일)는 안 본다.
+  공식 문서는 그게 있으면 import 하고 Claude 전용 절만 덧붙이라고 권한다(중복 작성 방지).
+  https://code.claude.com/docs/en/memory
+  → 바뀌는 자리: `commands/womc.md` 「기존 프로젝트 온보딩」 2절.
+
+### 5. 무엇을 왜 남겼나
+- **`CLAUDE.md` 「적극 위임」 전체** — 위 3번 기각①. 프리셋을 상쇄하는 자리다.
+- **`verify` 에이전트** — v2.7.0 과 같은 이유. 로그를 메인에서 떼어내는 값은 모델과 무관하다.
+- **`.env` deny 목록** — 리다이렉션 우회 여부와 무관하게 경로 규칙으로 막히는 범위는 그대로 유효하다.
+- **스킬에 `allowed-tools` 미도입** — 부작용 명령은 스킬 안에서 그때그때 승인받는 것이 설계 의도(승인 관문)라
+  턴 단위 사전승인과 충돌한다. SPEC 5절의 "`allow` 는 비워 둔다" 정책과도 어긋난다.
+- **`plugin.json` 의 `hooks`·`mcpServers` 번들 미도입** — v2.0.0 이 `hooks` 를 의도적으로 뺐고
+  SPEC 6절이 `.mcp.json` 자동 생성을 「안 만들 것」으로 못박았다. 근거 변화 없음.
+- **`sandbox.*` 설정 키 미도입** — v2.1.1 기록 ③의 실측 한계(샌드박스 때문인지 갈라내지 못함)가 아직 그대로다.
+
+### 6. 실측 필요
+- 열린 확인 3건은 **그대로 열려 있다** → `open:env-deny-redirect` · `open:delegation-vs-preset` · `open:eject-outputstyle`
+  (정본: `TASKS.md` 「할 일」)
+  - `open:env-deny-redirect` — **문서로는 못 닫았다.** `2.1.232` 가 넣은 입력 리다이렉션 권한 검사를 `2.1.233` 이
+    되돌렸고 `2.1.235` 까지 재도입이 없다 → **지금은 우회 가능 쪽에 무게.** permissions 문서는 deny 가
+    `cat`·`head`·`tail`·`sed` 에 걸린다고만 하고 리다이렉션 연산자는 언급하지 않는다.
+    https://code.claude.com/docs/en/permissions
+  - `open:delegation-vs-preset` — 문서상 어느 쪽이 이기는지 언급 없음. 위 2번의 "only steers" 가 전부다.
+  - `open:eject-outputstyle` — **가정의 절반이 문서로 확인됐다.** "The file name becomes the style name unless you
+    set `name` in the frontmatter." → 프로젝트 `.claude/output-styles/womc-plain.md` 는 **접두 없이 `womc-plain`** 으로
+    등록된다. **womc 가 세운 가정이 맞았다.** https://code.claude.com/docs/en/output-styles
+    남은 절반(플러그인이 주는 쪽이 `womc:womc-plain` 으로 등록되는지)은 문서에 없다 — 다만 이 저장소에서 그 값으로
+    말투가 실제 동작 중이라 사실상 확인된 셈이다. **끝난 것으로 보는 조건이 「사람이 화면으로 확인」이라 자동으로 닫지 않았다.**
+- **새로 연 확인 1건** → `open:import-command` (정본: `TASKS.md` 「할 일」)
+- **후보에서 내린 것**: `allowed-tools` 의 `${CLAUDE_PLUGIN_ROOT}` 치환이 플러그인 `commands/` 파일에도 적용되는지는
+  문서로 확정 못 했으나, 위 5번에서 `allowed-tools` 도입 자체를 기각했으므로 **열린 확인으로 올리지 않았다.**
 
 ## v2.7.0 — 2026-08-18 / Claude Code `2.1.234` · 모델 `Opus 5` 기준
 

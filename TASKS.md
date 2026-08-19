@@ -285,19 +285,21 @@
 > `docs/HARNESS-AUDIT.md` 에는 ID 한 줄과 링크만 둔다. **전문은 여기 한 곳뿐 — 지우지 말 것**(다른 곳에 사본이 없다).
 >
 > **2026-08-18 v2.7.0 감사에서 그때까지 열려 있던 확인 4건이 전부 닫혔다** — 넷의 결론(통과인지 기각인지)과
-> 근거 URL 은 「끝난 일」의 「열린 확인 4건 닫음」 항목에 있다. **지금 열려 있는 확인은 2건**이고, 둘 다 그 감사가 새로 연 것이다:
-> 입력 리다이렉션(`cat < .env` 류)이 `.env` deny 를 우회하는지(`open:env-deny-redirect`) ·
-> 「적극 위임」이 하네스의 「Agent tool 을 부르지 마라」를 이기는지(`open:delegation-vs-preset`).
+> 근거 URL 은 「끝난 일」의 「열린 확인 4건 닫음」 항목에 있다. **지금 열려 있는 확인은 4건이다.**
+> 그중 둘은 그 v2.7.0 감사가 새로 연 것이고 — 입력 리다이렉션(`cat < .env` 류)이 `.env` deny 를 우회하는지(`open:env-deny-redirect`) ·
+> 「적극 위임」이 하네스의 「Agent tool 을 부르지 마라」를 이기는지(`open:delegation-vs-preset`) —
+> 하나는 v2.8.0 `/code-review` 가(`open:eject-outputstyle`), 하나는 2026-08-19 감사가 열었다(`open:import-command`).
 > (`open:allow-cleanup` 은 2026-08-11 에 통과·닫았다 — 「닫힌 것 · 보류」 소절 참고.)
 > **「열린 확인」 2건과 별개로, 아래 「그 밖의 할 일」 소절에 보통 할 일이 따로 있다** — 그건 확인이 아니라 고칠 것이라 ID 주석이 없다.
 > **2026-08-11 — 갱신 모드 버그 ①②④는 v2.2.2·v2.2.3 으로 다 고쳤다. 여기 남은 것은 ③ 하나다.**
 > **지금 집을 것은 이 소절이 아니라 「지금 하는 일」의 맨 위 열린 항목이다** — 2026-08-14 현재 v2.4.0 확인, 그다음이 v2.3.0 확인이다.
 > (버전 이름 대신 **맨 위 열린 항목**으로 가리킨다 — 이름을 박아 두면 새 항목이 생길 때마다 이 줄이 낡는다. 실제로 그렇게 낡아 리뷰에 걸렸다.)
-> **감사 기록의 파생 자리**: 열린 3건 중 2건은 `docs/HARNESS-AUDIT.md` v2.7.0 기록의 6번 절이고,
-> 나머지 `open:eject-outputstyle` 은 v2.8.0 의 `/code-review` 지적에서 나왔다
-> (`open:env-deny-redirect` = 6번①, `open:delegation-vs-preset` = 6번②).
+> **감사 기록의 파생 자리**: 열린 4건 중 2건은 `docs/HARNESS-AUDIT.md` v2.7.0 기록의 6번 절이고
+> (`open:env-deny-redirect` = 6번①, `open:delegation-vs-preset` = 6번②),
+> `open:eject-outputstyle` 은 v2.8.0 의 `/code-review` 지적에서, `open:import-command` 는
+> 2026-08-19 감사(`docs/HARNESS-AUDIT.md` v2.8.0 기록 6번)에서 나왔다.
 >
-> **열린 확인은 전부 「급하지 않음」이다** (2026-08-19 현재 3건). 전부 확인일 뿐이고 실패해도 세팅이 깨지지 않는다.
+> **열린 확인은 전부 「급하지 않음」이다** (2026-08-19 현재 4건). 전부 확인일 뿐이고 실패해도 세팅이 깨지지 않는다.
 > 전용 시험 폴더를 만들어 붙잡지 않고, 다음에 `/womc update` 나 상태줄을 손볼 일이 생겼을 때 겸사 확인한다.
 > 그래서 지금은 **새 기능을 시작해도 되는 상태다** — 하던 것부터 끝내라고 말릴 항목이 없다.
 >
@@ -311,7 +313,7 @@
 > 그 구획을 읽어 열린 확인 목록을 화면에 알린다. 두 파일의 ID 집합이 어긋나면 `scripts/check-sync.py` 가 DRIFT 로 잡는다.
 > **한쪽만 고치면 이 장치가 끊긴다** — 두 파일을 항상 같이 고친다.
 
-### 열려 있는 것 (셋 다 급하지 않음)
+### 열려 있는 것 (넷 다 급하지 않음)
 
 - [ ] **입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 실측 — 급하지 않음 · 다음에 `.env` 를 쓰는 폴더에서 겸사** <!-- open:env-deny-redirect -->
   - 2026-08-18 v2.7.0 감사가 연 항목이다. Claude Code `2.1.232` 가 Bash **입력 리다이렉션**을 권한 검사 대상에 넣었다가
@@ -356,6 +358,28 @@
   - 확인 방법: 아무 프로젝트에서 `/womc eject womc-plain` 을 한 뒤 꺼낸 파일의 문구를 알아보게 고치고,
     `settings.json` 의 `outputStyle` 을 `"womc-plain"` 으로 바꿔 Claude Code 를 껐다 켠다. 고친 문구대로 답하는지 본다.
     안 먹으면 `/config` 의 Output style 목록에 꺼낸 쪽이 뜨는지도 함께 본다.
+    `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 로는 못 잡는다(문구가 파일에 있는지만 본다).
+  - **2026-08-19 감사 — 가정의 절반이 문서로 확인됐다(항목은 그대로 열어 둔다).**
+    출력 스타일 문서 원문: "The file name becomes the style name unless you set `name` in the frontmatter."
+    → 프로젝트 `.claude/output-styles/womc-plain.md` 는 **접두 없이 `womc-plain`** 으로 등록된다. womc 가 세운 가정이 맞다.
+    https://code.claude.com/docs/en/output-styles
+    남은 절반(플러그인이 주는 쪽이 `womc:womc-plain` 으로 등록되는지)은 문서에 없다 — 다만 이 저장소가 그 값으로
+    실제 동작 중이라 사실상 확인된 셈이다. **끝난 것으로 보는 조건이 「사람이 화면으로 확인」이라 자동으로 닫지 않았다.**
+    닫으려면 위 「확인 방법」을 한 번 돌려 보면 된다.
+
+- [ ] **`/import` 가 womc 온보딩 병합과 겹치거나 충돌하는지 실측 — 급하지 않음 · 다음에 기존 프로젝트에 `/womc` 를 깔 때 겸사** <!-- open:import-command -->
+  - 2026-08-19 감사가 연 항목이다. **온보딩 절차가 이미 있는 기능을 손으로 다시 하고 있을 수 있다.**
+  - 무엇이 불확실한가: 공식 문서(memory)는 `2.1.213+` 의 `/import` 가 `AGENTS.md`·MCP 서버·서브에이전트·스킬을
+    한 번에 끌어온다고만 적는다. womc 온보딩은 그와 별개로 ⓐ 코드를 훑어 `SPEC.md` 초안을 쓰고
+    ⓑ 기존 `CLAUDE.md`·`.claude/settings.json` 에 `womc:begin/end` 구획을 병합한다.
+    **겹치는 범위가 어디까지인지, 둘을 같이 돌리면 충돌하는지 못 봤다.** https://code.claude.com/docs/en/memory
+  - 손댈 파일: 겹치는 것으로 판명되면 `commands/womc.md` 의 「기존 프로젝트 온보딩」 2절에서 겹치는 단계를 빼고
+    `/import` 를 먼저 돌리라고 안내한다. 안 겹치면 아무것도 안 고친다(관찰만).
+  - 이어 쓸 것: 온보딩 병합 절차의 정본은 `commands/womc.md` 「기존 프로젝트 온보딩」 2절.
+    같은 감사가 올린 후보 ③(`AGENTS.md` 감지 → `@AGENTS.md` import)이 **같은 자리를 고친다** — 함께 처리한다.
+  - 끝난 것으로 보는 조건: `/import` 가 무엇을 끌어오는지 화면으로 확인하고, 겹치면 `commands/womc.md` 문구까지 고친 상태.
+  - 확인 방법: 기존 코드가 있는 아무 폴더에서 `/import` 를 돌려 무엇을 끌어오는지 보고,
+    이어서 `/womc` 를 돌려 온보딩이 같은 일을 또 하는지 본다.
     `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 로는 못 잡는다(문구가 파일에 있는지만 본다).
 
 ### 그 밖의 할 일 (열린 확인 아님 — 고칠 것)
