@@ -122,6 +122,12 @@
   조용히 사라지지 않게 했다. **①②③ 모두 문서 근거로 채택했을 뿐 실제 동작은 아직 화면으로 확인하지 않았다.**
   상세는 `TASKS.md` 「끝난 일」.
 
+- **v2.10.1 — 대화 도중 상태줄이 사라져 돌아오지 않던 버그를 고쳤다.** Claude Code 는 상태줄 명령이 실패하거나
+  빈 출력을 내면 직전 값을 남기지 않고 상태줄을 통째로 지우고, 다음 사건까지 다시 실행하지 않는다(본체 번들로 확인).
+  ① 명령을 `${CLAUDE_PROJECT_DIR}` 절대 경로로 바꾸고 ② `refreshInterval: 10` 을 넣어 저절로 되살아나게 했으며
+  ③ `statusline.js` 가 어떤 경우에도 종료코드 0 으로 끝나고 한 줄은 찍도록 방어를 넣었다.
+  이미 깔린 프로젝트에도 닿도록 `/womc update` 가 **옛 기본값일 때만** `statusLine` 을 교체한다.
+  상세는 `TASKS.md` 「끝난 일」.
 - **v2.10.0 — 상태줄에 세션 ID 를 추가했다.** `.claude/statusline.js` 가 stdin JSON 의 `session_id` 를
   읽어 **상태줄 둘째 줄**에 회색으로 따로 찍는다(전체 UUID — `claude --resume <id>` 에 그대로 쓸 수 있게 자른 형태가 아니다).
   정본(`commands/womc.md` 임베드 사본)과 라이브 사본(`.claude/statusline.js`)을 같이 고쳐 check-sync 가 통과한다.

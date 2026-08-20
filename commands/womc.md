@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=2.10.0 -->
+<!-- womc:skeleton-version=2.10.1 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=2.10.0 -->
+<!-- womc:skeleton-version=2.10.1 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -249,7 +249,12 @@ Thumbs.db
   CLAUDE.md 「절차 지키기」의 "한 번 좋다고 한 것이 다음번까지 이어지지 않는다"를 문장이 아니라 **설정으로 보장하는 자리**다.
   되묻는 횟수가 느는 건 아니다 — 지금도 매번 묻는다. 다만 실수로 「항상 허용」을 눌러도 풀리지 않을 뿐이다.
   목록을 **좁게 두는 것이 중요하다** — `Bash(git:*)` 처럼 넓히면 `git status` 같은 안전한 명령까지 묻게 된다.
-- `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(프로젝트 루트 기준 상대 경로, 6번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
+- `statusLine` 은 터미널 하단 상태줄로 `.claude/statusline.js` 를 실행한다(6번 참고). Node.js 가 없으면 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
+  **경로는 `${CLAUDE_PROJECT_DIR}` 를 앞에 붙인 절대 경로로 적는다** — 상대 경로(`node .claude/statusline.js`)로 두면 실행 위치가 프로젝트 루트가 아닐 때(worktree·`--add-dir` 등) 파일을 못 찾아 종료코드 1 로 죽는다.
+  이 변수는 Claude Code 가 채워 주며 bash·PowerShell 양쪽에서 동작한다(PowerShell 에서는 `${env:CLAUDE_PROJECT_DIR}` 로 자동 치환된다).
+  **`refreshInterval` 은 상태줄이 사라진 채로 남지 않게 하는 안전장치다(초 단위).** Claude Code 는 상태줄 명령이 한 번이라도 실패하거나 아무것도 안 찍으면
+  직전 값을 남기지 않고 상태줄을 **통째로 지우고**, 그다음 사건(새 답변·모델 변경·토큰 변화 등)이 올 때까지 다시 실행하지 않는다.
+  그래서 한 번 삐끗하면 「대화하다 보니 상태줄이 없어졌다」가 된다. `refreshInterval` 이 있으면 몇 초 뒤 저절로 되살아난다.
 - `outputStyle` 은 womc 플러그인이 제공하는 답변 말투를 이 프로젝트에서만 켠다. 다른 폴더에서는 평소 말투 그대로다.
   **값은 반드시 `womc:womc-plain` 이다** — 플러그인이 주는 출력 스타일은 `플러그인이름:스타일이름` 으로 등록되고 이름을 정확일치로 찾기 때문에,
   접두 `womc:` 를 빼면 **경고 한 줄 없이 조용히 무시된다**(v2.1.1 에서 고친 버그다. 파일 이름 `output-styles/womc-plain.md` 자체는 접두가 없다 — 헷갈리지 말 것).
@@ -261,7 +266,8 @@ Thumbs.db
   "outputStyle": "womc:womc-plain",
   "statusLine": {
     "type": "command",
-    "command": "node .claude/statusline.js"
+    "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
+    "refreshInterval": 10
   },
   "permissions": {
     "allow": [],
@@ -294,22 +300,62 @@ Thumbs.db
 아래 내용을 그대로, 한 글자도 바꾸지 않고 쓴다. Node.js 내장 모듈만 쓰고 하드코딩된 경로가 없어 어떤 프로젝트에도 그대로 쓸 수 있다.
 stdin 으로 들어오는 JSON 을 읽어 모델명·컨텍스트 토큰 사용량·5시간/주간 사용한도·현재 폴더명을 첫 줄에, 세션 ID 를 둘째 줄에 찍는다(여러 줄 상태줄은 Claude Code 가 지원한다).
 Node.js 가 설치돼 있어야 동작한다 — 없으면 이 파일은 그냥 아무것도 안 찍고, 상태줄만 안 보일 뿐 다른 기능엔 지장 없다.
+**이 스크립트는 어떤 경우에도 종료코드 0 으로 끝나고 최소 한 줄은 찍도록 짜여 있다** — 예외·깨진 입력·stdin 지연을 전부 삼키고 대체 문구(`…`)라도 출력한다.
+Claude Code 가 「실패하거나 빈 출력이면 상태줄을 통째로 지우고 다음 사건까지 그대로 둔다」로 동작하기 때문이다(5번의 `refreshInterval` 설명 참고).
+그러니 이 파일을 고칠 때 `emit()`·`try/catch`·`uncaughtException`·3초 guard 를 걷어내지 말 것 — 그게 상태줄이 사라지지 않게 붙잡는 부분이다.
 
 ```javascript
 #!/usr/bin/env node
 // Claude Code statusline (jq-free, Node-based)
 // Format: 1줄째 <model> │ <used>k/<ctx>k │ S:<5h>% W:<week>% │ <folder> / 2줄째 <session-id>
+//
+// 이 스크립트의 첫 번째 약속: 무슨 일이 있어도 0으로 끝나고, 반드시 한 줄은 찍는다.
+// Claude Code 는 상태줄 명령이 실패하거나(0이 아닌 종료) 아무것도 안 찍으면
+// 직전 값을 남기지 않고 상태줄을 통째로 지운다. 게다가 다음 사건(새 답변·모델 변경 등)이
+// 올 때까지 다시 실행하지 않으므로, 한 번 삐끗하면 상태줄이 한참 빈칸으로 남는다.
+// 그래서 예외·빈 입력·stdin 지연을 전부 삼키고 대체 문구라도 출력한다.
+// (settings.json 의 refreshInterval 이 두 번째 안전장치다 — 몇 초마다 스스로 되살아난다.)
+
+const FALLBACK = "…";
+let done = false;
+
+function emit(line) {
+  if (done) return;
+  done = true;
+  try {
+    process.stdout.write(line && line.trim() ? line : FALLBACK);
+  } catch (e) {
+    /* 여기서 더 할 수 있는 일은 없다 */
+  }
+}
+
+// 어떤 예외도 상태줄을 지우지 못하게 한다.
+process.exitCode = 0;
+process.on("uncaughtException", () => emit(FALLBACK));
+process.on("unhandledRejection", () => emit(FALLBACK));
+
+// stdin 이 끝나지 않아도 3초 뒤에는 무언가를 찍고 빠져나온다.
+const guard = setTimeout(() => {
+  emit(FALLBACK);
+  try {
+    process.stdin.pause();
+    process.stdin.destroy();
+  } catch (e) {}
+}, 3000);
 
 let raw = "";
 process.stdin.setEncoding("utf8");
+process.stdin.on("error", () => emit(FALLBACK));
 process.stdin.on("data", (c) => (raw += c));
 process.stdin.on("end", () => {
+  clearTimeout(guard);
+
+  // 입력이 깨져도 멈추지 않는다 — 빈 객체로 두고 아래에서 기본값으로 채운다.
   let d = {};
   try {
-    d = JSON.parse(raw);
+    d = JSON.parse(raw) || {};
   } catch (e) {
-    process.stdout.write("statusline: invalid input");
-    return;
+    d = {};
   }
 
   const model =
@@ -321,7 +367,7 @@ process.stdin.on("end", () => {
     d.cwd ||
     "";
   const folder = dir
-    ? dir.replace(/[\\/]+$/, "").split(/[\\/]/).pop()
+    ? dir.replace(/[\/]+$/, "").split(/[\/]/).pop()
     : "";
 
   // Session id (useful for `claude --resume <id>`)
@@ -352,7 +398,7 @@ process.stdin.on("end", () => {
   if (folder) line += ` │ \x1b[36m${folder}\x1b[0m`;
   // Session id on its own second row
   if (sid) line += `\n\x1b[90m${sid}\x1b[0m`;
-  process.stdout.write(line);
+  emit(line);
 });
 ```
 
@@ -374,7 +420,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=2.10.0 -->
+<!-- womc:skeleton-version=2.10.1 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -527,6 +573,9 @@ process.stdin.on("end", () => {
    **`ask` 키가 없으면 이 문서의 기본 `ask` 목록을 통째로 추가한다.** 되돌리기 어려운 명령을 「항상 허용」으로 풀어버리지 못하게 막는 자리다(위 「5) `.claude/settings.json`」 참고).
    **이미 `ask` 가 있으면 사용자가 넣은 항목은 한 줄도 지우지 않고, 이 문서의 기본 항목 중 빠진 것만 더한다.**
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
+   **딱 하나 예외**: 기존 `command` 가 옛 womc 기본값 `node .claude/statusline.js` **글자 그대로**이면(= 사용자가 손댄 적이 없다는 뜻) 이 문서의 새 기본값으로 **교체한다** —
+   상대 경로 + `refreshInterval` 없음 조합이 v2.10.1 에서 고친 「상태줄이 대화 도중 사라져 돌아오지 않는」 버그의 원인이라, 그대로 두면 고침이 옛 프로젝트에 닿지 않는다.
+   글자가 조금이라도 다르면 사용자가 고친 것으로 보고 건드리지 않는다. 교체했으면 마지막 보고에 한 줄로 알린다.
    `outputStyle` 키가 없으면 `"womc:womc-plain"` 으로 추가한다. **값이 `"womc:womc-caveman"` 또는 `"womc-caveman"` 이면 `"womc:womc-plain"` 으로 고친다** — 둘 다 옛 womc 골격이 넣던 값이지 사용자가 고른 말투가 아니다(스타일 이름 자체가 `womc-plain` 으로 바뀌었다). **무엇에서 무엇으로 고쳤는지 완료 보고에 한 줄 알린다.** 접두 `womc:` 가 빠진 쪽은 어떤 스타일과도 매칭되지 않아 말투가 조용히 안 켜지던 값이다(v2.1.1 에서 고쳤다) — 접두를 빼면 **경고 한 줄 없이 조용히 무시된다**는 함정은 지금도 그대로다.
    **값이 `"womc-plain"`(접두 `womc:` 없음)이면 `.claude/output-styles/womc-plain.md` 파일이 없을 때만 `"womc:womc-plain"` 으로 고친다.** 그 파일이 있으면 사용자가 `/womc eject womc-plain` 으로 꺼낸 것이고, 그때는 **접두 없는 이름이 오히려 맞는 값**이므로 건드리지 않는다(꺼낸 파일은 접두 없이 등록된다 — 아래 「꺼내기 모드」 4-b 참고). 이 조건 없이 고치면 갱신이 사용자의 eject 를 매번 되돌려 버린다.
    위에서 다룬 값들 말고 **다른 값이 들어 있으면 덮지 않고 그대로 둔다**(사용자가 고른 말투다) — 어느 쪽이었는지 완료 보고에 한 줄만 알린다.

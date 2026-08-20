@@ -2,7 +2,8 @@
   "outputStyle": "womc:womc-plain",
   "statusLine": {
     "type": "command",
-    "command": "node .claude/statusline.js"
+    "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
+    "refreshInterval": 10
   },
   "permissions": {
     "allow": [],
