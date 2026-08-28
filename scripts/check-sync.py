@@ -5,7 +5,7 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 실행:  py scripts/check-sync.py     (Windows)
        python3 scripts/check-sync.py (Mac/Linux)
 
-검사 여섯 가지:
+검사 일곱 가지:
 1) commands/womc.md 안에 박힌 "원본" 텍스트와, 이 저장소가 실제로 dogfood 하는
    라이브 파일(CLAUDE.md, HARNESS.md, settings.json, statusline.js)이 글자 그대로 일치하는지.
    (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
@@ -18,10 +18,13 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 5) 열린 확인(open-checks) 대조 — TASKS.md 의 열린 항목에 붙은 ID 주석과 docs/HARNESS-AUDIT.md 의
    앵커 구획 안 목록이 같은지. (한쪽만 고쳐 두 목록이 조용히 어긋나는 걸 막는다.
    ID 주석이 닫힌 항목에 남아 있는 것도 함께 잡는다.)
-6) 파일 사이 문자열 결합 대조 — 「안 고른 길」·「확실하지 않은 가정」·PLAN.md 절 제목처럼 여러 파일에 글자 그대로
-   같이 있어야 성립하는 이름이, 각 파일에 최소 횟수만큼 남아 있는지(LINKED_LITERALS). 임베드 대상이 아니라
-   1번이 못 보는 agents/·skills/·PLAN.md 사이의 결합을 잡는다.
+6) 파일 사이 문자열 결합 대조 — 「안 고른 길」·「확실하지 않은 가정」·`제약-공통.md` 파일명·그 안의 절 제목처럼
+   여러 파일에 글자 그대로 같이 있어야 성립하는 이름이, 각 파일에 최소 횟수만큼 남아 있는지(LINKED_LITERALS).
+   임베드 대상이 아니라 1번이 못 보는 agents/·skills/·commands/ 사이의 결합을 잡는다.
    한계: 글자만 보지 뜻은 못 보므로, 양쪽을 동시에 같은 이름으로 다듬으면 그대로 통과한다.
+7) 옛 기록 배너 잔류 검사 — PLAN.md·TASKS.md 에 「⚠ … 옛 기록 …」 배너가 붙은 절이 남아 있는지.
+   어떤 절이 옛 기록이 됐으면 배너를 붙여 그 자리에 두지 말고 docs/CHANGELOG.md 로 옮겨야 한다.
+   (docs/CHANGELOG.md 는 옛 기록을 모으는 곳이라 대상이 아니다.)
 
 하나라도 어긋나면 종료코드 1 로 끝난다.
 """
@@ -57,12 +60,19 @@ LINKED_LITERALS = [
     # 「안 고른 길」·「확실하지 않은 가정」: plan 의 출력 계약 ↔ plan-feature 3절이 그 이름으로 받는다
     ("안 고른 길", {"agents/plan.md": 1, "skills/plan-feature/SKILL.md": 1}),
     ("확실하지 않은 가정", {"agents/plan.md": 1, "skills/plan-feature/SKILL.md": 1}),
-    # PLAN.md 절 제목: SKILL.md 는 0절 빈 템플릿의 절 제목 + 3절 지시문 안 인용 두 자리라 최소 2
-    ("나중에 / 안 할 것", {"skills/plan-feature/SKILL.md": 2, "PLAN.md": 1}),
+    # 제약이 사는 곳: make-rule 이 이름을 정하고 ↔ plan-feature 3절·이관 절차가 그 이름으로 찾아 적는다
+    # ↔ 골격 CLAUDE.md(=commands/womc.md 임베드 사본)의 규칙도 같은 파일명을 가리킨다 (v2.13.0)
     (
-        "설계 결정 (계속 유효 — 앞으로도 지킨다)",
-        {"skills/plan-feature/SKILL.md": 2, "PLAN.md": 1},
+        "제약-공통.md",
+        {
+            "skills/plan-feature/SKILL.md": 2,
+            "skills/make-rule/SKILL.md": 1,
+            "CLAUDE.md": 1,
+            "commands/womc.md": 1,
+        },
     ),
+    # 「사용자가 닫은 것」: 안 고른 길·확정된 가정이 들어가는 절 이름 — make-rule 이 만들고 plan-feature 가 그 이름으로 적는다
+    ("사용자가 닫은 것", {"skills/plan-feature/SKILL.md": 1, "skills/make-rule/SKILL.md": 1}),
     # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 4절이 그 이름으로 넘김 → implement 의 입력 계약
     # (v2.6.0. 한 곳만 이름을 다듬으면 종료 조건이 조용히 안 넘어간다)
     # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v2.6.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
@@ -208,6 +218,22 @@ for literal, expected in LINKED_LITERALS:
     if ok:
         where = ", ".join(f"{rel}×{n}" for rel, n in expected.items())
         print(f"OK     「{literal}」 결합 유지 ({where} 이상)")
+
+# 7) 옛 기록 배너 잔류 검사 — 배너를 붙여 남기지 말고 docs/CHANGELOG.md 로 옮기는 게 규칙이다
+#    한 줄 안에 ⚠ 와 '옛 기록' 이 함께 있을 때만 잡는다(둘 중 하나만 있는 평범한 문장은 통과).
+STALE_BANNER_FILES = ["PLAN.md", "TASKS.md"]
+stale_banner_hits = []
+for rel in STALE_BANNER_FILES:
+    path = ROOT / rel
+    if not path.exists():
+        continue
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if "⚠" in line and "옛 기록" in line:
+            print(f"DRIFT  {rel}:{lineno} 옛 기록 배너가 남아 있음  [배너로 남기지 말고 그 절을 docs/CHANGELOG.md 로 옮기세요]")
+            problems.append(f"stale-banner:{rel}:{lineno}")
+            stale_banner_hits.append(rel)
+if not stale_banner_hits:
+    print(f"OK     옛 기록 배너 없음 ({', '.join(STALE_BANNER_FILES)})")
 
 if problems:
     print(f"\n[!] 어긋난 항목 {len(problems)}개 — 커밋 전에 맞춰 주세요.")
