@@ -65,14 +65,32 @@ LINKED_LITERALS = [
     (
         "제약-공통.md",
         {
-            "skills/plan-feature/SKILL.md": 2,
+            "skills/plan-feature/SKILL.md": 5,
             "skills/make-rule/SKILL.md": 1,
             "CLAUDE.md": 1,
             "commands/womc.md": 1,
         },
     ),
     # 「사용자가 닫은 것」: 안 고른 길·확정된 가정이 들어가는 절 이름 — make-rule 이 만들고 plan-feature 가 그 이름으로 적는다
-    ("사용자가 닫은 것", {"skills/plan-feature/SKILL.md": 1, "skills/make-rule/SKILL.md": 1}),
+    # ⚠ 실제로 그 절을 가진 파일(.claude/rules/제약-공통.md)도 함께 센다 — 안 세면 절 이름을 바꿔도 검사가 통과해
+    #   다음 plan-feature 실행이 "없으면 그때 만든다"에 따라 같은 뜻의 절을 하나 더 만든다(한 사실이 두 곳으로 갈라진다).
+    (
+        "사용자가 닫은 것",
+        {
+            "skills/plan-feature/SKILL.md": 1,
+            "skills/make-rule/SKILL.md": 1,
+            ".claude/rules/제약-공통.md": 1,
+        },
+    ),
+    # 짝인 「나중에 · 안 할 것」도 같은 이유로 센다 (v2.13.1)
+    (
+        "나중에 · 안 할 것",
+        {
+            "skills/plan-feature/SKILL.md": 3,
+            "skills/make-rule/SKILL.md": 1,
+            ".claude/rules/제약-공통.md": 3,
+        },
+    ),
     # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 4절이 그 이름으로 넘김 → implement 의 입력 계약
     # (v2.6.0. 한 곳만 이름을 다듬으면 종료 조건이 조용히 안 넘어간다)
     # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v2.6.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
