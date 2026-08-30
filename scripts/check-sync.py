@@ -10,6 +10,8 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
    라이브 파일(CLAUDE.md, settings.json, statusline.js)이 글자 그대로 일치하는지.
    (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
    에이전트·스킬·출력 스타일은 v2.0.0 부터 플러그인이 직접 제공하므로 womc.md 에 임베드하지 않는다 → 대조 대상이 아니다.
+   CLAUDE.md 는 「## 프로젝트 상세」 절 앞까지만 본다(SECTION_SPLIT) — v3.1.0 부터 그 절 본문은 프로젝트마다 다른
+   사용자 내용이라 글자 대조가 성립하지 않는다. 절 안쪽 소절 이름이 사라지는 건 6번(LINKED_LITERALS)이 지킨다.
 2) README.md 제목 끝의 버전과 .claude-plugin/plugin.json 의 version 이 같은지.
 3) womc:skeleton-version 표식이 plugin.json 의 version 과 같은지 — commands/womc.md 와 CLAUDE.md 에 있는
    **모든** 표식을 전수 검사한다. (이 표식은 /womc update 의 "옛 캐시" 판정 기준이라 어긋나면 캐시 감지가 조용히 오작동한다.
@@ -44,6 +46,10 @@ ROOT = Path(__file__).resolve().parent.parent
 def norm(s: str) -> str:
     return s.replace("\r\n", "\n").strip()
 
+
+# 라이브 파일 중 "여기까지만 대조한다"는 경계 (그 절부터는 프로젝트마다 내용이 달라진다)
+# 값은 줄 첫머리에서 시작하는 제목 문자열이다 — 본문 안의 백틱 언급에 걸리지 않게 앞에 개행을 붙인다.
+SECTION_SPLIT = {"CLAUDE.md": "\n## 프로젝트 상세"}
 
 # womc.md 원본에 박혀 있어야 할 라이브 파일들
 # (플러그인이 직접 제공하는 agents/·skills/·output-styles/ 는 임베드하지 않으므로 여기 없다)
@@ -105,6 +111,11 @@ LINKED_LITERALS = [
             "skills/plan-feature/SKILL.md": 3,
         },
     ),
+    # 「프로젝트 상세」 절 안쪽 소절 3종: 1번 검사가 v3.1.0 부터 그 절을 안 보게 됐으니(SECTION_SPLIT) 소절 이름은 여기서 지킨다
+    # — 골격 템플릿(commands/womc.md)과 이 저장소의 라이브 CLAUDE.md 가 같은 소절 이름을 쓰는지만 센다.
+    ("### 뭘 푸는가", {"CLAUDE.md": 1, "commands/womc.md": 1}),
+    ("### 안 만들 것", {"CLAUDE.md": 1, "commands/womc.md": 1}),
+    ("### 어디서 돌아가나 (배포)", {"CLAUDE.md": 1, "commands/womc.md": 1}),
     # 「새로 들일 것」: 감사 판정 축 ↔ /womc update 7번이 그 이름으로 사용자에게 묻는다 (v2.6.0)
     # womc.md 쪽은 1로 내렸다 — 나머지 한 자리가 HARNESS.md 템플릿 안이었는데 v3.0.0 에서 그 절을 통째로 지웠다.
     (
@@ -125,10 +136,21 @@ problems = []
 src = norm((ROOT / "commands/womc.md").read_text(encoding="utf-8"))
 for rel in EMBEDDED_FILES:
     live = norm((ROOT / rel).read_text(encoding="utf-8"))
-    if live in src:
-        print(f"OK     {rel}")
+    split = SECTION_SPLIT.get(rel)
+    if split is None:
+        target, note = live, ""
     else:
-        print(f"DRIFT  {rel}  (womc.md 원본과 라이브 불일치)")
+        head, found, _ = live.partition(split)
+        if not found:
+            print(f"DRIFT  {rel} 에 「{split.strip()}」 절이 없음")
+            problems.append(rel)
+            continue
+        # 앞부분 + 제목 줄까지만 본다 — 이렇게 붙여서 찾으면 원본 쪽도 같은 자리에서 그 절이 시작함이 함께 확인된다
+        target, note = head + split, f"  (「{split.strip()}」 절 앞까지)"
+    if target in src:
+        print(f"OK     {rel}{note}")
+    else:
+        print(f"DRIFT  {rel}  (womc.md 원본과 라이브 불일치){note}")
         problems.append(rel)
 
 # 2) README 제목 버전 ↔ plugin.json 버전

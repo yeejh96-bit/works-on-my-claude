@@ -37,7 +37,7 @@ description: 사용자가 "하네스 점검해줘", "Claude Code 가 업데이�
   `explore`(`agents/explore.md`)의 `tools` 는 `Read, Grep, Glob` 뿐이라 웹을 못 본다 — 시키면 「확인 못 함」으로 돌아오거나 URL 을 지어낼 수 있다.
   `CLAUDE.md` 「적극 위임」의 "4종에 안 맞으면 `general-purpose` 에 즉석 위임" 규칙을 따른 것이다.
 - **로컬 갈래**(이 프로젝트가 무엇을 손으로 떠안고 있는지)만 `explore` 에 맡긴다.
-  - 이 프로젝트 안: `CLAUDE.md`·`SPEC.md`·`.claude/settings.json`·`.claude/statusline.js`·`.claude/rules/`.
+  - 이 프로젝트 안: `CLAUDE.md`·`.claude/settings.json`·`.claude/statusline.js`·`.claude/rules/`.
   - 플러그인이 제공하는 정의(프로젝트 밖): `agents/`·`skills/`·`commands/womc.md` — Windows `C:\Users\<사용자>\.claude\plugins\marketplaces\works-on-my-claude\`, mac·linux `~/.claude/plugins/marketplaces/works-on-my-claude/` 아래(`commands/womc.md` 꺼내기 모드 절과 같은 경로).
   - 여기가 womc 저장소 자신이면(저장소 루트에 `agents/`·`skills/`·`commands/womc.md` 가 바로 있으면) 그쪽을 본다.
 
