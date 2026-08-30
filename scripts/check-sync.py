@@ -7,7 +7,7 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 
 검사 일곱 가지:
 1) commands/womc.md 안에 박힌 "원본" 텍스트와, 이 저장소가 실제로 dogfood 하는
-   라이브 파일(CLAUDE.md, HARNESS.md, settings.json, statusline.js)이 글자 그대로 일치하는지.
+   라이브 파일(CLAUDE.md, settings.json, statusline.js)이 글자 그대로 일치하는지.
    (한쪽만 고쳐 조용히 어긋나는 걸 막는다.)
    에이전트·스킬·출력 스타일은 v2.0.0 부터 플러그인이 직접 제공하므로 womc.md 에 임베드하지 않는다 → 대조 대상이 아니다.
 2) README.md 제목 끝의 버전과 .claude-plugin/plugin.json 의 version 이 같은지.
@@ -49,7 +49,6 @@ def norm(s: str) -> str:
 # (플러그인이 직접 제공하는 agents/·skills/·output-styles/ 는 임베드하지 않으므로 여기 없다)
 EMBEDDED_FILES = [
     "CLAUDE.md",
-    "HARNESS.md",
     ".claude/settings.json",
     ".claude/statusline.js",
 ]
@@ -58,14 +57,16 @@ EMBEDDED_FILES = [
 # (한쪽 이름만 다듬으면 조용히 어긋나는 자리 — 각 파일에 최소 몇 번 나와야 하는지로 적는다)
 LINKED_LITERALS = [
     # 「안 고른 길」·「확실하지 않은 가정」: plan 의 출력 계약 ↔ plan-feature 3절이 그 이름으로 받는다
-    ("안 고른 길", {"agents/plan.md": 1, "skills/plan-feature/SKILL.md": 1}),
-    ("확실하지 않은 가정", {"agents/plan.md": 1, "skills/plan-feature/SKILL.md": 1}),
+    # (v3.0.0. 최소치를 실측 개수로 조였다 — 아래 「끝난 것으로 보는 조건」과 같은 이유로 여유를 두지 않는다)
+    ("안 고른 길", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 4}),
+    ("확실하지 않은 가정", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 3}),
     # 제약이 사는 곳: make-rule 이 이름을 정하고 ↔ plan-feature 3절·이관 절차가 그 이름으로 찾아 적는다
     # ↔ 골격 CLAUDE.md(=commands/womc.md 임베드 사본)의 규칙도 같은 파일명을 가리킨다 (v2.13.0)
+    # plan-feature 쪽은 5→3 으로 내렸다 — v3.0.0 이 그 스킬을 줄이면서 같은 파일명을 가리키던 두 자리가 사라졌다.
     (
         "제약-공통.md",
         {
-            "skills/plan-feature/SKILL.md": 5,
+            "skills/plan-feature/SKILL.md": 3,
             "skills/make-rule/SKILL.md": 1,
             "CLAUDE.md": 1,
             "commands/womc.md": 1,
@@ -83,10 +84,11 @@ LINKED_LITERALS = [
         },
     ),
     # 짝인 「나중에 · 안 할 것」도 같은 이유로 센다 (v2.13.1)
+    # plan-feature 쪽은 3→2 로 내렸다 — v3.0.0 축소로 그 이름을 부르던 한 자리가 사라졌다.
     (
         "나중에 · 안 할 것",
         {
-            "skills/plan-feature/SKILL.md": 3,
+            "skills/plan-feature/SKILL.md": 2,
             "skills/make-rule/SKILL.md": 1,
             ".claude/rules/제약-공통.md": 3,
         },
@@ -94,19 +96,20 @@ LINKED_LITERALS = [
     # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 4절이 그 이름으로 넘김 → implement 의 입력 계약
     # (v2.6.0. 한 곳만 이름을 다듬으면 종료 조건이 조용히 안 넘어간다)
     # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v2.6.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
-    #   (plan-feature 4회 = TASKS 템플릿 1 + 3절 1 + 4절 2. 그중 4절 2개가 v2.6.0 이 더한 것이다.)
+    #   (plan-feature 3회 = TASKS 템플릿 1 + 3절 1 + 4절 1. 4절은 v3.0.0 축소로 2회에서 1회가 됐다 → 최소치도 4→3.)
     (
         "끝난 것으로 보는 조건",
         {
             "agents/plan.md": 1,
             "agents/implement.md": 2,
-            "skills/plan-feature/SKILL.md": 4,
+            "skills/plan-feature/SKILL.md": 3,
         },
     ),
     # 「새로 들일 것」: 감사 판정 축 ↔ /womc update 7번이 그 이름으로 사용자에게 묻는다 (v2.6.0)
+    # womc.md 쪽은 1로 내렸다 — 나머지 한 자리가 HARNESS.md 템플릿 안이었는데 v3.0.0 에서 그 절을 통째로 지웠다.
     (
         "새로 들일 것",
-        {"skills/harness-audit/SKILL.md": 7, "commands/womc.md": 2},
+        {"skills/harness-audit/SKILL.md": 7, "commands/womc.md": 1},
     ),
 ]
 
