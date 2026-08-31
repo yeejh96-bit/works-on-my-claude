@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.3.0 -->
+<!-- womc:skeleton-version=3.2.1 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.3.0 -->
+<!-- womc:skeleton-version=3.2.1 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -144,10 +144,6 @@ Thumbs.db
   **`refreshInterval` 은 상태줄이 사라진 채로 남지 않게 하는 안전장치다(초 단위).** Claude Code 는 상태줄 명령이 한 번이라도 실패하거나 아무것도 안 찍으면
   직전 값을 남기지 않고 상태줄을 **통째로 지우고**, 그다음 사건(새 답변·모델 변경·토큰 변화 등)이 올 때까지 다시 실행하지 않는다.
   그래서 한 번 삐끗하면 「대화하다 보니 상태줄이 없어졌다」가 된다. `refreshInterval` 이 있으면 몇 초 뒤 저절로 되살아난다.
-- **`subagentPromptCacheTtl` 은 서브에이전트에 맡긴 일의 「방금 읽은 것을 기억해 두는 시간」이다(`2.1.242` 이상).** Claude Code 는 메인 대화에는 1시간짜리 기억을 주지만 **서브에이전트 요청에는 기본 5분만 준다** — 한 세션에서 위임을 여러 번 하면 5분이 지날 때마다 같은 지시문을 처음부터 다시 읽힌다.
-  `"1h"` 로 두면 그 재처리가 사라진다. 이 골격은 위임을 많이 쓰므로(`CLAUDE.md` 「적극 위임」) 이득이 큰 자리다. 옛 Claude Code 는 이 키를 그냥 무시하니 넣어 둬도 해가 없고, 되돌리려면 이 한 줄만 지우면 된다(지우면 기본 5분으로 돌아간다).
-  다만 **1시간 캐시는 저장 요금이 더 비싸다** — 위임을 거의 안 쓰는 프로젝트라면 지워도 된다. 순이득 실측은 아직 안 끝났다(`TASKS.md` 의 열린 확인 `open:subagent-cache-ttl`).
-  **에이전트별 머리말(`agents/*.md` 의 `experimental.cacheTtl`)로는 주지 않는다** — 설정이 머리말을 이겨서 둘 다 넣으면 머리말 쪽이 죽고, 한 사실이 두 곳이 된다.
 
 ```json
 {
@@ -156,7 +152,6 @@ Thumbs.db
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
     "refreshInterval": 10
   },
-  "subagentPromptCacheTtl": "1h",
   "permissions": {
     "allow": [],
     "ask": [
@@ -301,7 +296,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.3.0 -->
+<!-- womc:skeleton-version=3.2.1 -->
 《여기》
 <!-- womc:end -->
 ~~~
