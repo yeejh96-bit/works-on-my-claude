@@ -4,22 +4,92 @@
 > 지금 모델이 알아서 하는 것)과 **새로 들인** 이력(그 사이 생긴 기능 중 골격이 쓸 만한 것)을 함께 남긴다.
 > 다음 감사는 **맨 위 기록의 「마지막 감사 기준 버전」부터** 시작하고, 같은 조사를 반복하지 않는다.
 > **감사 본체는 Claude Code 앞 두 자리(`major.minor`)가 달라지면 돈다.** (v3.0.0 에서 모델 트리거를 뺐다.)
-> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.235` (2026-08-19).
-> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v2.8.0 기록의 6번을 본다.
+> 맨 위 기록의 **마지막 감사 기준 버전**: Claude Code `2.1.251` (2026-08-31).
+> 맨 위 기록의 **실측 필요(미확인) 목록**은 아래 v3.2.0 기록의 6번을 본다.
 > **③에서 파생됐던 열린 확인(`open:allow-cleanup`)도 2026-08-11 에 통과·닫혔다** — 남은 열린 확인은 아래 목록을 본다.
 > ③의 결론(골격에서 `allow` 4줄을 뺄 수 있다)은 **v2.2.0 으로 실행됐다 (2026-08-10).**
 
 <!-- womc:open-checks:begin -->
-> **다음 감사가 먼저 볼 것 — 열린 확인 3건**
+> **다음 감사가 먼저 볼 것 — 열린 확인 4건**
 > (정본은 `TASKS.md` 「할 일」. 조건·확인 방법을 여기 베껴 적지 않는다.)
-> - `open:env-deny-redirect` — 입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 (파생 자리: v2.7.0 기록 6번①)
-> - `open:delegation-vs-preset` — 하네스가 Opus 5 에 심는 「Agent tool 을 시키지 마라」와 womc 「적극 위임」 중 어느 쪽이 이기는지 (파생 자리: v2.7.0 기록 6번② · **v3.0.0 이 위임 문턱값을 뺐으므로 무게가 더 커졌다**)
-> - `open:import-command` — `/import` 가 womc 온보딩 병합과 겹치거나 충돌하는지 (파생 자리: v2.8.0 기록 6번)
+> - `open:env-deny-redirect` — 입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 (파생 자리: v2.7.0 기록 6번① · **v3.2.0 감사에서 절반이 문서로 답이 나왔다**)
+> - `open:delegation-vs-preset` — 하네스가 Opus 5 에 심는 「Agent tool 을 시키지 마라」와 womc 「적극 위임」 중 어느 쪽이 이기는지 (파생 자리: v2.7.0 기록 6번② · **v3.2.0 감사가 공식 Opus 5 권고를 얹었다 — 무게가 또 커졌다**)
+> - `open:import-command` — `/import` 가 womc 온보딩 병합과 겹치는지 (파생 자리: v2.8.0 기록 6번 · **v3.2.0 감사에서 조사는 끝났고 안내 한 줄만 남았다**)
+> - `open:subagent-cache-ttl` — 서브에이전트 캐시 수명을 1시간으로 늘리는 것의 순이득 (파생 자리: v3.2.0 기록 4번①·6번)
 > (출력 스타일 eject 확인은 v3.0.0 에서 대상 폐지로 닫혔다 — `docs/CHANGELOG.md` v3.0.0 항목.)
 > **다음 감사는 이 항목들을 새 「실측 필요」로 다시 만들지 말고 `TASKS.md` 의 해당 항목을 갱신한다.**
 > (2026-08-18 v2.7.0 감사에서 그 앞의 열린 확인 4건이 **전부 닫혔다** — 결론은 아래 v2.7.0 기록 5번.
 > **닫힌 ID 를 이 구획에 백틱으로 남기지 말 것** — 대조 스크립트가 열린 것으로 센다.)
 <!-- womc:open-checks:end -->
+
+## v3.2.0 — 2026-08-31 / Claude Code `2.1.251` · 모델 `Opus 5` 기준
+
+### 1. 무엇을 확인했나
+- **트리거는 성립하지 않았다.** Claude Code 앞 두 자리가 같다(`2.1.235` → `2.1.251`, 패치만).
+  `/womc update` 7번이 「그래도 조사할까요?」로 멈췄고, **사용자가 「감사 돌려」라고 해서 돈 감사다.**
+- 조사 구간: `2.1.235` → `2.1.251` (그 사이 릴리스 전부).
+- 조사 분담: 웹 2갈래는 `general-purpose`(ⓐ 뺄 거리 + 열린 확인 3건의 문서상 답 / ⓑ 새로 들일 것), 로컬 1갈래는 `explore`.
+- 같은 세션의 `/womc update` 가 골격 3개(`CLAUDE.md`·`.claude/settings.json`·`.claude/statusline.js`)와 플러그인(3.2.0)이
+  최신판과 **글자 그대로 일치**함을 확인했다 — 갱신에서 고친 파일 0개.
+- always-on 로드량 실측: `CLAUDE.md` 61줄 + `.claude/rules/제약-공통.md` 41줄 = **102줄.** (`SPEC.md` 폐지 후 첫 실측이다.)
+- ⓐ 갈래는 CHANGELOG 를 WebFetch 요약이 아니라 **raw 파일을 받아 직접 대조**했다 — 요약 모델이 없는 항목을 엉뚱한 버전에 붙이는 것을 그 자리에서 잡아냈다. **다음 감사도 CHANGELOG 는 raw 로 받아 직접 grep 한다.**
+
+### 2. 뒤집힌 전제 — **없음. 대신 미확인 가정 2건이 문서로 확정됐다.**
+- **「`ask` 가 `allow` 를 이기는가」 → 이긴다.** "a matching ask rule prompts even when a more specific allow rule also matches the same call"
+  https://code.claude.com/docs/en/permissions
+  게다가 **auto 모드에서도 자동 승인되지 않는다** — 「Actions no mode auto-approves」의 첫 항목이 "Tools matched by an explicit ask rule" 이다.
+  https://code.claude.com/docs/en/permission-modes
+  **Pro·Max 는 이제 세션이 auto 모드로 시작하는데도** 골격의 승인 관문(v2.5.0)이 그대로 산다는 뜻이다.
+- **「프리픽스 `:*` 표기」 → 정식 문법이다.** "The `:*` suffix is an equivalent way to write a trailing wildcard, so `Bash(ls:*)` matches the same commands as `Bash(ls *)`."
+  단 **꼬리에서만** 유효하다 — `Bash(git:* push)` 처럼 가운데 두면 콜론이 글자 그대로 취급돼 아무것도 안 맞는다(`2.1.246` 이 이 경우 시작 시 경고를 넣었다).
+  골격의 `ask` 8줄은 `:*` 가 전부 맨 끝이라 정상 동작한다. **앞으로 `ask` 를 늘릴 때도 `:*` 는 맨 끝에만 쓴다.**
+- 남은 가정 「Windows git 표기」는 이번에도 확인 못 했다.
+- **이 두 확정을 `.claude/rules/제약-공통.md` 「아직 확인 못 한 가정」에 반영하는 것은 이 스킬이 하지 않는다**(골격 파일은 안 고친다). → `plan-feature` 몫이다.
+
+### 3. 무엇을 뺐나 — **없음. 「뺄 수 있음」이 하나도 안 나왔다.**
+- `permissions.ask` 8줄 → **남길 것.** 내장 안전장치가 이걸 대신하지 못한다(아래 5번).
+- `permissions.deny` 7줄 → **남길 것.** 비밀 파일 보호는 여전히 손으로 적는 것이 공식 방법이고, 새 문법도 프리셋도 안 생겼다.
+- `.claude/statusline.js` → **남길 것.** 내장 상태줄 요소나 템플릿 변수는 없다. `refreshInterval` 동작도 그대로다.
+- `CLAUDE.md` 산문 규칙 4종 → **남길 것.** 기본이 된 것은 없다. 다만 「적극 위임」은 아래 6번의 재검토 대상이다.
+- PowerShell `ask` 줄을 줄일 여지도 **없었다** — 별칭은 자동 정규화되지만("A rule written for the cmdlet name also matches its aliases"), 골격은 이미 cmdlet 이름으로 한 줄씩만 적어 뒀다.
+
+### 4. 무엇을 새로 들였나 — **아직 없다. 후보 2건을 사용자에게 넘겼다.**
+(고치는 일은 이 스킬이 하지 않는다 — `plan-feature` 몫이다.)
+- **① 서브에이전트 캐시 수명** — `subagentPromptCacheTtl`(`2.1.242`, 설정 한 줄로 전부) 또는 `experimental.cacheTtl`(`2.1.248`, 에이전트별 머리말). **둘 중 하나만 고른다** — 설정이 머리말을 이겨서 둘 다 넣으면 뒤가 죽는다.
+  https://code.claude.com/docs/en/prompt-caching#cache-lifetime · https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
+  **서브에이전트 요청은 구독 플랜에서도 기본 5분 캐시만 받는다**(메인 대화만 1시간). 위임을 많이 쓰는 골격일수록 이득이 크다.
+  골격의 어디: `commands/womc.md` 의 `.claude/settings.json` 템플릿 + 라이브 사본 — **둘을 같이 고쳐야 check-sync 1번을 통과한다.**
+  → 순이득(1시간 캐시는 쓰기 요금이 더 비싸다)은 실측 전엔 단정 못 함. 열린 확인 `open:subagent-cache-ttl`.
+- **② 상태줄 `prompt_cache`** — `warm`·`hit_ratio` 같은 캐시 통계가 상태줄 JSON 에 새로 들어왔다(`2.1.251`).
+  https://code.claude.com/docs/en/statusline#prompt-cache-fields
+  골격의 첫 번째 목표(컨텍스트를 얇게)를 **처음으로 눈에 보이게** 만든다 — `/compact` 나 새 세션을 시작할 시점의 근거가 된다. 서브에이전트 요청은 이 통계에서 빠져 정확히 「메인이 얇은가」만 보여 준다.
+  골격의 어디: `.claude/statusline.js` + `commands/womc.md` 안의 같은 코드 사본. 넣는다면 `warm`+`hit_ratio` 한 조각만 — 상태줄은 얇게 두는 것이 방침이다.
+- **안 들일 것으로 가른 것**: `PreModelSwitch`·`PostModelSwitch` 훅(`2.1.251` 신규 — 「훅으로 만드는 것은 안 한다」로 이미 닫혔다) · `rate_limits.spend_limit`(Claude apps gateway 뒤에서만 오는 값이라 개인 Pro·Max 에는 영영 안 온다 → 죽은 코드만 는다) · `modelPicker`·`modelPricing`·`ANTHROPIC_DEFAULT_MODEL`·`spellcheck`·`--restricted`·`keybindingFlavor`(개인 취향·조직 정책이지 골격이 하는 일과 무관).
+
+### 5. 무엇을 왜 남겼나
+- **`permissions.ask` 8줄** — 내장 회로차단기는 작업폴더 *바깥*(홈·드라이브 루트·상위 폴더)을 겨냥한 `rm` 만 무조건 막고, **폴더 안쪽의 `rm -rf src/` 는 안 걸린다.** `git reset --hard` 류는 **auto 모드 분류기만** 막아 manual 모드엔 관문이 없고, `git push` 는 분류기 기본 차단 목록에 아예 없다(막는 건 force push 와 비밀정보를 실어 보내는 push 뿐이다). `mv` 는 어떤 내장 장치에도 안 걸린다. → **ask 8줄이 전부 내장 장치보다 넓다.**
+  https://code.claude.com/docs/en/permission-modes
+- **`permissions.deny` 7줄** — 형태까지 정답이다. 문서는 `Write(...)`·`Glob(...)` 로 쓴 경로 규칙은 "받아들이되 절대 참조하지 않고 시작 시 경고한다"고 못 박는데, 골격은 전부 `Read(...)` 라 그 함정을 피했다. `2.1.251` 이 「Grep·Glob 이 심링크 너머 `Read` deny 를 안 지키던 것」을 고쳐 **가만히 있었는데 더 강해졌다.**
+  https://code.claude.com/docs/en/permissions
+- **한글 파일 이름 방침**(`.claude/rules/제약-공통.md` 같은 이름) — `2.1.248` 이 「`@` 멘션이 비라틴 문자를 못 맞추던 것」을, `2.1.239` 가 「BOM 붙은 `agents/*.md`·`SKILL.md` 가 **소리 없이 무시**되던 것」을 고쳤다. Windows + 한글 이름 조합이 이제 안전하다 — 방침을 그대로 쓴다.
+- **`skills/*/SKILL.md` 배치와 frontmatter** — `2.1.246` 이 이 배치의 스킬 수를 0 으로 세던 버그와 `name` 에 `plugin:` 접두어가 겹쳐 보이던 버그를 고쳤다. 실측해 보니 골격의 스킬 3종은 접두어 없이 `name: harness-audit` 식이라 애초에 안 걸렸다.
+- **`verify` 서브에이전트** — Opus 5 프롬프팅 가이드가 "'use a subagent to verify' 류 지시는 빼라 … 별도 검증 단계를 더하는 레거시 하네스 뼈대도 마찬가지"라고 명시한다. 골격은 이미 「구현이 끝날 때마다 자동으로 부르는 고정 단계가 아니다」로 좁혀 놨다 — **그 좁힘이 공식 권고와 정확히 맞아 그대로 남긴다.**
+  https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
+- **`commands/womc.md` 배치** — 문서가 새 플러그인에는 `skills/` 를 권하지만("Use `skills/` for new plugins") 기존 `commands/` 는 계속 동작한다고 명시한다("Your existing `.claude/commands/` files keep working"). 이번 구간의 변화가 아니라 「뺄 거리」로 올리지 않았다.
+  https://code.claude.com/docs/en/plugins
+
+### 6. 실측 필요
+- **`CLAUDE.md` 「적극 위임」이 공식 Opus 5 권고와 어긋난다 — 이번 감사의 가장 큰 발견이다.**
+  Anthropic 은 "Claude Opus 5 delegates to subagents more readily than prior models. Delegation pays off on genuinely independent, sizeable tracks of work, but **it multiplies cost and time when applied to small tasks**" 라며 「작은 일은 위임하지 마라 / 하나로 되면 하나만 써라 / spawn 수를 낮게 유지하라」를 권한다.
+  https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
+  womc 는 v3.0.0 에서 **「위임 문턱값을 골격에 박지 않는다」를 사용자가 닫았는데, 모델 쪽 권고가 정반대로 왔다.**
+  → 기존 열린 확인 `open:delegation-vs-preset` 에 이 근거를 얹었다 (정본: `TASKS.md` 「할 일」).
+- → 열린 확인 `open:subagent-cache-ttl` (정본: `TASKS.md` 「할 일」) — 캐시 수명을 1시간으로 늘렸을 때의 순이득과, 플러그인이 제공하는 에이전트에서 `experimental.cacheTtl` 이 먹히는지.
+- → 열린 확인 `open:env-deny-redirect` (정본: `TASKS.md` 「할 일」) — **절반은 문서로 답이 나왔다.** `Read` deny 는 Claude Code 가 알아보는 Bash 파일 명령(`cat`·`head`·`tail`·`sed`)에도 걸리고 Grep·Glob 검색 결과에서도 빠지지만, **임의 서브프로세스(파이썬·노드 스크립트가 스스로 파일을 여는 것)는 안 막는다**(문서 명시). 입력 리다이렉션은 `2.1.232` 에 권한 검사 대상이 됐다가 `2.1.233` 에서 되돌려졌고 **이 구간에 안 돌아왔다**(전 구간 grep 확인). 공식 해법인 샌드박스는 macOS·Linux·WSL2 전용이라 **Windows 네이티브인 이 환경엔 대안이 없다.**
+  https://code.claude.com/docs/en/permissions
+- → 열린 확인 `open:import-command` (정본: `TASKS.md` 「할 일」) — **조사 부분은 끝났다.** `/import [codex|gemini]`(`2.1.213+`)는 **Codex·Gemini CLI 설정만** 대상이고, `AGENTS.md` 같은 지시 파일을 `CLAUDE.md` 에 **한 번 복사해 붙인다.** womc 는 `@AGENTS.md` **연결**을 넣어 사본을 안 만드는데, **공식 문서가 바로 그 방식을 권한다** — "create a `CLAUDE.md` that imports it so both tools read the same instructions without duplicating them", Windows 에서는 symlink 대신 import 를 쓰라고까지 명시한다. → **womc 의 선택이 공식 권고와 일치한다.** 남은 것은 **겹침 안내 한 줄**뿐이다: 온보딩으로 `@AGENTS.md` 를 넣은 뒤 `/import` 를 돌리면 같은 내용이 **연결 + 사본으로 두 번** 들어간다(`womc:begin/end` 구획이 그 사본까지 감싸주지 않는다).
+  https://code.claude.com/docs/en/commands · https://code.claude.com/docs/en/memory
+- 「Windows git 표기」 가정(v2.5.0)은 이번에도 확인 못 했다 — `.claude/rules/제약-공통.md` 「아직 확인 못 한 가정」에 그대로 남는다.
 
 ## v2.8.0 — 2026-08-19 / Claude Code `2.1.235` · 모델 `Opus 5` 기준
 

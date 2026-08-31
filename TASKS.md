@@ -151,7 +151,7 @@ v3.0.0 대개편은 2026-08-31 에 끝나 `docs/CHANGELOG.md` 의 v3.0.0 항목�
 > 그 구획을 읽어 열린 확인 목록을 화면에 알린다. 두 파일의 ID 집합이 어긋나면 `scripts/check-sync.py` 가 DRIFT 로 잡는다.
 > **한쪽만 고치면 이 장치가 끊긴다** — 두 파일을 항상 같이 고친다.
 
-### 열려 있는 것 (셋 다 급하지 않음)
+### 열려 있는 것 (넷 다 급하지 않음)
 
 - [ ] **입력 리다이렉션(`cat < .env` 류)이 골격의 `.env` deny 를 우회하는지 실측 — 급하지 않음 · 다음에 `.env` 를 쓰는 폴더에서 겸사** <!-- open:env-deny-redirect -->
   - 2026-08-18 v2.7.0 감사가 연 항목이다. Claude Code `2.1.232` 가 Bash **입력 리다이렉션**을 권한 검사 대상에 넣었다가
@@ -162,6 +162,8 @@ v3.0.0 대개편은 2026-08-31 에 끝나 `docs/CHANGELOG.md` 의 v3.0.0 항목�
     (v2.7.0 때는 이 한계 설명이 `HARNESS.md` 에 있었는데, 그 파일은 v3.0.0 에서 없어졌다 — 이제 갈 곳은 womc.md 의 deny 설명이다.)
   - 이어 쓸 것: deny 목록의 정본은 `commands/womc.md` 의 `.claude/settings.json` 템플릿, 라이브 사본은
     `.claude/settings.json`(한쪽만 고치면 check-sync 1번이 DRIFT 로 잡는다). 근거 문서 https://code.claude.com/docs/en/permissions
+  - 2026-08-31 v3.2.0 감사가 **절반을 문서로 답했다**: `Read` deny 는 Claude Code 가 알아보는 Bash 파일 명령(`cat`·`head`·`tail`·`sed`)에도 걸리고 Grep·Glob 검색 결과에서도 빠지지만, **임의 서브프로세스(파이썬·노드 스크립트가 스스로 파일을 여는 것)는 안 막는다**(문서 명시). 입력 리다이렉션은 `2.1.233` 의 되돌림 이후 `2.1.251` 까지 **안 돌아왔다**(전 구간 grep 확인) — 남은 절반은 그대로 열려 있다.
+  - 공식 해법인 샌드박스(OS 수준 차단)는 macOS·Linux·WSL2 전용이라 **Windows 네이티브인 이 환경엔 대안이 없다** — 우회로 판명돼도 고칠 수 있는 건 위 「손댈 파일」의 한 줄짜리 한계 설명뿐이다.
   - 끝난 것으로 보는 조건: 막히는지 안 막히는지 사람이 화면으로 확인하고, **안 막히면 위 deny 설명 문구까지 고친** 상태.
   - 확인 방법: 아무 프로젝트에 더미 `.env`(가짜 값만 넣는다)를 두고 Bash 로 `cat < .env` 를 시켜 차단되는지 본다.
     `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 로는 못 잡는다(설정이 파일에 있는지만 본다).
@@ -176,6 +178,8 @@ v3.0.0 대개편은 2026-08-31 에 끝나 `docs/CHANGELOG.md` 의 v3.0.0 항목�
   - 이어 쓸 것: **v3.0.0 부터 문턱값이 없다** — 위임 여부는 모델이 정한다(`CLAUDE.md` 「적극 위임」, 문턱값 재도입 금지는
     `.claude/rules/제약-공통.md` 「사용자가 닫은 것」). 근거 원문은 `docs/HARNESS-AUDIT.md` v2.7.0 기록 **2번②**.
     **v3.0.0 이 문턱값을 뺐으므로 이 확인의 무게가 더 커졌다** — 문턱값 없이도 위임이 실제로 도는지가 관찰 대상이다.
+  - 2026-08-31 v3.2.0 감사가 **반대편 근거를 찾아 무게를 더 키웠다.** Anthropic 의 Opus 5 프롬프팅 가이드가 "Claude Opus 5 delegates to subagents more readily than prior models … **it multiplies cost and time when applied to small tasks**" 라며 「작은 일은 위임하지 마라 / 하나로 되면 하나만 써라 / spawn 수를 낮게 유지하라」를 권한다. https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5
+  - 즉 이 항목은 이제 **「위임이 도는가」뿐 아니라 「너무 도는 건 아닌가」도 함께 본다.** v3.0.0 에서 사용자가 닫은 「위임 문턱값 금지」를 다시 열지가 걸려 있다 — 다시 여는 판단은 사용자 몫이고, 결정적 상한(`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` 기본 3 · `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` 기본 20)이 산문 대신 쓸 수 있는 수단으로 새로 확인됐다.
   - 끝난 것으로 보는 조건: 여러 파일을 뒤져야 하는 작업에서 `explore` 가 실제로 불리는지 사람이 화면으로 확인하고,
     안 불리면 문구를 어떻게 고칠지 **결정까지 마친** 상태.
   - 확인 방법: 새 세션에서 여러 파일을 뒤져야 하는 일을 시키고 서브에이전트가 실제로 뜨는지 본다.
@@ -193,10 +197,32 @@ v3.0.0 대개편은 2026-08-31 에 끝나 `docs/CHANGELOG.md` 의 v3.0.0 항목�
     같은 감사가 올린 후보 ③(`AGENTS.md` 감지 → `@AGENTS.md` import)은 **v2.9.0 에서 이미 처리됐다** —
     무조건 import 가 아니라 **「제안 후 승낙」** 방식이고, 자리는 온보딩 2-b 소절이다(`docs/CHANGELOG.md` 의 v2.9.0 항목 참고).
     **이 항목에 남은 것은 `/import` 와 겹치는지 하나뿐이다.**
+  - 2026-08-31 v3.2.0 감사가 **조사 부분을 끝냈다.** `/import [codex|gemini]`(`2.1.213+`)는 **Codex·Gemini CLI 설정만** 대상이고, `AGENTS.md` 같은 지시 파일을 `CLAUDE.md` 에 **한 번 복사해 붙인다.** womc 는 `@AGENTS.md` **연결**을 넣어 사본을 안 만드는데 **공식 문서가 바로 그 방식을 권한다** — "so both tools read the same instructions without duplicating them", Windows 에서는 symlink 대신 import 를 쓰라고까지 명시한다. → **womc 의 선택이 공식 권고와 일치한다.** https://code.claude.com/docs/en/commands · https://code.claude.com/docs/en/memory
+  - **남은 것은 겹침 안내 한 줄뿐이다** — 온보딩으로 `@AGENTS.md` 를 넣은 뒤 `/import` 를 돌리면 같은 내용이 **연결 + 사본으로 두 번** 들어간다(`womc:begin/end` 구획이 그 사본까지 감싸주지 않는다). 이 한 줄을 `commands/womc.md` 「기존 프로젝트 온보딩」 1-b 소절에 넣으면 이 항목은 닫힌다 — 온보딩 단계를 빼는 일은 없다.
   - 끝난 것으로 보는 조건: `/import` 가 무엇을 끌어오는지 화면으로 확인하고, 겹치면 `commands/womc.md` 문구까지 고친 상태.
   - 확인 방법: 기존 코드가 있는 아무 폴더에서 `/import` 를 돌려 무엇을 끌어오는지 보고,
     이어서 `/womc` 를 돌려 온보딩이 같은 일을 또 하는지 본다.
     `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 로는 못 잡는다(문구가 파일에 있는지만 본다).
+
+- [ ] **서브에이전트 캐시 수명을 1시간으로 늘리는 것의 순이득 실측 — 급하지 않음 · 위임을 여러 번 쓰는 세션에서 겸사** <!-- open:subagent-cache-ttl -->
+  - 2026-08-31 v3.2.0 감사가 연 항목이다. **위임을 많이 쓰는 골격이라 이득이 클 자리인데, 공짜가 아니다.**
+  - 무엇이 불확실한가: 서브에이전트 요청은 구독 플랜에서도 **기본 5분 캐시**만 받는다(메인 대화만 1시간).
+    `2.1.242` 의 설정 `subagentPromptCacheTtl: "1h"` 로 늘릴 수 있는데, **1시간 캐시는 쓰기 요금이 더 비싸다.**
+    한 세션에서 위임을 몇 번 하느냐에 따라 읽기 절약이 쓰기 증가를 넘는지가 갈린다 — **넘는지 못 봤다.**
+    https://code.claude.com/docs/en/prompt-caching#cache-lifetime
+  - 같이 걸린 두 번째 불확실: `2.1.248` 의 에이전트별 머리말 `experimental.cacheTtl` 이
+    **플러그인이 제공하는 에이전트에서도 먹히는지.** 문서의 「플러그인 서브에이전트가 무시하는 필드」 목록
+    (`hooks`·`mcpServers`·`permissionMode`)에 `experimental` 은 없지만, 된다고 적혀 있지도 않다.
+    https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
+  - 손댈 파일: 들이기로 하면 `commands/womc.md` 의 `.claude/settings.json` 템플릿과 라이브 사본 `.claude/settings.json`
+    **둘 다** — 한쪽만 고치면 `check-sync.py` 1번이 DRIFT 로 잡는다.
+    에이전트별로 가기로 하면 대신 `agents/plan.md`·`implement.md`·`verify.md` 머리말이다(`explore` 는 haiku 라 이득이 작다).
+  - 이어 쓸 것: **설정이 머리말을 이긴다 — 둘 중 하나만 넣는다.** 둘 다 넣으면 머리말 쪽이 죽는다.
+    「한 사실은 한 곳에만」·얇게 철학에는 설정 한 줄이 맞고, 값비싼 에이전트만 고르려면 머리말이다.
+  - 끝난 것으로 보는 조건: 순이득이 있는지 사람이 숫자로 확인하고, **있으면 위 파일까지 고친** 상태.
+  - 확인 방법: `claude -p "hello" --output-format json` 의 `usage.cache_creation` 에서 `ephemeral_1h_input_tokens` 를 본다.
+    설정을 넣기 전후로 위임을 여러 번 쓰는 같은 작업을 돌려 비교한다.
+    `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` 로는 못 잡는다(설정이 파일에 있는지만 본다).
 
 ### 그 밖의 할 일 (열린 확인 아님 — 고칠 것)
 
