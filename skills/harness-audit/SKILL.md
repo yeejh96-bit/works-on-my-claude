@@ -29,14 +29,13 @@ description: 사용자가 "하네스 점검해줘", "Claude Code 가 업데이�
 - **구간이 짧아 보여도 Claude Code CHANGELOG 훑기는 건너뛰지 않는다** — 2절 ⓑ(새로 들일 것)의 출처가 바로 그 CHANGELOG 라,
   건너뛰면 「새로 들일 것」 축이 아무것도 못 찾는다. 짧으면 가볍게 훑되 거르지는 않는다.
 
-## 2. 그 사이 무엇이 바뀌었나 조사 (웹은 general-purpose, 로컬은 explore)
+## 2. 그 사이 무엇이 바뀌었나 조사
 1절이 정한 조사 구간(버전 구간)의 변경을 조사한다. 갈래를 도구에 맞게 나눠 **한 메시지에서 여러 개를 병렬로** 띄운다.
 **웹 갈래에는 두 가지를 함께 시킨다** — ⓐ 골격이 손으로 떠안은 것이 이제 기본이 됐는지(뺄 거리), ⓑ **새로 생긴 기능 중 골격이 쓸 만한 것**(들일 거리).
 ⓑ 를 빠뜨리면 이 스킬은 줄이기만 하고 최신 기능을 영영 못 따라간다.
-- **웹 갈래**(공식 문서 `code.claude.com/docs/en/*`, CHANGELOG·릴리스 노트)는 내장 `general-purpose` 에 그 자리에서 프롬프트를 짜서 위임한다.
-  `explore`(`agents/explore.md`)의 `tools` 는 `Read, Grep, Glob` 뿐이라 웹을 못 본다 — 시키면 「확인 못 함」으로 돌아오거나 URL 을 지어낼 수 있다.
-  `CLAUDE.md` 「적극 위임」의 "4종에 안 맞으면 `general-purpose` 에 즉석 위임" 규칙을 따른 것이다.
-- **로컬 갈래**(이 프로젝트가 무엇을 손으로 떠안고 있는지)만 `explore` 에 맡긴다.
+- **웹 갈래**(공식 문서 `code.claude.com/docs/en/*`, CHANGELOG·릴리스 노트)에는 웹을 볼 수 있는 도구가 필요하다.
+  `agents/explore.md` 의 `tools` 는 `Read, Grep, Glob` 뿐이라 웹을 못 본다 — 시키면 「확인 못 함」으로 돌아오거나 URL 을 지어낼 수 있다.
+- **로컬 갈래**(이 프로젝트가 무엇을 손으로 떠안고 있는지)는 아래 파일들을 읽어 조사한다.
   - 이 프로젝트 안: `CLAUDE.md`·`.claude/settings.json`·`.claude/statusline.js`·`.claude/rules/`.
   - 플러그인이 제공하는 정의(프로젝트 밖): `agents/`·`skills/`·`commands/womc.md` — Windows `C:\Users\<사용자>\.claude\plugins\marketplaces\works-on-my-claude\`, mac·linux `~/.claude/plugins/marketplaces/works-on-my-claude/` 아래(`commands/womc.md` 꺼내기 모드 절과 같은 경로).
   - 여기가 womc 저장소 자신이면(저장소 루트에 `agents/`·`skills/`·`commands/womc.md` 가 바로 있으면) 그쪽을 본다.

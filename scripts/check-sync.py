@@ -21,7 +21,8 @@ womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
    앵커 구획 안 목록이 같은지. (한쪽만 고쳐 두 목록이 조용히 어긋나는 걸 막는다.
    ID 주석이 닫힌 항목에 남아 있는 것도 함께 잡는다.)
 6) 파일 사이 문자열 결합 대조 — 「안 고른 길」·「확실하지 않은 가정」·`제약-공통.md` 파일명·그 안의 절 제목처럼
-   여러 파일에 글자 그대로 같이 있어야 성립하는 이름이, 각 파일에 최소 횟수만큼 남아 있는지(LINKED_LITERALS).
+   여러 파일에 글자 그대로 같이 있어야 성립하는 이름이, 각 파일에 그대로 남아 있는지(LINKED_LITERALS).
+   횟수는 세지 않는다 — 이름이 아예 사라지는 것만 잡는다(v3.4.0).
    임베드 대상이 아니라 1번이 못 보는 agents/·skills/·commands/ 사이의 결합을 잡는다.
    한계: 글자만 보지 뜻은 못 보므로, 양쪽을 동시에 같은 이름으로 다듬으면 그대로 통과한다.
 7) 옛 기록 배너 잔류 검사 — PLAN.md·TASKS.md 에 「⚠ … 옛 기록 …」 배너가 붙은 절이 남아 있는지.
@@ -60,82 +61,62 @@ EMBEDDED_FILES = [
 ]
 
 # 여러 파일에 "글자 그대로" 같이 있어야 성립하는 결합들
-# (한쪽 이름만 다듬으면 조용히 어긋나는 자리 — 각 파일에 최소 몇 번 나와야 하는지로 적는다)
+# (한쪽 이름만 다듬으면 조용히 어긋나는 자리 — 어느 파일에 그 이름이 살아 있어야 하는지로 적는다)
+#
+# v3.4.0 — 횟수를 세지 않고 "있는지"만 본다.
+#   예전에는 파일마다 최소 등장 횟수를 박아 뒀다. 그러면 문장을 한 줄 줄일 때마다 이 숫자도 따라 내려야 해서
+#   「지우고, 써 보고, 두 번 이상 걸릴 때만 되살린다」는 고치는 방식에 비용이 붙었다(3→2·5→3 으로 내린 이력이 있다).
+#   결합이 **끊기는 것**(이름이 아예 사라지는 것)은 여전히 잡는다 — 그게 이 검사의 목적이다.
+#   한계: 이름만 보고 뜻은 못 본다. 양쪽을 동시에 같은 이름으로 다듬으면 그대로 통과한다.
 LINKED_LITERALS = [
     # 「안 고른 길」·「확실하지 않은 가정」: plan 의 출력 계약 ↔ plan-feature 「갈림길은 네가 고른다」·「자리 규칙」이 그 이름으로 받는다
-    # (v3.0.0. 최소치를 실측 개수로 조였다 — 아래 「끝난 것으로 보는 조건」과 같은 이유로 여유를 두지 않는다)
-    ("안 고른 길", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 4}),
-    # plan-feature 쪽은 3→2 로 내렸다 — v3.2.0 이 되묻기 절차를 없애며 그 이름을 부르던 한 자리가 사라졌다.
-    ("확실하지 않은 가정", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 2}),
+    ("안 고른 길", ["agents/plan.md", "skills/plan-feature/SKILL.md"]),
+    ("확실하지 않은 가정", ["agents/plan.md", "skills/plan-feature/SKILL.md"]),
     # 제약이 사는 곳: make-rule 이 이름을 정하고 ↔ plan-feature 「자리 규칙」이 그 이름으로 찾아 적는다
     # ↔ 골격 CLAUDE.md(=commands/womc.md 임베드 사본)의 규칙도 같은 파일명을 가리킨다 (v2.13.0)
-    # plan-feature 쪽은 5→3 으로 내렸다 — v3.0.0 이 그 스킬을 줄이면서 같은 파일명을 가리키던 두 자리가 사라졌다.
     (
         "제약-공통.md",
-        {
-            "skills/plan-feature/SKILL.md": 3,
-            "skills/make-rule/SKILL.md": 1,
-            "CLAUDE.md": 1,
-            "commands/womc.md": 1,
-        },
+        [
+            "skills/plan-feature/SKILL.md",
+            "skills/make-rule/SKILL.md",
+            "CLAUDE.md",
+            "commands/womc.md",
+        ],
     ),
     # 「사용자가 닫은 것」: 안 고른 길·확정된 가정이 들어가는 절 이름 — make-rule 이 만들고 plan-feature 가 그 이름으로 적는다
-    # ⚠ 실제로 그 절을 가진 파일(.claude/rules/제약-공통.md)도 함께 센다 — 안 세면 절 이름을 바꿔도 검사가 통과해
+    # ⚠ 실제로 그 절을 가진 파일(.claude/rules/제약-공통.md)도 함께 본다 — 안 보면 절 이름을 바꿔도 검사가 통과해
     #   다음 plan-feature 실행이 "없으면 그때 만든다"에 따라 같은 뜻의 절을 하나 더 만든다(한 사실이 두 곳으로 갈라진다).
     (
         "사용자가 닫은 것",
-        {
-            "skills/plan-feature/SKILL.md": 1,
-            "skills/make-rule/SKILL.md": 1,
-            ".claude/rules/제약-공통.md": 1,
-        },
+        [
+            "skills/plan-feature/SKILL.md",
+            "skills/make-rule/SKILL.md",
+            ".claude/rules/제약-공통.md",
+        ],
     ),
-    # 짝인 「나중에 · 안 할 것」도 같은 이유로 센다 (v2.13.1)
-    # plan-feature 쪽은 3→2 로 내렸다 — v3.0.0 축소로 그 이름을 부르던 한 자리가 사라졌다.
+    # 짝인 「나중에 · 안 할 것」도 같은 이유로 본다 (v2.13.1)
     (
         "나중에 · 안 할 것",
-        {
-            "skills/plan-feature/SKILL.md": 2,
-            "skills/make-rule/SKILL.md": 1,
-            ".claude/rules/제약-공통.md": 3,
-        },
+        [
+            "skills/plan-feature/SKILL.md",
+            "skills/make-rule/SKILL.md",
+            ".claude/rules/제약-공통.md",
+        ],
     ),
-    # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 「구현 위임」이 그 이름으로 넘김 → implement 의 입력 계약
-    # (v2.6.0. 한 곳만 이름을 다듬으면 종료 조건이 조용히 안 넘어간다)
-    # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v2.6.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
-    #   (plan-feature 3회 = TASKS 템플릿 1 + 「자리 규칙」 1 + 「구현 위임」 1.)
+    # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 「구현 위임」이 그 이름으로 넘김 → implement 의 입력 계약 (v2.6.0)
     (
         "끝난 것으로 보는 조건",
-        {
-            "agents/plan.md": 1,
-            "agents/implement.md": 2,
-            "skills/plan-feature/SKILL.md": 3,
-        },
+        ["agents/plan.md", "agents/implement.md", "skills/plan-feature/SKILL.md"],
     ),
     # 「확인 방법」: plan-feature 가 계획 단계에서 TASKS 칸에 채우고 → 구현 위임에 그대로 넘기고 → implement 의 입력 계약이 된다 (v3.2.0)
-    # (한 곳만 이름을 다듬으면 확인 방법이 조용히 안 넘어가고, implement 가 「확인 결과」를 못 채운다)
-    # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v3.2.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
-    (
-        "확인 방법",
-        {
-            "skills/plan-feature/SKILL.md": 7,
-            "agents/implement.md": 4,
-        },
-    ),
+    ("확인 방법", ["skills/plan-feature/SKILL.md", "agents/implement.md"]),
     # 「프로젝트 상세」 절 안쪽 소절 3종: 1번 검사가 v3.1.0 부터 그 절을 안 보게 됐으니(SECTION_SPLIT) 소절 이름은 여기서 지킨다
-    # — 골격 템플릿(commands/womc.md)과 이 저장소의 라이브 CLAUDE.md 가 같은 소절 이름을 쓰는지만 센다.
-    # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — womc.md 의 1 은 골격 CLAUDE.md 템플릿 한 곳뿐이다. 템플릿에서 지우면 0 이 돼 바로 물린다.
-    #   그러니 산문에 이 소절 이름을 글자 그대로 다시 적지 마라 — 개수가 채워져 템플릿에서 지워도 통과한다(1번 검사는 SECTION_SPLIT 때문에 그 절을 안 봐 못 잡는다).
-    #   가리켜야 하면 「위 1번 템플릿의 세 소절」처럼 참조로 쓴다.
-    ("### 뭘 푸는가", {"CLAUDE.md": 1, "commands/womc.md": 1}),
-    ("### 안 만들 것", {"CLAUDE.md": 1, "commands/womc.md": 1}),
-    ("### 어디서 돌아가나 (배포)", {"CLAUDE.md": 1, "commands/womc.md": 1}),
+    # — 골격 템플릿(commands/womc.md)과 이 저장소의 라이브 CLAUDE.md 가 같은 소절 이름을 쓰는지만 본다.
+    ("### 뭘 푸는가", ["CLAUDE.md", "commands/womc.md"]),
+    ("### 안 만들 것", ["CLAUDE.md", "commands/womc.md"]),
+    ("### 어디서 돌아가나 (배포)", ["CLAUDE.md", "commands/womc.md"]),
     # 「새로 들일 것」: 감사 판정 축 ↔ /womc update 7번이 그 이름으로 사용자에게 묻는다 (v2.6.0)
-    # womc.md 쪽은 1로 내렸다 — 나머지 한 자리가 HARNESS.md 템플릿 안이었는데 v3.0.0 에서 그 절을 통째로 지웠다.
-    (
-        "새로 들일 것",
-        {"skills/harness-audit/SKILL.md": 7, "commands/womc.md": 1},
-    ),
+    ("새로 들일 것", ["skills/harness-audit/SKILL.md", "commands/womc.md"]),
 ]
 
 # 버전 표식(womc:skeleton-version=x.y.z)이 들어 있는 파일들 — 전수 검사한다
@@ -257,25 +238,22 @@ if audit_ids is not None:
         print(f"       AUDIT 에만: {', '.join('open:' + i for i in only_audit) if only_audit else '(없음)'}")
         problems.append("open-checks")
 
-# 6) 파일 사이 문자열 결합 대조 — 같은 이름이 양쪽에 그대로 남아 있는지
-for literal, expected in LINKED_LITERALS:
+# 6) 파일 사이 문자열 결합 대조 — 같은 이름이 양쪽에 그대로 남아 있는지 (횟수는 세지 않는다)
+for literal, files in LINKED_LITERALS:
     ok = True
-    for rel, minimum in expected.items():
+    for rel in files:
         path = ROOT / rel
         if not path.exists():
-            print(f"DRIFT  {rel} 파일이 없음  [「{literal}」이 최소 {minimum}번 있어야 함]")
+            print(f"DRIFT  {rel} 파일이 없음  [「{literal}」이 있어야 함]")
             problems.append(f"linked-literal:{literal}:{rel}")
             ok = False
             continue
-        count = path.read_text(encoding="utf-8").count(literal)
-        if count < minimum:
-            print(f"DRIFT  {rel} 에 「{literal}」이 최소 {minimum}번 필요한데 {count}번")
+        if literal not in path.read_text(encoding="utf-8"):
+            print(f"DRIFT  {rel} 에 「{literal}」이 없음")
             problems.append(f"linked-literal:{literal}:{rel}")
             ok = False
     if ok:
-        where = ", ".join(f"{rel}×{n}" for rel, n in expected.items())
-        print(f"OK     「{literal}」 결합 유지 ({where} 이상)")
-
+        print(f"OK     「{literal}」 결합 유지 ({', '.join(files)})")
 # 7) 옛 기록 배너 잔류 검사 — 배너를 붙여 남기지 말고 docs/CHANGELOG.md 로 옮기는 게 규칙이다
 #    한 줄 안에 ⚠ 와 '옛 기록' 이 함께 있을 때만 잡는다(둘 중 하나만 있는 평범한 문장은 통과).
 STALE_BANNER_FILES = ["PLAN.md", "TASKS.md"]
