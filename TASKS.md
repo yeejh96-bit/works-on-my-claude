@@ -184,8 +184,8 @@ v3.0.0 대개편은 2026-08-31 에 끝나 `docs/CHANGELOG.md` 의 v3.0.0 항목�
 - [ ] **`/import` 가 womc 온보딩 병합과 겹치거나 충돌하는지 실측 — 급하지 않음 · 다음에 기존 프로젝트에 `/womc` 를 깔 때 겸사** <!-- open:import-command -->
   - 2026-08-19 감사가 연 항목이다. **온보딩 절차가 이미 있는 기능을 손으로 다시 하고 있을 수 있다.**
   - 무엇이 불확실한가: 공식 문서(memory)는 `2.1.213+` 의 `/import` 가 `AGENTS.md`·MCP 서버·서브에이전트·스킬을
-    한 번에 끌어온다고만 적는다. womc 온보딩은 그와 별개로 ⓐ 코드를 훑어 `SPEC.md` 초안을 쓰고
-    ⓑ 기존 `CLAUDE.md`·`.claude/settings.json` 에 `womc:begin/end` 구획을 병합한다.
+    한 번에 끌어온다고만 적는다. womc 온보딩은 그와 별개로 기존 `CLAUDE.md`·`.claude/settings.json` 에
+    `womc:begin/end` 구획을 병합한다.
     **겹치는 범위가 어디까지인지, 둘을 같이 돌리면 충돌하는지 못 봤다.** https://code.claude.com/docs/en/memory
   - 손댈 파일: 겹치는 것으로 판명되면 `commands/womc.md` 의 「기존 프로젝트 온보딩」 2절에서 겹치는 단계를 빼고
     `/import` 를 먼저 돌리라고 안내한다. 안 겹치면 아무것도 안 고친다(관찰만).
