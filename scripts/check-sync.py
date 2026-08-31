@@ -113,9 +113,11 @@ LINKED_LITERALS = [
     ),
     # 「프로젝트 상세」 절 안쪽 소절 3종: 1번 검사가 v3.1.0 부터 그 절을 안 보게 됐으니(SECTION_SPLIT) 소절 이름은 여기서 지킨다
     # — 골격 템플릿(commands/womc.md)과 이 저장소의 라이브 CLAUDE.md 가 같은 소절 이름을 쓰는지만 센다.
-    ("### 뭘 푸는가", {"CLAUDE.md": 1, "commands/womc.md": 1}),
-    ("### 안 만들 것", {"CLAUDE.md": 1, "commands/womc.md": 1}),
-    ("### 어디서 돌아가나 (배포)", {"CLAUDE.md": 1, "commands/womc.md": 1}),
+    # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — womc.md 의 2 는 「골격 템플릿 안 1곳 + 갱신 모드 2-b 설명문 1곳」이다.
+    #   템플릿에서 소절을 지우면 1로 떨어져 걸린다. womc.md 를 고쳐 개수가 달라지면 이 숫자도 같은 작업에서 함께 고친다.
+    ("### 뭘 푸는가", {"CLAUDE.md": 1, "commands/womc.md": 2}),
+    ("### 안 만들 것", {"CLAUDE.md": 1, "commands/womc.md": 2}),
+    ("### 어디서 돌아가나 (배포)", {"CLAUDE.md": 1, "commands/womc.md": 2}),
     # 「새로 들일 것」: 감사 판정 축 ↔ /womc update 7번이 그 이름으로 사용자에게 묻는다 (v2.6.0)
     # womc.md 쪽은 1로 내렸다 — 나머지 한 자리가 HARNESS.md 템플릿 안이었는데 v3.0.0 에서 그 절을 통째로 지웠다.
     (
