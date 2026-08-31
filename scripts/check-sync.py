@@ -62,11 +62,12 @@ EMBEDDED_FILES = [
 # 여러 파일에 "글자 그대로" 같이 있어야 성립하는 결합들
 # (한쪽 이름만 다듬으면 조용히 어긋나는 자리 — 각 파일에 최소 몇 번 나와야 하는지로 적는다)
 LINKED_LITERALS = [
-    # 「안 고른 길」·「확실하지 않은 가정」: plan 의 출력 계약 ↔ plan-feature 3절이 그 이름으로 받는다
+    # 「안 고른 길」·「확실하지 않은 가정」: plan 의 출력 계약 ↔ plan-feature 「갈림길은 네가 고른다」·「자리 규칙」이 그 이름으로 받는다
     # (v3.0.0. 최소치를 실측 개수로 조였다 — 아래 「끝난 것으로 보는 조건」과 같은 이유로 여유를 두지 않는다)
     ("안 고른 길", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 4}),
-    ("확실하지 않은 가정", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 3}),
-    # 제약이 사는 곳: make-rule 이 이름을 정하고 ↔ plan-feature 3절·이관 절차가 그 이름으로 찾아 적는다
+    # plan-feature 쪽은 3→2 로 내렸다 — v3.2.0 이 되묻기 절차를 없애며 그 이름을 부르던 한 자리가 사라졌다.
+    ("확실하지 않은 가정", {"agents/plan.md": 3, "skills/plan-feature/SKILL.md": 2}),
+    # 제약이 사는 곳: make-rule 이 이름을 정하고 ↔ plan-feature 「자리 규칙」이 그 이름으로 찾아 적는다
     # ↔ 골격 CLAUDE.md(=commands/womc.md 임베드 사본)의 규칙도 같은 파일명을 가리킨다 (v2.13.0)
     # plan-feature 쪽은 5→3 으로 내렸다 — v3.0.0 이 그 스킬을 줄이면서 같은 파일명을 가리키던 두 자리가 사라졌다.
     (
@@ -99,16 +100,26 @@ LINKED_LITERALS = [
             ".claude/rules/제약-공통.md": 3,
         },
     ),
-    # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 4절이 그 이름으로 넘김 → implement 의 입력 계약
+    # 「끝난 것으로 보는 조건」: plan 의 출력 → plan-feature 「구현 위임」이 그 이름으로 넘김 → implement 의 입력 계약
     # (v2.6.0. 한 곳만 이름을 다듬으면 종료 조건이 조용히 안 넘어간다)
     # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v2.6.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
-    #   (plan-feature 3회 = TASKS 템플릿 1 + 3절 1 + 4절 1. 4절은 v3.0.0 축소로 2회에서 1회가 됐다 → 최소치도 4→3.)
+    #   (plan-feature 3회 = TASKS 템플릿 1 + 「자리 규칙」 1 + 「구현 위임」 1.)
     (
         "끝난 것으로 보는 조건",
         {
             "agents/plan.md": 1,
             "agents/implement.md": 2,
             "skills/plan-feature/SKILL.md": 3,
+        },
+    ),
+    # 「확인 방법」: plan-feature 가 계획 단계에서 TASKS 칸에 채우고 → 구현 위임에 그대로 넘기고 → implement 의 입력 계약이 된다 (v3.2.0)
+    # (한 곳만 이름을 다듬으면 확인 방법이 조용히 안 넘어가고, implement 가 「확인 결과」를 못 채운다)
+    # ⚠ 최소치는 "지금 실제 개수"로 잡는다 — 여유를 두면 v3.2.0 이 더한 자리를 통째로 지워도 옛 자리 몫으로 통과한다.
+    (
+        "확인 방법",
+        {
+            "skills/plan-feature/SKILL.md": 7,
+            "agents/implement.md": 4,
         },
     ),
     # 「프로젝트 상세」 절 안쪽 소절 3종: 1번 검사가 v3.1.0 부터 그 절을 안 보게 됐으니(SECTION_SPLIT) 소절 이름은 여기서 지킨다
