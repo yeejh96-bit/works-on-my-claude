@@ -115,8 +115,6 @@ LINKED_LITERALS = [
     ("### 뭘 푸는가", ["CLAUDE.md", "commands/womc.md"]),
     ("### 안 만들 것", ["CLAUDE.md", "commands/womc.md"]),
     ("### 어디서 돌아가나 (배포)", ["CLAUDE.md", "commands/womc.md"]),
-    # 「새로 들일 것」: 감사 판정 축 ↔ /womc update 7번이 그 이름으로 사용자에게 묻는다 (v2.6.0)
-    ("새로 들일 것", ["skills/harness-audit/SKILL.md", "commands/womc.md"]),
 ]
 
 # 버전 표식(womc:skeleton-version=x.y.z)이 들어 있는 파일들 — 전수 검사한다
