@@ -4,6 +4,7 @@
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
     "refreshInterval": 10
   },
+  "subagentPromptCacheTtl": "1h",
   "permissions": {
     "allow": [],
     "ask": [
