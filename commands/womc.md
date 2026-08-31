@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.5.0 -->
+<!-- womc:skeleton-version=3.6.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.5.0 -->
+<!-- womc:skeleton-version=3.6.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -64,7 +64,7 @@ disable-model-invocation: true
 
 ## 세션을 이어서 하기
 - `PLAN.md`·`TASKS.md` 는 **필요할 때만 읽는다** — 하던 일을 이어가거나 기능 작업을 시작할 때. 각 항목에 「손댈 파일」·「이어 쓸 것」·「끝난 것으로 보는 조건」·「확인 방법」이 있어, 그 항목만 읽고도 일을 시작할 수 있다.
-- 끝난 항목·끝난 설계 경위가 가는 곳은 `docs/CHANGELOG.md` 다(옮기는 시점은 「절차 지키기」의 커밋 불릿). 앞으로도 지킬 제약은 `.claude/rules/제약-공통.md`(항상 켜짐) 또는 `.claude/rules/제약-<영역>.md`(맨 위 `paths` 로 그 파일을 손댈 때만 켜짐)에 적는다 — `TASKS.md`·`PLAN.md` 에 쌓지 않는다. **한 사실은 한 곳에만 적는다.**
+- 끝난 항목·끝난 설계 경위가 가는 곳은 `docs/CHANGELOG.md` 다(옮기는 시점은 「절차 지키기」의 커밋 불릿). 앞으로도 지킬 제약은 `.claude/rules/제약-공통.md`(골격을 설계·수정할 때) 또는 `.claude/rules/제약-<영역>.md`(그 영역 파일을 손댈 때)에 적는다 — 둘 다 맨 위 `paths` 로 켜지는 자리가 정해진다. `TASKS.md`·`PLAN.md` 에 쌓지 않는다. **한 사실은 한 곳에만 적는다.**
 - 버전을 올리는 작업이면 같은 작업에서 `docs/CHANGELOG.md` 를 반드시 함께 갱신한다 — 맨 위에 기록을 더하고, 맨 아래 「버전 한 줄 요약 (색인)」에 한 줄을 더한다.
 
 ## 절차 지키기 (벗어나면 되돌리기)
@@ -297,7 +297,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.5.0 -->
+<!-- womc:skeleton-version=3.6.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
