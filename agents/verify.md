@@ -1,7 +1,7 @@
 ---
 name: verify
 description: 사용자가 동작 확인을 직접 부탁했거나, 테스트·실행 로그가 길어 메인 대화에서 떼어내야 할 때만 쓴다. "이게 되는지 확인해줘", "테스트 돌려서 잘 되는지 봐줘"처럼 확인을 요청받으면 여기로 위임된다. 테스트·실행으로 확인하고 통과/실패만 돌려준다. 코드는 고치지 않는다. 구현이 끝날 때마다 자동으로 부르는 고정 단계가 아니다.
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, Skill
 model: opus
 effort: high
 ---

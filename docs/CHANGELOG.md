@@ -7,6 +7,31 @@
 > **옛 항목이 가리키는 자리 하나가 바뀌었다**: v2.13.0 이전 항목에 나오는 `PLAN.md` 의 「나중에 / 안 할 것」·「설계 결정 (계속 유효 — 앞으로도 지킨다)」은
 > 지금 `.claude/rules/제약-공통.md` 의 「나중에 · 안 할 것」·「사용자가 닫은 것」이다. 옛 항목의 문장은 그때 기록이라 그대로 둔다.
 
+## v3.9.0 — 서브에이전트에게 스킬을 열었다 (2026-09-01)
+
+  - **계기**: `CLAUDE.md` 「프로젝트 스킬·규칙」에 「메인이든 서브에이전트든, 프로젝트 스킬이 있으면 적극적으로 먼저 쓴다」가 있었는데 **거짓이었다.**
+    서브에이전트 4종은 `tools:` 를 화이트리스트로 못박아 뒀고 거기 `Skill` 이 없었다 —
+    스킬을 못 부르는 정도가 아니라 **스킬 목록 자체가 시스템 프롬프트에 주입되지 않았다.** 지킬 수 없는 지시를 골격에 적어 두고 있었다.
+  - **실측으로 갈랐다**: `womc:explore`(`tools: Read, Grep, Glob`) → Skill 툴 없음 · 스킬 목록 없음.
+    `general-purpose`(툴 제한 없음)와 내장 `Explore`(툴 제한은 있으나 `Skill` 포함) → 둘 다 Skill 툴 있음 · 플러그인 스킬(`womc:*`) 포함 전체 목록 주입됨.
+    → **목록 주입은 `tools: *` 여부가 아니라 `Skill` 이 명단에 있느냐로 갈린다.**
+    공식 문서 `sub-agents.md` 「Control subagent capabilities」의 예시도 `tools: Read, Grep, Glob, Bash, Write, Edit, Skill` 형태다.
+  - **한 것 ①**: `agents/explore.md:4` · `agents/plan.md:4` · `agents/implement.md:4` · `agents/verify.md:4` 의 `tools:` 끝에 `Skill` 을 더했다. 본문은 안 건드렸다.
+  - **한 것 ②**: 경계 한 줄을 `CLAUDE.md` 「프로젝트 스킬·규칙」 세 번째 불릿과 `commands/womc.md` 의 같은 자리에 **글자까지 똑같이** 넣었다 —
+    서브에이전트가 쓰는 범위는 `.claude/skills/` 의 프로젝트 스킬까지고, `womc:` 이름표가 붙은 절차·오케스트레이션 스킬은 부르지 않는다.
+    열어 주면 스킬 목록에 `womc:plan-feature` 도 같이 뜨는데, 서브에이전트가 그걸 부르면 `PLAN.md`·`TASKS.md` 를 고치고 재위임까지 시도한다.
+  - **경계를 에이전트 4종 본문이 아니라 `CLAUDE.md` 한 곳에 둔 이유**: `CLAUDE.md` 는 `paths` 규칙과 달리 **서브에이전트에도 전달된다.**
+    4곳에 베끼면 한 사실이 네 곳이 된다.
+  - **앞으로 만들 스킬도 자동으로 딸려온다**: 스킬 목록은 등록제가 아니라 세션이 시작될 때 폴더를 훑어 만들어진다.
+    각 프로젝트에서 스킬을 새로 만들 때 에이전트 파일을 고칠 일은 없다 — 오히려 **앞으로 만들 프로젝트 스킬이 이번에 열어 준 대상**이고, 닫은 쪽은 `womc:` 절차 스킬이다.
+  - **안 건드린 것**: 4종의 `description`·`model`·`effort`·본문 전부 · `skills/` 아래 스킬 3종 · `.claude/settings.json` · `scripts/`.
+  - 손댄 파일: `agents/explore.md` · `agents/plan.md` · `agents/implement.md` · `agents/verify.md` · `CLAUDE.md` · `commands/womc.md` ·
+    `.claude/rules/제약-공통.md` · `TASKS.md` · `docs/HARNESS-AUDIT.md` · `docs/CHANGELOG.md` · `.claude-plugin/plugin.json` · `README.md`
+  - 남긴 것: 열린 확인 `open:project-skill-to-subagent` (정본은 `TASKS.md` 「할 일」).
+  - 확인 방법: `grep -n "^tools:" agents/*.md` → 4줄 모두 `Skill` 로 끝남 ·
+    `grep -n "프로젝트 스킬이 있으면" CLAUDE.md commands/womc.md` → 2줄이 서로 같음 ·
+    `PYTHONIOENCODING=utf-8 py scripts/check-sync.py` → `[OK] 모두 일치.`
+
 ## v3.8.0 — 하네스 감사를 `/womc update` 에서 떼어, 사용자가 부를 때만 돌게 했다 (2026-09-01)
 
   - **계기**: `/womc update` 7번 단계가 갱신을 마칠 때마다 `harness-audit` 스킬을 **자동으로** 실행했다.
@@ -1869,6 +1894,7 @@ v3.3.0 부터는 갱신이 끝나면 **그 프로젝트에 쌓인 것**(할 일 
 - **v3.6.0 — 「하지 말 것 목록」을 always-on 에서 내렸다.** `.claude/rules/제약-공통.md`(매 세션 읽히던 것의 67%)에 `paths` 를 붙여 골격을 설계·수정할 때만 켜지게 하고, `plan-feature` 가 설계 전에 읽게 했다. 그 파일에 「나가는 문」도 달아 판올림마다 쌓이기만 하던 것을 멈췄다 — 대가는 위임할 때 메인이 필요한 항목을 붙여 넣어야 한다는 것.
 - **v3.7.0 — 감사 트리거를 전체 버전으로 넓히고, 작업 크기를 재던 「파일 1~2개」를 걷었다.** 하네스 감사는 이제 Claude Code 전체 버전이 지난 감사 기준과 다르면 돌고(완전히 같을 때만 건너뛴다), 조사 결과 관련 변화가 없으면 「WOMC 골격에 반영할 변경 없음」 한 줄로 끝낸다. `plan-feature`·`plan`·`implement` 에서 파일 개수로 작업 크기를 재던 문턱값과 「간단히 할까요, 계획을 세울까요?」 되묻기를 없앴다 — 크기와 분할은 모델이 작업 내용을 보고 정한다. 남긴 숫자는 재위임 상한·나가는 문 기한처럼 목적이 분명한 것뿐이다.
 - **v3.8.0 — 하네스 감사를 `/womc update` 에서 떼어, 사용자가 부를 때만 돌게 했다.** 갱신이 끝날 때마다 감사(웹 조사)를 자동 실행하던 7번 단계를 「버전 비교 안내 한 줄 + 열린 확인 알림」으로 바꿨다 — v3.7.0 이 트리거를 넓힌 뒤로 사실상 갱신할 때마다 돌아 토큰을 크게 먹고 있었다. 「그래도 돌릴까요?」 되묻기도 없앴다. 스킬 본체·전체 버전 비교 기준·`open:allow-cleanup` 처리는 그대로고, 감사를 부르는 입구는 사용자뿐이다.
+- **v3.9.0 — 서브에이전트에게 스킬을 열었다.** `agents/*.md` 4종의 `tools:` 에 `Skill` 을 더해, 그동안 스킬 목록조차 못 받던 서브에이전트가 프로젝트 스킬을 쓸 수 있게 했다 — `CLAUDE.md` 의 「메인이든 서브에이전트든 먼저 쓴다」가 그동안 거짓이었다. 목록 주입은 `tools: *` 여부가 아니라 `Skill` 이 명단에 있느냐로 갈린다는 것을 실측으로 확인했다. 대신 `womc:` 절차 스킬은 부르지 않는다는 경계 한 줄을 `CLAUDE.md`·`commands/womc.md` 두 곳에 같이 넣었다. 각 프로젝트에서 앞으로 만들 스킬도 자동으로 딸려온다 — 다만 프로젝트 스킬(`.claude/skills/`)이 실제로 목록에 뜨는지는 아직 눈으로 확인 못 했다(`open:project-skill-to-subagent`).
 
 `PLAN.md` 가 v1.12.0 에서 멈춰 있던 이유(이 문단은 옛 `PLAN.md` 에서 옮겨 온 것이다): v1.13~1.17 은 전부 "작은 변경"(파일 몇 개, 자명한 수정) 규모였다.
 `plan-feature` 스킬 규칙상 작은 변경은 PLAN/TASKS 를 만들지 않고 바로 처리하므로,

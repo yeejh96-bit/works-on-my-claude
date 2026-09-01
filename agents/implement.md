@@ -1,7 +1,7 @@
 ---
 name: implement
 description: 설계가 정해진 한 단계를 실제로 코드로 구현할 때 사용한다. 파일에 직접 수정을 가하는 유일한 서브에이전트다. 한 번에 한 단계(하나의 목표와 하나의 완료 기준)만 맡기고, 끝나면 무엇을 바꿨는지 요약을 돌려받는다. 서로 다른 파일을 건드리는 독립 단계는 여러 개를 병렬로 부를 수 있다.
-tools: Read, Grep, Glob, Edit, Write, Bash
+tools: Read, Grep, Glob, Edit, Write, Bash, Skill
 model: opus
 effort: high
 ---

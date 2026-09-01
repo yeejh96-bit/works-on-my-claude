@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.8.0 -->
+<!-- womc:skeleton-version=3.9.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.8.0 -->
+<!-- womc:skeleton-version=3.9.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -59,7 +59,7 @@ disable-model-invocation: true
 ## 프로젝트 스킬·규칙 (모델이 만들고 쓰고 지운다)
 - 이 프로젝트에서만 통하는 것(도메인 지식·반복 절차)은 `.claude/skills/<이름>/SKILL.md` 로, 앞으로 계속 지킬 제약은 `.claude/rules/제약-<영역>.md` 로 남긴다.
 - 같은 일을 두 번 이상 하게 되면 스킬로 남기자고 먼저 제안한다 — 사용자가 시키기를 기다리지 않는다.
-- 메인이든 서브에이전트든, 프로젝트 스킬이 있으면 적극적으로 먼저 쓴다.
+- 메인이든 서브에이전트든, 프로젝트 스킬이 있으면 적극적으로 먼저 쓴다. 다만 **서브에이전트로 불렸다면 `.claude/skills/` 의 프로젝트 스킬까지다** — 절차·오케스트레이션 스킬(`womc:` 이름표가 붙은 것)은 메인이 부르는 것이라 서브에이전트는 부르지 않는다.
 - 안 쓰는 프로젝트 스킬은 지우자고 제안한다.
 
 ## 세션을 이어서 하기
@@ -297,7 +297,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.8.0 -->
+<!-- womc:skeleton-version=3.9.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
