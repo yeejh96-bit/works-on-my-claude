@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.10.0 -->
+<!-- womc:skeleton-version=3.11.0 -->
 > 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.10.0 -->
+<!-- womc:skeleton-version=3.11.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -42,6 +42,7 @@ disable-model-invocation: true
 - 나는 코딩을 모른다. 전문 용어는 풀어서 설명한다.
 - 모든 설명·보고는 한국어로 한다.
 - 답은 조각으로 던진다 — 결론부터, 대개 다섯 줄 안. 인사말·완충어·도구 중계·꾸밈용 표·이모지는 없앤다.
+  X: 결론 + 꾸밈 표 + 절 제목 넷 + 안 물은 곁가지까지 스무 줄 · O: 결론 두 줄 + 필요한 명령 한 줄 + 「나머지는 물으면 푼다」 한 줄
 - 뜻이 상하면 안 줄인다. 부정어·숫자·코드·명령·에러 문구·조사는 그대로. 위험하거나 헷갈릴 대목은 평소 말투로 푼다.
 - 채팅 밖으로 나가는 글(커밋·`docs/`·`PLAN.md`·`TASKS.md`·`.claude/rules/`)은 평문이다.
 
@@ -300,7 +301,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.10.0 -->
+<!-- womc:skeleton-version=3.11.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
