@@ -2,8 +2,8 @@
 """
 womc 저장소 정합성 검사 (커밋 전에 한 번 돌리면 좋다).
 
-실행:  py scripts/check-sync.py     (Windows)
-       python3 scripts/check-sync.py (Mac/Linux)
+실행:  python3 scripts/check-sync.py   (Mac·Linux)
+       py scripts/check-sync.py        (Windows)
 
 검사 일곱 가지:
 1) commands/womc.md 안에 박힌 "원본" 텍스트와, 이 저장소가 실제로 dogfood 하는

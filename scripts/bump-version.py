@@ -1,7 +1,7 @@
 """버전을 한 번에 올린다.
 
-실행:  py scripts/bump-version.py 2.0.0        (Windows)
-       python3 scripts/bump-version.py 2.0.0   (Mac/Linux)
+실행:  python3 scripts/bump-version.py 2.0.0   (Mac·Linux)
+       py scripts/bump-version.py 2.0.0        (Windows)
 
 버전 숫자가 박혀 있는 자리가 여러 곳이라 손으로 고치면 반드시 하나를 빠뜨린다.
 (빠뜨리면 check-sync.py 가 DRIFT 로 잡지만, 애초에 빠뜨리지 않는 게 낫다.)
@@ -28,7 +28,8 @@ except Exception:
 ROOT = Path(__file__).resolve().parent.parent
 
 
-# 줄바꿈을 그대로 두고 읽고 쓴다 (이 저장소는 LF 인데 plugin.json 만 CRLF 라, 섞이면 diff 가 통째로 뜬다)
+# 줄바꿈을 그대로 두고 읽고 쓴다 (파이썬이 멋대로 바꾸지 않게 한다).
+# 지금은 모든 파일이 LF 다 — .gitattributes 가 LF 로 고정한다.
 def read(path: Path) -> str:
     with open(path, encoding="utf-8", newline="") as f:
         return f.read()
@@ -49,7 +50,7 @@ args = [a for a in sys.argv[1:] if a != "--dry-run"]
 dry_run = "--dry-run" in sys.argv
 
 if len(args) != 1 or not re.fullmatch(r"\d+\.\d+\.\d+", args[0]):
-    print("사용법: py scripts/bump-version.py <새버전>   예) py scripts/bump-version.py 2.0.0")
+    print("사용법: python3 scripts/bump-version.py <새버전>   예) python3 scripts/bump-version.py 2.0.0")
     sys.exit(2)
 
 new = args[0]
@@ -104,4 +105,4 @@ for rel in VERSION_MARKER_FILES:
         print(f"  [!] {rel} 에 womc:skeleton-version 표식이 없음")
 
 print(f"\n{'바꿀' if dry_run else '바꾼'} 자리 {changed}곳.")
-print("다음: PYTHONIOENCODING=utf-8 py scripts/check-sync.py  로 전 항목 OK 인지 확인한다.")
+print("다음: python3 scripts/check-sync.py  로 전 항목 OK 인지 확인한다.")

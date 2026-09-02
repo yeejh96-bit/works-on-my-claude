@@ -17,7 +17,11 @@ Ubuntu에서 앞의 셋을 한 번에 까는 명령:
 ```
 sudo apt install git python3 nodejs
 ```
-→ git · 파이썬 · Node.js 를 시스템에 설치한다.
+→ git · 파이썬 · Node.js 를 시스템에 설치한다. (암호를 물어본다.)
+
+파이썬은 Ubuntu 에 보통 이미 깔려 있다. **Node.js 는 안 깔려 있는 경우가 많다** —
+안 깔린 채로 두면 터미널 아래 상태줄만 안 나오고 나머지는 다 정상 동작한다.
+깔렸는지 보려면 `node -v` 를 쳐 본다(숫자가 나오면 된 것, `command not found` 면 안 깔린 것).
 
 **왜 3.9 / 18 이면 충분한가.** `scripts/bump-version.py` 와 `scripts/check-sync.py` 는 파이썬에 기본으로 딸려 오는
 표준 라이브러리(`json` · `re` · `sys` · `pathlib`)만 쓴다. 밖에서 받아오는 라이브러리가 없다.
@@ -41,6 +45,8 @@ sudo apt install git python3 nodejs
 
 ## 3. 받아온 직후 반드시 한 번 해야 하는 것
 
+### 3-1. 어떤 경우든 (한 번만)
+
 ```
 git config core.hooksPath .githooks
 ```
@@ -50,7 +56,33 @@ git config core.hooksPath .githooks
 켜지 않으면 커밋 전 정합성 검사(`scripts/check-sync.py`)가 돌지 않아, 파일끼리 어긋난 채로 커밋이 그냥 통과한다.
 받아온 폴더 안에서 **한 번만** 실행하면 그다음부터는 계속 적용된다.
 
----
+### 3-2. 윈도우에서 폴더를 통째로 복사해 왔다면 (추가로)
+
+`git clone` 으로 새로 받았다면 이 절은 건너뛴다. **폴더째 복사(USB·압축파일·클라우드 동기화)** 로 옮겼을 때만 필요하다.
+복사하면 `.git` 폴더 안의 윈도우용 설정과, 윈도우에 없는 「실행 권한」이 그대로 따라오기 때문이다.
+
+```
+chmod +x .githooks/pre-commit .githooks/commit-msg
+```
+→ 훅 파일에 「실행해도 된다」는 표시를 붙인다. 이게 없으면 git이 훅을 **에러도 없이 조용히 건너뛴다**
+(`hook was ignored because it's not set as executable` 이라는 힌트만 뜬다). 3-1을 해도 검사가 안 돌게 된다.
+
+```
+git config core.fileMode true
+git config core.ignorecase false
+git config core.symlinks true
+```
+→ 윈도우 기준으로 남아 있는 git 설정 셋을 리눅스 기준으로 되돌린다.
+차례로 「실행 권한 변화를 본다」 · 「파일 이름의 대소문자를 구분한다」 · 「바로가기 링크를 링크로 다룬다」는 뜻이다.
+첫 줄을 안 하면 바로 위 `chmod` 를 해도 git이 그 차이를 못 본다.
+
+```
+git ls-files -z | xargs -0 grep -lU $'\r' || echo "윈도우 줄바꿈이 남은 파일: 없음"
+```
+→ 윈도우에서 편집한 파일이 윈도우식 줄바꿈(CRLF)으로 들어왔는지 본다.
+「없음」이 나오면 정상이다. 파일 이름이 나오면 그 파일에 `sed -i 's/\r$//' <파일이름>` 을 돌려 되돌린다.
+(그냥 두면 내용이 한 글자도 안 바뀌었는데 파일 전체가 바뀐 것처럼 보여, 무엇을 고쳤는지 안 보이게 된다.)
+저장소에 `.gitattributes` 가 있어 앞으로는 자동으로 맞춰지지만, **이미 들어와 있는 파일은 손으로 한 번 걷어야 한다.**
 
 ## 4. git에 안 올라가는 것 — 옮기려면 손으로 옮긴다
 
@@ -60,6 +92,7 @@ git config core.hooksPath .githooks
   없으면 승인 창이 좀 더 자주 뜰 뿐, 동작은 똑같다.
   윈도우에서 쓰던 파일을 그대로 가져오면 안에 적힌 `PowerShell(...)` 이나 `py` 표기가 리눅스에서는 맞지 않는다 —
   각각 `Bash(...)` 와 `python3` 로 고쳐서 쓴다.
+  **`git push` 를 이 파일의 허용 목록에 넣지 않는다** — `settings.json` 이 push 를 물어보게 해 둔 것을 무력화한다.
 - **`reference/`** — 외부에서 받아 둔 참고 자료 폴더. 개발에 필요하지 않다.
 - **비밀키** — 옮길 것이 없다. 이 저장소에는 `.env` 파일 자체가 없다.
 
@@ -74,9 +107,16 @@ python3 scripts/check-sync.py
 (어긋난 곳이 있으면 `DRIFT` 로 표시되고 종료코드 1 로 끝난다.)
 
 ```
+git hook run pre-commit
+```
+→ 커밋 전 검사가 **실제로 도는지** 본다. 위 `python3` 명령과 같은 결과가 주르륵 나오면 3번 절이 제대로 된 것이다.
+`hook was ignored because it's not set as executable` 이 뜨면 3-2의 `chmod` 를 안 한 것이다.
+
+```
 node .claude/statusline.js
 ```
 → 상태줄 스크립트가 에러 없이 실행되는지 본다. Node가 제대로 깔렸는지 확인하는 용도다.
+(입력을 기다리며 멈춰 있으면 `Ctrl+C` 로 빠져나온다 — 그것도 정상 동작이다.)
 
 ---
 

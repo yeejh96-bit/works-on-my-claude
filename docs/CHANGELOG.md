@@ -7,6 +7,52 @@
 > **옛 항목이 가리키는 자리 하나가 바뀌었다**: v2.13.0 이전 항목에 나오는 `PLAN.md` 의 「나중에 / 안 할 것」·「설계 결정 (계속 유효 — 앞으로도 지킨다)」은
 > 지금 `.claude/rules/제약-공통.md` 의 「나중에 · 안 할 것」·「사용자가 닫은 것」이다. 옛 항목의 문장은 그때 기록이라 그대로 둔다.
 
+## 저장소 정리 — Ubuntu 로 옮긴 저장소가 실제로 돌게 고쳤다 (2026-09-02)
+
+  - **계기**: 2026-09-01 항목으로 절차 문서(`SETUP.md`)까지 만든 뒤, 사용자가 실제로 Ubuntu PC 에서
+    「윈도우 종속을 전부 찾아 고쳐 달라」고 요청했다. 폴더를 `git clone` 이 아니라 **통째로 복사**해 옮긴 상태였다.
+  - **훑어서 확인한 것(고칠 게 없던 것)**: 하드코딩 절대 경로 · `pywin32`/`winreg`/`os.startfile` ·
+    `.bat`/`.cmd`/`.ps1` · 외부 프로그램 호출 · 대소문자 충돌 파일명 · `cp949`/`euc-kr` 지정 ·
+    인코딩 없는 `open()` · CRLF 의존 로직 — **하나도 없었다.** 파일 입출력은 이미 `pathlib` +
+    `encoding="utf-8"` 명시로 되어 있고, 서드파티 의존성은 0개다(2026-09-01 항목과 같은 결론).
+    실제로 막힌 것은 **코드가 아니라 옮기는 과정에서 생긴 것들**이었다.
+  - **손댄 파일**: 새 파일 `.gitattributes` · `SETUP.md` · `scripts/bump-version.py` · `scripts/check-sync.py` ·
+    `commands/womc.md`(9번째 줄 한 줄) · `TASKS.md`(확인 방법 3곳) · `.claude/settings.local.json`(git 에 안 올라감) ·
+    `.githooks/pre-commit`·`.githooks/commit-msg`(권한만) · 저장소 로컬 git 설정.
+  - **한 것**:
+    - **훅이 조용히 안 돌던 것을 고쳤다.** `.githooks/` 두 파일에 실행 권한이 없어 git 이
+      `hook was ignored because it's not set as executable` 힌트만 남기고 건너뛰고 있었다.
+      `core.fileMode=false` 라 `git status` 에도 안 보였다. `chmod +x` 로 붙였다.
+      **2026-09-01 항목이 「`core.hooksPath` 만 켜면 된다」고 적은 것은 반쪽이었다** — 폴더째 복사한 경우엔 권한도 필요하다.
+    - **윈도우 시절 git 로컬 설정 셋을 되돌렸다**: `core.fileMode` false→true · `core.ignorecase` true→false ·
+      `core.symlinks` false→true. (`.git/config` 는 커밋되지 않아 이 저장소를 새로 `clone` 하는 사람에게는 해당 없다.)
+    - **CRLF 로 들어와 있던 4개 파일을 LF 로 되돌렸다**(`.claude/settings.json`·`README.md`·
+      `docs/HARNESS-AUDIT.md`·`skills/plan-feature/SKILL.md`). 839줄이 바뀐 것처럼 떠 있었으나
+      `--ignore-cr-at-eol` 로 대조해 **내용 차이가 0** 임을 확인하고 걷었다. 되돌린 뒤 파일 해시가 HEAD 와 일치한다.
+      재발 방지로 `.gitattributes`(`* text=auto eol=lf`, 셸 스크립트는 명시적으로 LF)를 새로 만들었다.
+    - **`py` 표기를 `python3` 로 바꿨다** — 리눅스에 `py` 라는 명령이 없다. 스크립트 2개의 실행 안내,
+      `commands/womc.md` 9번째 줄, `TASKS.md` 의 확인 방법 3곳. 안내문은 `python3`(Mac·Linux) 를 앞에,
+      `py`(Windows) 를 뒤에 두는 순서로 통일했다. `PYTHONIOENCODING=utf-8` 접두는 뺐다 —
+      스크립트가 스스로 `sys.stdout.reconfigure` 로 처리한다.
+      `pre-commit` 훅은 원래부터 `py → python3 → python` 폴백이 있어 **동작에는 지장이 없었다**(문구만 틀렸다).
+    - `scripts/bump-version.py` 의 「plugin.json 만 CRLF」 주석을 걷었다 — 실측하니 그 파일도 LF 였다(거짓 정보).
+    - `.claude/settings.local.json` 을 리눅스용으로 다시 썼다. `PowerShell(...)` 9줄과
+      `Read(//c/Program Files/Git/**)` 를 빼고 `Bash(...)`·`python3` 로 바꿨다.
+      **겸해서 `git push` 를 허용 목록에서 뺐다** — `settings.json` 이 push 를 물어보게 해 둔 것을
+      이 파일이 무력화하고 있었다(`CLAUDE.md` 「절차 지키기」와 어긋난다).
+    - `SETUP.md` 3번 절을 「어떤 경우든(3-1)」과 「폴더째 복사해 왔다면(3-2)」로 갈랐다.
+      위에서 실제로 걸린 것(실행 권한 · git 설정 셋 · CRLF 점검)이 3-2 다.
+      5번 절에 `git hook run pre-commit`(검사가 진짜 도는지 보는 명령)을 더했다.
+  - **남긴 것**: **Node.js 가 이 PC 에 안 깔려 있다** — `sudo apt install nodejs`(암호가 필요해 사용자가 직접 실행).
+    안 깔아도 상태줄만 안 나오고 나머지는 정상이다. `.claude/settings.json` 의 `PowerShell(...)` ask 4줄은
+    **그대로 둔다** — 이 플러그인은 윈도우 사용자도 쓴다. 같은 이유로 `commands/womc.md` 의 `C:\Users\...` 경로도
+    (바로 옆에 mac·linux 경로가 나란히 적힌 양쪽 안내문이라) 그대로다.
+  - **확인 방법**: `python3 scripts/check-sync.py` 가 `[OK] 모두 일치` 로 끝나고,
+    `git hook run pre-commit` 이 그 검사를 실제로 실행한다(무시 힌트가 안 뜬다).
+    `git ls-files -z | xargs -0 grep -lU $'\r'` 가 아무 파일도 안 뱉는다.
+  - **다시 열 조건**: 이 저장소를 또 다른 OS 로 옮기게 되면 `SETUP.md` 3-2 가 그 OS 에도 맞는지 본다.
+    `.gitattributes` 를 넣었으니 앞으로 CRLF 가 또 들어오면 그건 규칙이 안 먹은 것이므로 규칙 자체를 다시 본다.
+
 ## 저장소 정리 — 다른 PC(Ubuntu)로 옮겨 이어 개발하는 절차를 문서로 남겼다 (2026-09-01)
 
   - **계기**: 사용자가 이 저장소를 회사 윈도우 PC 에서 개인 Ubuntu PC 로 옮겨 이어 개발하려고,

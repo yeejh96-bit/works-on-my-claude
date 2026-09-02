@@ -6,7 +6,7 @@ disable-model-invocation: true
 ---
 
 <!-- womc:skeleton-version=3.11.0 -->
-> 버전을 올리면 `py scripts/check-sync.py` 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
+> 버전을 올리면 `python3 scripts/check-sync.py`(윈도우는 `py scripts/check-sync.py`) 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
 사용자 인자: $ARGUMENTS
