@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.11.0 -->
+<!-- womc:skeleton-version=3.12.0 -->
 > 버전을 올리면 `python3 scripts/check-sync.py`(윈도우는 `py scripts/check-sync.py`) 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.11.0 -->
+<!-- womc:skeleton-version=3.12.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -132,10 +132,16 @@ Thumbs.db
   `.env.*` 처럼 통째로 막지 않고 **비밀이 들어가는 이름만 골라서** 막는다. (deny 는 allow 보다 우선이라, 통째로 막으면 견본만 예외로 풀 방법이 없다.
   흔한 이름 기준이므로 특이한 이름의 비밀 파일까지 다 잡지는 못한다 — 진짜 중요한 비밀은 프로젝트 폴더 밖에 둔다.)
   또한 이 차단은 파일 읽기 도구(Read)에만 걸린다. 터미널 명령으로 읽는 것까지 다 막지는 못한다.
-- `allow` 는 **빈 목록으로 둔다.** `git status`·`Get-ChildItem` 같은 읽기 전용 명령은 Claude Code 가
-  **기본으로 프롬프트 없이 허용**하므로 적을 필요가 없다 — Bash 뿐 아니라 **PowerShell 도 마찬가지**다(Windows 실측, 2026-08-10).
-  v2.1.1 까지는 PowerShell 4줄을 박아 두었으나 불필요한 것으로 확인돼 뺐다. 필요한 것이 생기면 그때 추가한다.
-- `push`·`reset` 같이 되돌리기 어려운 명령은 **`allow` 에는** 넣지 않는다 — 그건 매번 확인받는 게 맞다. 대신 아래 `ask` 로 잡는다.
+  **`Write(**/.env)`·`Edit(**/.env)` 도 함께 막는다** — 아래 `allow` 가 `Edit`·`Write` 를 통째로 열어 주므로, 열어 준 문으로 비밀 파일이 덮어써지는 것만 따로 닫는다.
+- `allow` 에는 **되돌릴 수 있는 일을 전부 넣는다.** 「되돌릴 수 있는 일은 묻지 않는다 — 대신 체크포인트 커밋을 남긴다」(`CLAUDE.md` 「절차 지키기」)를
+  **설정으로 그대로 옮긴 자리**다. 산문은 「묻지 마라」라고 하는데 설정이 매번 승인 창을 띄우면 규칙이 반쪽만 도는 셈이라, 둘을 맞췄다.
+  넣는 것은 넷이다 — **조회 명령**(`ls`·`grep`·`find` 류) · **git 조회와 체크포인트**(`status`·`log`·`add`·`commit` 류) ·
+  **실행**(`python3`·`node`·`npm run`·`pytest` 류) · **파일 만들고 고치기**(`Edit`·`Write`·`mkdir`·`sed` 류).
+  전부 커밋으로 되돌릴 수 있는 것이고, 되돌릴 수 없는 것은 아래 `ask` 가 잡는다.
+  **v3.11.0 까지는 빈 목록이었다.** 읽기 전용 명령이 기본 허용이라 적을 필요가 없다는 것이 이유였는데(Windows 실측, 2026-08-10 — 지금도 사실이다),
+  실제로 승인 창을 띄우는 것은 그런 조회 명령이 아니라 **파일 수정과 실행**이었다. 그쪽을 비워 두니 프로젝트마다 손으로 채우게 됐다.
+- `push`·`reset --hard`·파일 지우기·폴더 밖으로 옮기기는 **`allow` 에는** 넣지 않는다 — 커밋으로도 못 되돌려서 매번 확인받는 게 맞다. 아래 `ask` 로 잡는다.
+  `git checkout`·`git restore` 도 안 넣는다 — 저장 안 한 작업을 말없이 날린다. `curl`·`gh` 도 안 넣는다 — 밖으로 내보내는 명령이라 되돌리기가 없다.
 - `ask` 에는 **커밋으로 되돌릴 수 없는 것만** 넣는다(`git push`·`git reset --hard`·파일 지우기·폴더 밖으로 옮기기).
   커밋·브랜치 삭제는 넣지 않는다 — 커밋은 묻지 않고 남기는 체크포인트고, 브랜치는 지워도 커밋이 남아 되돌릴 수 있다.
   **배포·데이터베이스 삭제는 프로젝트마다 명령이 달라 패턴으로 못 잡는다 — `CLAUDE.md` 「절차 지키기」의 산문 규칙이 맡는다.**
@@ -158,7 +164,73 @@ Thumbs.db
     "refreshInterval": 10
   },
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(awk:*)",
+      "Bash(cut:*)",
+      "Bash(tr:*)",
+      "Bash(diff:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(xargs:*)",
+      "Bash(jq:*)",
+      "Bash(tree:*)",
+      "Bash(pwd)",
+      "Bash(cd:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git config:*)",
+      "Bash(git blame:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git init:*)",
+      "Bash(git stash:*)",
+      "Bash(git switch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(node:*)",
+      "Bash(pytest:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npm ci:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx:*)",
+      "Bash(uv run:*)",
+      "Bash(pip install:*)",
+      "Bash(pip3 install:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(touch:*)",
+      "Bash(sed:*)",
+      "Bash(chmod:*)",
+      "Edit",
+      "Write",
+      "NotebookEdit"
+    ],
     "ask": [
       "Bash(git push:*)",
       "Bash(git reset --hard:*)",
@@ -176,7 +248,9 @@ Thumbs.db
       "Read(**/.env.development)",
       "Read(**/.env.production)",
       "Read(**/.env.test)",
-      "Read(**/.env.staging)"
+      "Read(**/.env.staging)",
+      "Write(**/.env)",
+      "Edit(**/.env)"
     ]
   }
 }
@@ -301,7 +375,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.11.0 -->
+<!-- womc:skeleton-version=3.12.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -458,9 +532,12 @@ process.stdin.on("end", () => {
    - `.claude/answer-style.js` 를 지웠으면 아래 3번에서 `settings.json` 의 그 훅 항목도 함께 뺀다.
 3. `.claude/settings.json` 은 통째로 덮어쓰지 않는다. 기존 파일을 먼저 읽고,
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
-   (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.)
-   **`allow` 에 옛 골격의 PowerShell 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)이 있으면 그 4개만 지운다** — v2.2.0 에서 뺀 옛 기본값이다. 읽기 전용 명령은 Bash·PowerShell 모두 Claude Code 가 기본으로 프롬프트 없이 허용하므로 필요 없다(Windows 실측, 2026-08-10). **그 4개 말고 `allow` 에 들어 있는 항목은 사용자가 직접 넣은 것이므로 한 줄도 건드리지 않는다.**
-   **옛 4줄을 실제로 지웠는지, 아니면 애초에 없어서 지울 게 없었는지를 완료 보고(6번)에 반드시 한 줄 적는다** — 이 청소는 한 번뿐이라 지금이 실제로 지워졌는지 확인할 유일한 기회이고, 아래 7번이 그 결과를 열린 확인 `open:allow-cleanup` 을 닫는 근거로 쓴다.
+   (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.
+   `deny` 에 `Write(**/.env)`·`Edit(**/.env)` 가 없으면 더한다 — `allow` 가 `Edit`·`Write` 를 통째로 여는 만큼 이 둘이 짝으로 있어야 한다.)
+   **`allow` 키가 없거나 빈 목록이면 이 문서의 기본 `allow` 목록을 통째로 넣는다.** v3.11.0 까지의 골격이 빈 목록을 깔았으므로 옛 프로젝트는 대부분 이 경우다.
+   **이미 항목이 들어 있으면 사용자가 넣은 것은 한 줄도 지우지 않고, 이 문서의 기본 항목 중 빠진 것만 더한다.**
+   **딱 하나 예외 — 옛 골격의 PowerShell 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)이 있으면 그 4개는 지운다.** v2.2.0 에서 뺀 옛 기본값이고, 읽기 전용 명령은 Bash·PowerShell 모두 기본으로 프롬프트 없이 허용된다(Windows 실측, 2026-08-10).
+   **`allow` 에 무엇을 더했는지(몇 개인지)와 옛 4줄을 지웠는지를 완료 보고(6번)에 한 줄 적는다.** `Edit`·`Write` 가 새로 들어가 **파일 수정 승인 창이 더는 안 뜬다**는 것도 쉬운 말로 함께 알린다 — 사용자가 모르고 넘어가면 안 되는 변화다.
    **`ask` 키가 없으면 이 문서의 기본 `ask` 목록을 통째로 추가한다.** 되돌리기 어려운 명령을 「항상 허용」으로 풀어버리지 못하게 막는 자리다(위 「3) `.claude/settings.json`」 참고).
    **이미 `ask` 가 있으면 사용자가 넣은 항목은 한 줄도 지우지 않고, 이 문서의 기본 항목 중 빠진 것만 더한다.**
    `statusLine` 은 다르게 다룬다 — 이미 있으면(사용자가 커스텀했을 수 있으므로) **값을 덮어쓰지 않고 그대로 둔다**. 아예 없을 때만 이 문서의 기본 `statusLine`(`.claude/statusline.js` 실행)을 새로 추가한다.
@@ -493,7 +570,6 @@ process.stdin.on("end", () => {
    - `docs/HARNESS-AUDIT.md` 가 없으면 "아직 하네스 점검을 한 적이 없습니다 — 「하네스 점검해줘」로 시작할 수 있습니다" 한 줄만 적는다.
    - `claude --version` 실행이 막히면 이 안내를 **조용히 건너뛴다** — 감사 안내 때문에 갱신이 실패해서는 안 된다.
    - **열린 확인 알림은 버전이 같든 다르든 항상 한다.** `docs/HARNESS-AUDIT.md` 머리의 `womc:open-checks` 구획(`womc:open-checks:begin` 이 들어 있는 줄부터 `womc:open-checks:end` 가 들어 있는 줄까지)을 읽어, 열린 확인 항목이 있으면 **한 줄씩** 사용자에게 알린다. 그 항목의 전문(조건·확인 방법)은 `TASKS.md` 「할 일」에 있으니 필요하면 거기서 읽어 온다.
-     위 3번에서 옛 `allow` 4줄을 **실제로 지웠다면 그 사실이 열린 확인 `open:allow-cleanup` 의 확인 결과**이므로 함께 알리고, `TASKS.md` 의 그 항목을 닫아도 되는지 사용자에게 묻는다. (`TASKS.md` 를 말없이 고치지 않는다 — 사용자가 좋다고 할 때만 닫는다.)
 8. **쌓인 것 훑기 (갱신이 끝난 뒤 한 번).** 위 7번까지 마쳤으면 이어서 한다. 갱신은 골격을 최신으로 갈아 줄 뿐이라 **그 프로젝트에 이미 쌓여 있는 것은 아무도 보지 않는다** — 갱신이 끝나는 이 자리에서 한 번 훑는다.
    - **여섯 가지를 본다. 각각 결과를 쉬운 말로 한 줄씩 알린다**(사용자는 코딩을 모른다 — 무엇이 왜 문제인지 한 줄에 같이 담는다). 어떻게 찾을지는 정해 두지 않는다.
      ① `TASKS.md` 에 끝난 항목(`[x]`)이 남아 있는지, 남아 있으면 그 파일이 몇 줄인지. (v3.3.0 부터 `TASKS.md` 에는 끝남 표기가 없다 — `[x]` 가 보이면 옛 방식으로 쌓인 것이다.)
