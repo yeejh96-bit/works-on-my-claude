@@ -90,7 +90,6 @@
       "Read(**/.env.production)",
       "Read(**/.env.test)",
       "Read(**/.env.staging)",
-      "Write(**/.env)",
       "Edit(**/.env)"
     ]
   }

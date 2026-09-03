@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.12.0 -->
+<!-- womc:skeleton-version=3.12.1 -->
 > 버전을 올리면 `python3 scripts/check-sync.py`(윈도우는 `py scripts/check-sync.py`) 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.12.0 -->
+<!-- womc:skeleton-version=3.12.1 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -132,7 +132,9 @@ Thumbs.db
   `.env.*` 처럼 통째로 막지 않고 **비밀이 들어가는 이름만 골라서** 막는다. (deny 는 allow 보다 우선이라, 통째로 막으면 견본만 예외로 풀 방법이 없다.
   흔한 이름 기준이므로 특이한 이름의 비밀 파일까지 다 잡지는 못한다 — 진짜 중요한 비밀은 프로젝트 폴더 밖에 둔다.)
   또한 이 차단은 파일 읽기 도구(Read)에만 걸린다. 터미널 명령으로 읽는 것까지 다 막지는 못한다.
-  **`Write(**/.env)`·`Edit(**/.env)` 도 함께 막는다** — 아래 `allow` 가 `Edit`·`Write` 를 통째로 열어 주므로, 열어 준 문으로 비밀 파일이 덮어써지는 것만 따로 닫는다.
+  **`Edit(**/.env)` 도 함께 막는다** — 아래 `allow` 가 `Edit`·`Write` 를 통째로 열어 주므로, 열어 준 문으로 비밀 파일이 덮어써지는 것만 따로 닫는다.
+  **`Write(**/.env)` 는 넣지 않는다** — 파일을 고치는 도구를 막을 때 Claude Code 가 보는 규칙은 `Edit(경로)` 하나뿐이고, `Edit` 규칙이 `Write` 를 포함한 파일 수정 도구 전부를 덮는다.
+  `Write(경로)` 를 적으면 아무 데도 걸리지 않는 죽은 규칙이 되어, 세션을 열 때마다 "이건 안 먹으니 `Edit` 로 쓰라"는 경고가 뜬다.
 - `allow` 에는 **되돌릴 수 있는 일을 전부 넣는다.** 「되돌릴 수 있는 일은 묻지 않는다 — 대신 체크포인트 커밋을 남긴다」(`CLAUDE.md` 「절차 지키기」)를
   **설정으로 그대로 옮긴 자리**다. 산문은 「묻지 마라」라고 하는데 설정이 매번 승인 창을 띄우면 규칙이 반쪽만 도는 셈이라, 둘을 맞췄다.
   넣는 것은 넷이다 — **조회 명령**(`ls`·`grep`·`find` 류) · **git 조회와 체크포인트**(`status`·`log`·`add`·`commit` 류) ·
@@ -249,7 +251,6 @@ Thumbs.db
       "Read(**/.env.production)",
       "Read(**/.env.test)",
       "Read(**/.env.staging)",
-      "Write(**/.env)",
       "Edit(**/.env)"
     ]
   }
@@ -375,7 +376,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.12.0 -->
+<!-- womc:skeleton-version=3.12.1 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -533,7 +534,8 @@ process.stdin.on("end", () => {
 3. `.claude/settings.json` 은 통째로 덮어쓰지 않는다. 기존 파일을 먼저 읽고,
    **사용자가 직접 추가한 항목(allow/deny 등 이 문서의 기본값에 없는 것)은 그대로 둔 채** 기본값 항목만 최신으로 맞춰 다시 쓴다.
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.
-   `deny` 에 `Write(**/.env)`·`Edit(**/.env)` 가 없으면 더한다 — `allow` 가 `Edit`·`Write` 를 통째로 여는 만큼 이 둘이 짝으로 있어야 한다.)
+   `deny` 에 `Edit(**/.env)` 가 없으면 더한다 — `allow` 가 `Edit`·`Write` 를 통째로 여는 만큼 필요하다.
+   반대로 `deny` 에 `Write(**/.env)` 가 있으면 **지운다** — 걸리지 않는 죽은 규칙이라 세션마다 경고만 띄운다. 막는 힘은 `Edit(**/.env)` 가 그대로 갖는다.)
    **`allow` 키가 없거나 빈 목록이면 이 문서의 기본 `allow` 목록을 통째로 넣는다.** v3.11.0 까지의 골격이 빈 목록을 깔았으므로 옛 프로젝트는 대부분 이 경우다.
    **이미 항목이 들어 있으면 사용자가 넣은 것은 한 줄도 지우지 않고, 이 문서의 기본 항목 중 빠진 것만 더한다.**
    **딱 하나 예외 — 옛 골격의 PowerShell 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)이 있으면 그 4개는 지운다.** v2.2.0 에서 뺀 옛 기본값이고, 읽기 전용 명령은 Bash·PowerShell 모두 기본으로 프롬프트 없이 허용된다(Windows 실측, 2026-08-10).
