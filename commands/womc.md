@@ -5,7 +5,7 @@ allowed-tools: Write, Edit, Read, Glob, Task, Bash
 disable-model-invocation: true
 ---
 
-<!-- womc:skeleton-version=3.12.1 -->
+<!-- womc:skeleton-version=3.13.0 -->
 > 버전을 올리면 `python3 scripts/check-sync.py`(윈도우는 `py scripts/check-sync.py`) 를 돌려 모든 표식이 `plugin.json` 과 맞는지 확인한다.
 > (표식이 몇 곳인지 세지 말 것 — 검사기가 전수로 잡아 준다.)
 
@@ -34,7 +34,7 @@ disable-model-invocation: true
 
 ```markdown
 # 작업 규칙 (모든 프로젝트 공통 · 불변)
-<!-- womc:skeleton-version=3.12.1 -->
+<!-- womc:skeleton-version=3.13.0 -->
 
 이 파일은 매 세션 자동으로 로드된다. 아래 규칙은 프로젝트와 상관없이 항상 적용된다.
 
@@ -77,6 +77,7 @@ disable-model-invocation: true
 - **커밋으로도 못 되돌리는 것만 하기 전에 사용자에게 한 줄로 묻는다**: `git push` / 배포·외부로 보내기 / 데이터베이스 내용 지우기 / `git reset --hard` / 파일·폴더 지우기 / 폴더 밖으로 옮기기. 물을 때는 무엇이 사라지는지 쉬운 말로 함께 알린다(사용자는 코딩을 모른다).
 - 폴백: git 저장소가 아니거나 커밋이 실패하면 체크포인트가 없다 — 그때는 되돌리기 어려운 일 전부를 하기 전에 묻는다.
 - 한 번 좋다고 한 것이 **다음번까지 이어지지 않는다** — 되돌리기 어려운 일은 그때그때 다시 묻는다. (`.claude/settings.json` 의 `ask` 가 이걸 설정으로도 붙잡는다.)
+- **권한 규칙에 `Write(경로)` 를 쓰지 않는다 — 경로를 붙일 때는 `Edit(경로)` 로 적는다.** 파일을 고치는 도구에 걸리는 규칙은 Claude Code 가 `Edit(경로)` 하나만 보고, 그 하나가 `Write` 를 포함한 파일 수정 도구 전부를 덮는다. `Write(경로)` 는 아무 데도 안 걸리는 죽은 규칙이라, 막지도 열지도 못하면서 세션을 열 때마다 경고만 띄운다. (경로 없는 `Write` 통짜는 그대로 쓴다.)
 
 ## 프로젝트 상세
 **코드가 스펙이다.** 스택·구조·기능은 코드를 보면 안다 — 여기 옮겨 적지 않는다.
@@ -376,7 +377,7 @@ process.stdin.on("end", () => {
 ~~~markdown
 
 <!-- womc:begin — 이 구획만 /womc update 가 관리. 위쪽 사용자 내용은 건드리지 않음 -->
-<!-- womc:skeleton-version=3.12.1 -->
+<!-- womc:skeleton-version=3.13.0 -->
 《여기》
 <!-- womc:end -->
 ~~~
@@ -536,6 +537,9 @@ process.stdin.on("end", () => {
    (기존 파일이 없으면 기본값으로 새로 만든다. 예전 기본값이던 `Read(**/.env.*)` 가 있으면 위의 새 deny 목록으로 교체한다 — 견본 `.env.example` 을 읽을 수 있게 하기 위해서다.
    `deny` 에 `Edit(**/.env)` 가 없으면 더한다 — `allow` 가 `Edit`·`Write` 를 통째로 여는 만큼 필요하다.
    반대로 `deny` 에 `Write(**/.env)` 가 있으면 **지운다** — 걸리지 않는 죽은 규칙이라 세션마다 경고만 띄운다. 막는 힘은 `Edit(**/.env)` 가 그대로 갖는다.)
+   **`allow`·`deny`·`ask` 어디든 `Write(경로)` 꼴이 남아 있으면 전부 걷는다** — `Write(**/.env)` 만이 아니라 `Write(docs/**)`·`Write(*.md)` 처럼 프로젝트가 나중에 손으로 넣은 것까지 본다. 걷는 방법은 짝이 있는지로 갈린다: 같은 목록에 **`Edit(같은 경로)` 가 이미 있으면 `Write(경로)` 줄만 지우고**, 없으면 그 줄을 **`Edit(경로)` 로 바꿔 쓴다**(원래 열려던·막으려던 뜻을 살리는 자리다). `Write(경로)` 는 어차피 아무 데도 안 걸리는 죽은 규칙이라 어느 쪽이든 실제 권한은 그대로다.
+   **몇 줄을 지우고 몇 줄을 `Edit` 로 바꿨는지 완료 보고(6번)에 한 줄 적는다** — "세션마다 뜨던 `not matched by file permission checks` 경고가 이제 안 뜬다"도 쉬운 말로 함께 알린다.
+   (경로 없는 통짜 `Write` 는 정상 규칙이다 — 건드리지 않는다.)
    **`allow` 키가 없거나 빈 목록이면 이 문서의 기본 `allow` 목록을 통째로 넣는다.** v3.11.0 까지의 골격이 빈 목록을 깔았으므로 옛 프로젝트는 대부분 이 경우다.
    **이미 항목이 들어 있으면 사용자가 넣은 것은 한 줄도 지우지 않고, 이 문서의 기본 항목 중 빠진 것만 더한다.**
    **딱 하나 예외 — 옛 골격의 PowerShell 4줄(`PowerShell(git status:*)`·`(git diff:*)`·`(git log:*)`·`(Get-ChildItem:*)`)이 있으면 그 4개는 지운다.** v2.2.0 에서 뺀 옛 기본값이고, 읽기 전용 명령은 Bash·PowerShell 모두 기본으로 프롬프트 없이 허용된다(Windows 실측, 2026-08-10).
