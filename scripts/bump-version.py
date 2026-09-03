@@ -4,15 +4,13 @@
        py scripts/bump-version.py 2.0.0        (Windows)
 
 버전 숫자가 박혀 있는 자리가 여러 곳이라 손으로 고치면 반드시 하나를 빠뜨린다.
-(빠뜨리면 check-sync.py 가 DRIFT 로 잡지만, 애초에 빠뜨리지 않는 게 낫다.)
 
 고치는 곳:
 1) .claude-plugin/plugin.json 의 "version"
 2) README.md 첫 줄 제목 끝의 vX.Y.Z
-3) womc:skeleton-version=X.Y.Z 표식 전부 (commands/womc.md · CLAUDE.md)
+3) womc:skeleton-version=X.Y.Z 표식 전부 (skills/womc/SKILL.md · CLAUDE.md)
    — 개수를 세지 않고 정규식으로 전부 바꾼다.
 
-바꾼 뒤에는 반드시 check-sync.py 를 돌린다(이 스크립트가 마지막에 안내한다).
 --dry-run 을 주면 무엇을 바꿀지 보여주기만 하고 파일은 건드리지 않는다.
 """
 import json
@@ -40,9 +38,8 @@ def save(path: Path, text: str) -> None:
         f.write(text)
 
 
-# 버전 표식(womc:skeleton-version=x.y.z)이 들어 있는 파일들 — check-sync.py 와 같은 목록
 VERSION_MARKER_FILES = [
-    "commands/womc.md",
+    "skills/womc/SKILL.md",
     "CLAUDE.md",
 ]
 
@@ -105,4 +102,3 @@ for rel in VERSION_MARKER_FILES:
         print(f"  [!] {rel} 에 womc:skeleton-version 표식이 없음")
 
 print(f"\n{'바꿀' if dry_run else '바꾼'} 자리 {changed}곳.")
-print("다음: python3 scripts/check-sync.py  로 전 항목 OK 인지 확인한다.")

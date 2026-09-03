@@ -50,6 +50,7 @@
       "Bash(git switch:*)",
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
+      "Bash(git rm:*)",
       "Bash(python3:*)",
       "Bash(python:*)",
       "Bash(node:*)",
