@@ -1,4 +1,4 @@
-# works-on-my-claude v4.1.0
+# works-on-my-claude v4.1.1
 
 코딩을 몰라도 무엇을 원하는지만 말하면 Claude Code 가 나머지를 맡게 만드는 **얇은 기본 하네스**를 프로젝트에 깐다. 설치하면 끝이다. `/womc` 를 칠 일도 거의 없다.
 
