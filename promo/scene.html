@@ -5,7 +5,7 @@
 <title>womc promo</title>
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #0a0a0e; }
+  html, body { margin: 0; width: 1080px; height: 1920px; } html.wide, body.wide { width: 1920px; height: 1080px; overflow: hidden; background: #0a0a0e; }
   body { font-family: "Noto Sans CJK KR", sans-serif; color: #f4f2ee; position: relative; }
   #bg { position: absolute; inset: 0;
     background:
@@ -75,22 +75,74 @@
          font-family: "Noto Sans Mono", monospace; font-size: 27px; color: #ffd8b8; opacity: 0; line-height: 1.7; box-shadow: 0 0 60px rgba(245,136,58,.25); }
   .cmd .dim { font-size: 24px; }
   #fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+
+  /* ---------- 가로(16:9) 배치: body.wide 일 때만 ---------- */
+  body.wide, body.wide html { width: 1920px; height: 1080px; }
+  .wide #bg { background:
+      radial-gradient(1100px 600px at 50% -20%, rgba(245,136,58,.22), transparent 70%),
+      radial-gradient(900px 700px at 50% 125%, rgba(217,119,87,.16), transparent 70%), #0a0a0e; }
+  .wide .cap { left: 90px !important; right: auto !important; width: 780px; text-align: left; font-size: 70px; }
+  .wide .cap.sm { font-size: 50px; } .wide .cap.xs { font-size: 36px; }
+  .wide .term { left: 960px !important; width: 870px !important; }
+  /* 훅 */
+  .wide #h1 { top: 330px !important; }
+  .wide #h2 { top: 430px !important; }
+  .wide #s_hook .term { top: 250px !important; height: 560px !important; }
+  .wide #hcap { top: 600px !important; }
+  /* 문제 */
+  .wide #s_problem .term { top: 60px !important; height: 960px !important; }
+  .wide #s_problem .cap { top: 400px !important; }
+  /* 등장: 가운데 정렬 유지 */
+  .wide #s_reveal .cap { left: 0 !important; right: 0 !important; width: auto; text-align: center; }
+  .wide #logo { top: 210px !important; }
+  .wide #r1 { top: 640px !important; }
+  .wide #r2 { top: 740px !important; }
+  .wide #rpill { top: 900px !important; }
+  /* 설치 */
+  .wide #icap { top: 150px !important; }
+  .wide #s_install .term { top: 70px !important; height: 700px !important; }
+  .wide #ixs { top: 330px !important; }
+  .wide #chip1 { left: 90px !important; top: 560px !important; }
+  .wide #chip2 { left: 470px !important; top: 560px !important; }
+  .wide #chip3 { left: 90px !important; top: 710px !important; }
+  .wide #chip4 { left: 470px !important; top: 710px !important; }
+  /* 워크플로우 */
+  .wide #fcap { top: 150px !important; }
+  .wide #s_flow .term { top: 40px !important; height: 1000px !important; }
+  .wide #fsm { top: 420px !important; }
+  /* 이점 */
+  .wide #wcap { top: 150px !important; }
+  .wide #s_why .card { left: 960px !important; width: 870px !important; padding: 32px 40px; }
+  .wide #card1 { top: 100px !important; }
+  .wide #card2 { top: 400px !important; }
+  .wide #card3 { top: 700px !important; }
+  /* 설치 안내 */
+  .wide #logo2 { top: 110px !important; }
+  .wide #logo2 > div { font-size: 150px !important; }
+  .wide #s_cta .cap { left: 0 !important; right: 0 !important; width: auto; text-align: center; }
+  .wide #ccap { top: 330px !important; }
+  .wide #ccmd { left: 310px !important; width: 1300px !important; top: 500px !important; }
+  .wide #cxs { top: 720px !important; }
+  .wide #cpill { top: 830px !important; }
+  .wide #ring { top: 40%; }
+  .wide #flash { background: radial-gradient(circle at 50% 40%, #ffb070, #F5883A 30%, rgba(245,136,58,0) 70%); }
 </style>
 </head>
 <body>
+<script>if (location.search.includes("wide")) { document.documentElement.classList.add("wide"); document.body.classList.add("wide"); }</script>
 <div id="bg"></div><div id="grid"></div>
 
 <!-- 0. HOOK -->
 <section class="scene" id="s_hook">
-  <div class="cap" style="top:430px" data-at="0.15">Claude Code,</div>
-  <div class="cap" style="top:540px" data-at="0.6">설치는 <span class="acc">했는데</span>…</div>
+  <div class="cap" style="top:430px" id="h1" data-at="0.15">Claude Code,</div>
+  <div class="cap" style="top:540px" id="h2" data-at="0.6">설치는 <span class="acc">했는데</span>…</div>
   <div class="term" style="top:860px;height:520px" data-at="1.2">
     <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude — my-app</span></div>
     <div class="tb"><span class="user"></span><span class="cur" id="hookcur"></span>
 <span class="dim" data-at="2.0" style="display:inline-block">……</span></div>
     <div class="status"><span>Fable 5.1</span><span>0 tok</span><span>my-app</span></div>
   </div>
-  <div class="cap sm dim" style="top:1470px" data-at="2.4">뭘, 어떻게 시켜야 하지?</div>
+  <div class="cap sm dim" style="top:1470px" id="hcap" data-at="2.4">뭘, 어떻게 시켜야 하지?</div>
 </section>
 
 <!-- 1. PROBLEM -->
@@ -118,14 +170,14 @@
 <section class="scene" id="s_reveal">
   <div id="flash"></div><div id="ring"></div>
   <div id="logo"><div class="w">w<span>o</span>mc</div><div class="s" data-at="13.0">WORKS ON MY CLAUDE</div></div>
-  <div class="cap" style="top:1060px" data-at="14.0">원하는 것만 말하면</div>
-  <div class="cap" style="top:1170px" data-at="14.5">나머지는 <span class="acc">Claude</span> 가 맡는다</div>
-  <div class="pill" style="top:1400px" data-at="15.5">Claude Code 플러그인 · 무료 · 오픈소스</div>
+  <div class="cap" style="top:1060px" id="r1" data-at="14.0">원하는 것만 말하면</div>
+  <div class="cap" style="top:1170px" id="r2" data-at="14.5">나머지는 <span class="acc">Claude</span> 가 맡는다</div>
+  <div class="pill" style="top:1400px" id="rpill" data-at="15.5">Claude Code 플러그인 · 무료 · 오픈소스</div>
 </section>
 
 <!-- 3. INSTALL -->
 <section class="scene" id="s_install">
-  <div class="cap" style="top:230px" data-at="18.2">설치는 <span class="acc">두 줄</span></div>
+  <div class="cap" style="top:230px" id="icap" data-at="18.2">설치는 <span class="acc">두 줄</span></div>
   <div class="term" style="top:420px;height:760px" data-at="18.1">
     <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude</span></div>
     <div class="tb">
@@ -136,16 +188,16 @@
     </div>
     <div class="status"><span>Fable 5.1</span><span>2k tok</span><span>~</span></div>
   </div>
-  <div class="cap xs" style="top:1240px" data-at="24.0">그 다음 아무 폴더에서 <span class="mono acc">claude</span> 를 열면<br>설정 파일 <b>4개</b>가 <span class="acc">자동으로</span> 생긴다</div>
-  <div class="chip" style="left:80px;top:1460px" data-at="24.3">CLAUDE.md<small>작업 규칙 + 브리핑</small></div>
-  <div class="chip" style="left:560px;top:1460px" data-at="24.45">settings.json<small>권한 · 위험한 것만 묻기</small></div>
-  <div class="chip" style="left:80px;top:1610px" data-at="24.6">statusline.js<small>터미널 아래 상태줄</small></div>
-  <div class="chip" style="left:560px;top:1610px" data-at="24.75">.gitignore<small>없을 때만</small></div>
+  <div class="cap xs" style="top:1240px" id="ixs" data-at="24.0">그 다음 아무 폴더에서 <span class="mono acc">claude</span> 를 열면<br>설정 파일 <b>4개</b>가 <span class="acc">자동으로</span> 생긴다</div>
+  <div class="chip" style="left:80px;top:1460px" id="chip1" data-at="24.3">CLAUDE.md<small>작업 규칙 + 브리핑</small></div>
+  <div class="chip" style="left:560px;top:1460px" id="chip2" data-at="24.45">settings.json<small>권한 · 위험한 것만 묻기</small></div>
+  <div class="chip" style="left:80px;top:1610px" id="chip3" data-at="24.6">statusline.js<small>터미널 아래 상태줄</small></div>
+  <div class="chip" style="left:560px;top:1610px" id="chip4" data-at="24.75">.gitignore<small>없을 때만</small></div>
 </section>
 
 <!-- 4. FLOW -->
 <section class="scene" id="s_flow">
-  <div class="cap" style="top:230px" data-at="27.2">말만 하면, <span class="acc">순서대로</span></div>
+  <div class="cap" style="top:230px" id="fcap" data-at="27.2">말만 하면, <span class="acc">순서대로</span></div>
   <div class="term" style="top:410px;height:1160px" data-at="27.1">
     <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude — 가계부</span></div>
     <div class="tb">
@@ -162,15 +214,15 @@
     </div>
     <div class="status"><span>Fable 5.1</span><span>21k tok</span><span>가계부</span></div>
   </div>
-  <div class="cap sm" style="top:1660px" data-at="36.6">묻는 건 <span class="acc">되돌릴 수 없는 일</span>뿐</div>
+  <div class="cap sm" style="top:1660px" id="fsm" data-at="36.6">묻는 건 <span class="acc">되돌릴 수 없는 일</span>뿐</div>
 </section>
 
 <!-- 5. WHY -->
 <section class="scene" id="s_why">
-  <div class="cap" style="top:260px" data-at="39.7">왜 <span class="acc">womc</span> 인가</div>
-  <div class="card" style="top:520px" data-at="40.0"><div class="ic">4</div><div><h3>얇다</h3><p>파일 4개, 200줄 안. 모델이 좋아질수록 더 얇아진다.</p></div></div>
-  <div class="card" style="top:880px" data-at="41.2"><div class="ic">?</div><div><h3>안 묻는다</h3><p>되돌릴 수 있는 일은 알아서. 커밋으로 못 되돌리는 것만 묻는다.</p></div></div>
-  <div class="card" style="top:1240px" data-at="42.4"><div class="ic">가</div><div><h3>초보자 기준</h3><p>코딩 몰라도 된다. 한국어로, 결론부터, 다섯 줄 안.</p></div></div>
+  <div class="cap" style="top:260px" id="wcap" data-at="39.7">왜 <span class="acc">womc</span> 인가</div>
+  <div class="card" style="top:520px" id="card1" data-at="40.0"><div class="ic">4</div><div><h3>얇다</h3><p>파일 4개, 200줄 안. 모델이 좋아질수록 더 얇아진다.</p></div></div>
+  <div class="card" style="top:880px" id="card2" data-at="41.2"><div class="ic">?</div><div><h3>안 묻는다</h3><p>되돌릴 수 있는 일은 알아서. 커밋으로 못 되돌리는 것만 묻는다.</p></div></div>
+  <div class="card" style="top:1240px" id="card3" data-at="42.4"><div class="ic">가</div><div><h3>초보자 기준</h3><p>코딩 몰라도 된다. 한국어로, 결론부터, 다섯 줄 안.</p></div></div>
 </section>
 
 <!-- 6. CTA -->
@@ -178,11 +230,11 @@
   <div id="logo2" style="position:absolute;left:0;right:0;top:460px;text-align:center;opacity:0">
     <div class="mono" style="font-weight:700;font-size:170px;letter-spacing:-0.06em;line-height:1;text-shadow:0 0 60px rgba(245,136,58,.5)">w<span class="acc">o</span>mc</div>
   </div>
-  <div class="cap" style="top:700px" data-at="46.5">지금 <span class="acc">설치</span>하기</div>
-  <div class="cmd" style="top:900px" data-at="46.9"><span class="acc">❯</span> /plugin marketplace add yeejh96-bit/works-on-my-claude
+  <div class="cap" style="top:700px" id="ccap" data-at="46.5">지금 <span class="acc">설치</span>하기</div>
+  <div class="cmd" style="top:900px" id="ccmd" data-at="46.9"><span class="acc">❯</span> /plugin marketplace add yeejh96-bit/works-on-my-claude
 <span class="acc">❯</span> /plugin install womc@works-on-my-claude</div>
-  <div class="cap xs dim" style="top:1200px" data-at="47.6">github.com/<span style="color:#f4f2ee">yeejh96-bit/works-on-my-claude</span></div>
-  <div class="pill" style="top:1360px" data-at="48.0">MIT · 무료</div>
+  <div class="cap xs dim" style="top:1200px" id="cxs" data-at="47.6">github.com/<span style="color:#f4f2ee">yeejh96-bit/works-on-my-claude</span></div>
+  <div class="pill" style="top:1360px" id="cpill" data-at="48.0">MIT · 무료</div>
 </section>
 
 <div id="fade"></div>

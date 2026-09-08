@@ -13,3 +13,9 @@
 npm install
 node render.js && node audio.js && node build.js
 ```
+
+가로형(`../womc-promo-가로형.mp4`, 1920×1080)은 같은 장면을 두 칸(왼쪽 자막·오른쪽 터미널)으로 다시 놓은 것이다. `scene.html` 의 `body.wide` CSS 가 배치를 바꾼다. 브라우저에서 `scene.html?wide` 로 열면 미리 볼 수 있다.
+```
+WIDE=1 node render.js && WIDE=1 node build.js
+```
+(소리는 세로형과 같은 `mix.wav` 를 쓴다.)

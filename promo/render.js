@@ -8,7 +8,8 @@ const T = require('./timeline');
 
 (async () => {
   const preview = process.argv.slice(2).map(Number);
-  const outDir = preview.length ? 'preview' : 'frames';
+  const wide = !!process.env.WIDE;
+  const outDir = preview.length ? 'preview' : (wide ? 'frames-wide' : 'frames');
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir);
   const browser = await puppeteer.launch({
@@ -17,8 +18,8 @@ const T = require('./timeline');
     args: ['--no-sandbox', '--disable-gpu', '--hide-scrollbars', '--font-render-hinting=none'],
   });
   const page = await browser.newPage();
-  await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
-  await page.goto('file://' + path.resolve('scene.html'));
+  await page.setViewport(wide ? { width: 1920, height: 1080 } : { width: 1080, height: 1920 });
+  await page.goto('file://' + path.resolve('scene.html') + (wide ? '?wide' : ''));
   await page.evaluate(() => document.fonts.ready);
   const times = preview.length ? preview : Array.from({ length: Math.round(T.duration * T.fps) }, (_, i) => i / T.fps);
   let i = 0;
