@@ -59,7 +59,7 @@ function click(at) { // 키보드 타건
 }
 function whoosh(at) {
   const f = lp(400);
-  add(at - 0.2, 0.55, (i, n) => { const p = i / n; const c = 300 + 5000 * Math.sin(Math.PI * p) ** 2; return f(rnd(), c) * Math.sin(Math.PI * p) ** 1.5 * 2.2; }, 0.35);
+  add(at - 0.2, 0.55, (i, n) => { const p = i / n; const c = 300 + 5000 * Math.sin(Math.PI * p) ** 2; return f(rnd(), c) * Math.sin(Math.PI * p) ** 1.5 * 2.2; }, 0.22);
 }
 function blip(at) { add(at, 0.09, i => Math.sin(2 * Math.PI * 920 * i / SR) * exp(i, 40) + 0.3 * Math.sin(2 * Math.PI * 1840 * i / SR) * exp(i, 60), 0.22); }
 function buzz(at) { add(at, 0.3, i => (Math.sin(2 * Math.PI * 105 * i / SR) > 0 ? 1 : -1) * 0.5 * exp(i, 8) + Math.sin(2 * Math.PI * 52 * i / SR) * exp(i, 6) * 0.5, 0.25); }
@@ -132,7 +132,7 @@ for (let i = 0; i < N; i++) {
   let g = 1;
   if (i < fadeIn) g = i / fadeIn;
   if (i > N - fadeOut) g = Math.min(g, (N - i) / fadeOut);
-  const l = Math.tanh(L[i] * 1.4 * g) * 0.82, r = Math.tanh(R[i] * 1.4 * g) * 0.82;
+  const l = Math.tanh(L[i] * 1.4 * g) * 0.72, r = Math.tanh(R[i] * 1.4 * g) * 0.72;
   peak = Math.max(peak, Math.abs(l), Math.abs(r));
   out.writeInt16LE(Math.round(l * 32767), i * 4);
   out.writeInt16LE(Math.round(r * 32767), i * 4 + 2);
