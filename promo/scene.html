@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>womc promo</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #0a0a0e; }
+  body { font-family: "Noto Sans CJK KR", sans-serif; color: #f4f2ee; position: relative; }
+  #bg { position: absolute; inset: 0;
+    background:
+      radial-gradient(900px 700px at 50% -10%, rgba(245,136,58,.22), transparent 70%),
+      radial-gradient(800px 800px at 50% 115%, rgba(217,119,87,.16), transparent 70%),
+      #0a0a0e; }
+  #grid { position: absolute; inset: 0; opacity: .35;
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 60px 60px; }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .acc { color: #F5883A; }
+  .dim { color: #8d8b93; }
+  .mono { font-family: "Noto Sans Mono", "Noto Sans Mono CJK KR", monospace; }
+
+  .cap { position: absolute; left: 70px; right: 70px; text-align: center; font-weight: 900;
+         font-size: 78px; line-height: 1.22; letter-spacing: -0.025em; opacity: 0; }
+  .cap.sm { font-size: 54px; font-weight: 700; }
+  .cap.xs { font-size: 40px; font-weight: 500; }
+
+  .term { position: absolute; left: 80px; width: 920px; background: #111116; border: 1px solid #2b2b35;
+          border-radius: 30px; box-shadow: 0 40px 90px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.03) inset; overflow: hidden; opacity: 0; }
+  .bar { height: 66px; display: flex; align-items: center; padding: 0 30px; gap: 12px; border-bottom: 1px solid #22222b; background: #15151b; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; }
+  .bar .title { margin-left: auto; font-size: 22px; color: #6f6e78; font-family: "Noto Sans Mono", monospace; }
+  .tb { padding: 30px 36px; font-family: "Noto Sans Mono", "Noto Sans Mono CJK KR", monospace; font-size: 27px; line-height: 1.6;
+        white-space: pre-wrap; word-break: break-all; }
+  .status { position: absolute; left: 0; right: 0; bottom: 0; border-top: 1px solid #22222b; padding: 14px 36px; font-size: 22px; color: #7f7e88;
+            font-family: "Noto Sans Mono", monospace; display: flex; gap: 26px; background: #0f0f14; }
+  .line { opacity: 0; }
+  .user { color: #f4f2ee; }
+  .user::before { content: "❯ "; color: #F5883A; font-weight: 700; }
+  .cur { display: inline-block; width: 15px; height: 32px; background: #F5883A; vertical-align: -6px; margin-left: 2px; border-radius: 2px; }
+  .box { margin: 9px 0; padding: 11px 22px; border-radius: 14px; border: 1px solid #F5883A55; background: #F5883A14; color: #ffd8b8; }
+  .box.red { border-color: #ff5a5a88; background: #ff5a5a1a; color: #ffc4c4; }
+  .box.ok { border-color: #56d36488; background: #56d36414; color: #cdf5d1; }
+  .box b { color: #fff; }
+  .reply { border-left: 6px solid #F5883A; padding: 6px 0 6px 22px; margin: 14px 0 6px; color: #e9e6df; }
+  .reply .k { color: #F5883A; font-weight: 700; }
+  .step { display: flex; align-items: center; gap: 16px; margin: 8px 0; color: #dcd9d2; }
+  .chk { width: 36px; height: 36px; border-radius: 50%; background: #56d364; color: #0a0a0e; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 24px; flex: 0 0 36px; }
+  .chip { position: absolute; padding: 18px 30px; border-radius: 18px; background: #1a1a22; border: 1px solid #F5883A66; color: #ffe1c8;
+          font-family: "Noto Sans Mono", monospace; font-size: 30px; opacity: 0; box-shadow: 0 16px 40px rgba(0,0,0,.5); }
+  .chip small { display: block; font-family: "Noto Sans CJK KR"; font-size: 20px; color: #8d8b93; margin-top: 4px; }
+
+  /* reveal */
+  #flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 46%, #ffb070, #F5883A 30%, rgba(245,136,58,0) 70%); opacity: 0; }
+  #ring { position: absolute; left: 50%; top: 46%; width: 200px; height: 200px; margin: -100px 0 0 -100px; border: 6px solid #F5883A; border-radius: 50%; opacity: 0; }
+  #logo { position: absolute; left: 0; right: 0; top: 640px; text-align: center; opacity: 0; }
+  #logo .w { font-family: "Noto Sans Mono", monospace; font-weight: 700; font-size: 250px; letter-spacing: -0.06em; line-height: 1; color: #fff;
+             text-shadow: 0 0 60px rgba(245,136,58,.55); }
+  #logo .w span { color: #F5883A; }
+  #logo .s { margin-top: 18px; font-family: "Noto Sans Mono", monospace; font-size: 40px; letter-spacing: .32em; color: #b9b6bd; }
+  .pill { position: absolute; left: 50%; transform: translateX(-50%); padding: 14px 34px; border-radius: 999px; border: 1px solid #F5883A88; color: #F5883A;
+          font-size: 30px; font-weight: 700; opacity: 0; background: rgba(245,136,58,.08); white-space: nowrap; }
+
+  /* why cards */
+  .card { position: absolute; left: 80px; width: 920px; padding: 40px 46px; border-radius: 28px; background: #14141a; border: 1px solid #2b2b35; opacity: 0;
+          box-shadow: 0 30px 70px rgba(0,0,0,.55); display: flex; gap: 32px; align-items: center; }
+  .card .ic { width: 110px; height: 110px; border-radius: 26px; background: linear-gradient(145deg, #F5883A, #d96a3a); display: flex; align-items: center; justify-content: center;
+              font-size: 54px; font-weight: 900; color: #14141a; flex: 0 0 110px; font-family: "Noto Sans Mono", monospace; }
+  .card h3 { margin: 0 0 8px; font-size: 52px; font-weight: 900; letter-spacing: -0.02em; }
+  .card p { margin: 0; font-size: 30px; line-height: 1.45; color: #b9b6bd; }
+
+  /* cta */
+  .cmd { position: absolute; left: 80px; width: 920px; padding: 26px 36px; white-space: pre-wrap; border-radius: 22px; background: #111116; border: 1px solid #F5883A88;
+         font-family: "Noto Sans Mono", monospace; font-size: 27px; color: #ffd8b8; opacity: 0; line-height: 1.7; box-shadow: 0 0 60px rgba(245,136,58,.25); }
+  .cmd .dim { font-size: 24px; }
+  #fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="grid"></div>
+
+<!-- 0. HOOK -->
+<section class="scene" id="s_hook">
+  <div class="cap" style="top:430px" data-at="0.15">Claude Code,</div>
+  <div class="cap" style="top:540px" data-at="0.55">설치는 <span class="acc">했는데</span>…</div>
+  <div class="term" style="top:860px;height:520px" data-at="1.0">
+    <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude — my-app</span></div>
+    <div class="tb"><span class="user"></span><span class="cur" id="hookcur"></span>
+<span class="dim" data-at="1.9" style="display:inline-block">……</span></div>
+    <div class="status"><span>Fable 5.1</span><span>0 tok</span><span>my-app</span></div>
+  </div>
+  <div class="cap sm dim" style="top:1470px" data-at="2.1">뭘, 어떻게 시켜야 하지?</div>
+</section>
+
+<!-- 1. PROBLEM -->
+<section class="scene" id="s_problem">
+  <div class="term" style="top:230px;height:1130px" data-at="3.0" id="pterm">
+    <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude — my-app</span></div>
+    <div class="tb">
+<div class="line user" data-at="3.3"><span data-type="p_user"></span></div>
+<div class="line box" data-at="4.4">Allow <b>Bash(npm install express)</b>? [y/n]</div>
+<div class="line box" data-at="4.8">Allow <b>Edit(src/app.js)</b>? [y/n]</div>
+<div class="line box" data-at="5.15">Allow <b>Edit(package.json)</b>? [y/n]</div>
+<div class="line box" data-at="5.45">Allow <b>Bash(npm test)</b>? [y/n]</div>
+<div class="line box" data-at="5.75">Allow <b>Edit(src/db.js)</b>? [y/n]</div>
+<div class="line dim" data-at="6.2">✎ 17 files changed, 412 insertions(+)</div>
+<div class="line box red" data-at="6.7">Allow <b>Bash(rm -rf dist)</b>? [y/n]  ⚠</div>
+    </div>
+    <div class="status"><span>Fable 5.1</span><span>38k tok</span><span>my-app</span></div>
+  </div>
+  <div class="cap" style="top:1440px" data-at="3.7" data-until="5.3">허락해 달라는<br>창만 <span class="acc">계속</span></div>
+  <div class="cap" style="top:1440px" data-at="5.4" data-until="6.9">계획 없이<br>파일 <span class="acc">17개</span>가 바뀌고</div>
+  <div class="cap" style="top:1440px" data-at="7.0">확인은 결국<br><span class="acc">내 몫</span></div>
+</section>
+
+<!-- 2. REVEAL -->
+<section class="scene" id="s_reveal">
+  <div id="flash"></div><div id="ring"></div>
+  <div id="logo"><div class="w">w<span>o</span>mc</div><div class="s" data-at="8.5">WORKS ON MY CLAUDE</div></div>
+  <div class="cap" style="top:1060px" data-at="9.3">원하는 것만 말하면</div>
+  <div class="cap" style="top:1170px" data-at="9.8">나머지는 <span class="acc">Claude</span> 가 맡는다</div>
+  <div class="pill" style="top:1400px" data-at="10.5">Claude Code 플러그인 · 무료 · 오픈소스</div>
+</section>
+
+<!-- 3. INSTALL -->
+<section class="scene" id="s_install">
+  <div class="cap" style="top:230px" data-at="11.7">설치는 <span class="acc">두 줄</span></div>
+  <div class="term" style="top:420px;height:760px" data-at="11.6">
+    <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude</span></div>
+    <div class="tb">
+<div class="line user" data-at="12.1"><span data-type="i1"></span></div>
+<div class="line box ok" data-at="13.7">✓ marketplace 추가됨: works-on-my-claude</div>
+<div class="line user" data-at="14.3"><span data-type="i2"></span></div>
+<div class="line box ok" data-at="15.6">✓ womc v4.3.1 설치됨</div>
+    </div>
+    <div class="status"><span>Fable 5.1</span><span>2k tok</span><span>~</span></div>
+  </div>
+  <div class="cap xs" style="top:1240px" data-at="16.0">그 다음 아무 폴더에서 <span class="mono acc">claude</span> 를 열면<br>설정 파일 <b>4개</b>가 <span class="acc">자동으로</span> 생긴다</div>
+  <div class="chip" style="left:80px;top:1460px" data-at="16.25">CLAUDE.md<small>작업 규칙 + 브리핑</small></div>
+  <div class="chip" style="left:560px;top:1460px" data-at="16.4">settings.json<small>권한 · 위험한 것만 묻기</small></div>
+  <div class="chip" style="left:80px;top:1610px" data-at="16.55">statusline.js<small>터미널 아래 상태줄</small></div>
+  <div class="chip" style="left:560px;top:1610px" data-at="16.7">.gitignore<small>없을 때만</small></div>
+</section>
+
+<!-- 4. FLOW -->
+<section class="scene" id="s_flow">
+  <div class="cap" style="top:230px" data-at="17.7">말만 하면, <span class="acc">순서대로</span></div>
+  <div class="term" style="top:410px;height:1160px" data-at="17.6">
+    <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="title">claude — 가계부</span></div>
+    <div class="tb">
+<div class="line user" data-at="17.9"><span data-type="f_user"></span></div>
+<div class="line reply" data-at="19.2"><span class="k">만들 것</span>  수입·지출 입력, 월별 합계 화면
+<span class="k">안 만들 것</span>  로그인, 서버
+<span class="k">확인 방법</span>  npm test → 3건 통과</div>
+<div class="line step" data-at="20.4"><div class="chk">✓</div>계획을 다섯 줄로 보여주기</div>
+<div class="line step" data-at="21.2"><div class="chk">✓</div>체크포인트 커밋</div>
+<div class="line step" data-at="22.0"><div class="chk">✓</div>구현 · npm test 3건 통과</div>
+<div class="line step" data-at="23.0"><div class="chk">✓</div>별도 에이전트가 검증 · <span style="color:#56d364">합격</span></div>
+<div class="line step" data-at="23.8"><div class="chk">✓</div>한 줄 보고 + 커밋</div>
+<div class="line box" data-at="24.8"><b>git push</b> 할까요? 밖으로 나가면 되돌릴 수 없어요. [y/n]</div>
+    </div>
+    <div class="status"><span>Fable 5.1</span><span>21k tok</span><span>가계부</span></div>
+  </div>
+  <div class="cap sm" style="top:1660px" data-at="25.0">묻는 건 <span class="acc">되돌릴 수 없는 일</span>뿐</div>
+</section>
+
+<!-- 5. WHY -->
+<section class="scene" id="s_why">
+  <div class="cap" style="top:260px" data-at="26.6">왜 <span class="acc">womc</span> 인가</div>
+  <div class="card" style="top:520px" data-at="26.9"><div class="ic">4</div><div><h3>얇다</h3><p>파일 4개, 200줄 안. 모델이 좋아질수록 더 얇아진다.</p></div></div>
+  <div class="card" style="top:880px" data-at="27.6"><div class="ic">?</div><div><h3>안 묻는다</h3><p>되돌릴 수 있는 일은 알아서. 커밋으로 못 되돌리는 것만 묻는다.</p></div></div>
+  <div class="card" style="top:1240px" data-at="28.3"><div class="ic">가</div><div><h3>초보자 기준</h3><p>코딩 몰라도 된다. 한국어로, 결론부터, 다섯 줄 안.</p></div></div>
+</section>
+
+<!-- 6. CTA -->
+<section class="scene" id="s_cta">
+  <div id="logo2" style="position:absolute;left:0;right:0;top:460px;text-align:center;opacity:0">
+    <div class="mono" style="font-weight:700;font-size:170px;letter-spacing:-0.06em;line-height:1;text-shadow:0 0 60px rgba(245,136,58,.5)">w<span class="acc">o</span>mc</div>
+  </div>
+  <div class="cap" style="top:700px" data-at="29.9">지금 <span class="acc">설치</span>하기</div>
+  <div class="cmd" style="top:900px" data-at="30.2"><span class="acc">❯</span> /plugin marketplace add yeejh96-bit/works-on-my-claude
+<span class="acc">❯</span> /plugin install womc@works-on-my-claude</div>
+  <div class="cap xs dim" style="top:1200px" data-at="30.8">github.com/<span style="color:#f4f2ee">yeejh96-bit/works-on-my-claude</span></div>
+  <div class="pill" style="top:1360px" data-at="31.1">MIT · 무료</div>
+</section>
+
+<div id="fade"></div>
+
+<script src="timeline.js"></script>
+<script>
+  const clamp01 = x => Math.max(0, Math.min(1, x));
+  const easeOut = x => 1 - Math.pow(1 - x, 3);
+  const easeInOut = x => x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2;
+  const prog = (t, at, d) => clamp01((t - at) / d);
+
+  const scenes = Object.entries(T.scenes).map(([k, [a, b]]) => ({ el: document.getElementById('s_' + k), a, b }));
+  const timed = [...document.querySelectorAll('[data-at]')];
+  const typers = T.typing.map(x => ({ ...x, el: document.querySelector(`[data-type="${x.id}"]`) }));
+  const CUR = 0.9;
+
+  function render(t) {
+    // 장면 전환: 들어올 때 아래서 올라오고, 나갈 때 위로 빠진다
+    for (const s of scenes) {
+      const inP = easeOut(prog(t, s.a, 0.45));
+      const outP = easeInOut(prog(t, s.b - 0.3, 0.3));
+      const active = t >= s.a - 0.01 && t < s.b;
+      s.el.style.opacity = active ? String(inP * (1 - outP)) : '0';
+      s.el.style.transform = `translateY(${(1 - inP) * 120 - outP * 120}px)`;
+    }
+    // data-at 요소: 페이드 + 살짝 위로
+    for (const el of timed) {
+      const at = +el.dataset.at, d = +(el.dataset.d || 0.4);
+      const until = el.dataset.until ? +el.dataset.until : Infinity;
+      const p = easeOut(prog(t, at, d));
+      const q = 1 - easeOut(prog(t, until, 0.25));
+      el.style.opacity = String(p * q);
+      const base = el.classList.contains('pill') ? 'translateX(-50%) ' : '';
+      const pop = el.classList.contains('box') || el.classList.contains('chip') || el.classList.contains('card') || el.classList.contains('step');
+      el.style.transform = base + (pop ? `scale(${0.92 + 0.08*p}) translateY(${(1-p)*24}px)` : `translateY(${(1 - p) * 40}px)`);
+    }
+    // 타이핑
+    for (const ty of typers) {
+      const n = Math.max(0, Math.floor((t - ty.at) * ty.cps));
+      const done = ty.at + ty.text.length / ty.cps;
+      ty.el.textContent = ty.text.slice(0, n);
+      let cur = ty.el.nextElementSibling;
+      if (!cur) { cur = document.createElement('span'); cur.className = 'cur'; ty.el.after(cur); }
+      const blink = t > done ? (Math.floor((t - done) * 2.5) % 2 === 0) : true;
+      cur.style.opacity = (t >= ty.at && t < done + CUR && blink) ? '1' : '0';
+    }
+    document.getElementById('hookcur').style.opacity = (t > 1.2 && Math.floor(t * 2.5) % 2 === 0) ? '1' : '0';
+
+    // 문제 장면: 흔들림
+    const pt = document.getElementById('pterm');
+    if (t >= T.shakeAt && t < T.shakeAt + 0.6) {
+      const k = 1 - prog(t, T.shakeAt, 0.6);
+      pt.style.transform = `translate(${Math.sin(t * 173) * 14 * k}px, ${Math.cos(t * 211) * 10 * k}px) rotate(${Math.sin(t*97)*0.6*k}deg)`;
+    }
+    // 등장 장면: 섬광 · 링 · 로고
+    const fl = prog(t, T.boomAt, 0.7);
+    document.getElementById('flash').style.opacity = String(t >= T.boomAt ? (1 - easeOut(fl)) * 0.95 : 0);
+    const rp = prog(t, T.boomAt, 0.9);
+    const ring = document.getElementById('ring');
+    ring.style.opacity = String(t >= T.boomAt ? (1 - rp) : 0);
+    ring.style.transform = `scale(${1 + easeOut(rp) * 7})`;
+    const lp = easeOut(prog(t, T.boomAt + 0.05, 0.6));
+    const logo = document.getElementById('logo');
+    logo.style.opacity = String(lp);
+    logo.style.transform = `scale(${0.55 + 0.45 * lp})`;
+    // CTA 로고
+    const l2 = easeOut(prog(t, T.scenes.cta[0] + 0.15, 0.5));
+    const logo2 = document.getElementById('logo2');
+    logo2.style.opacity = String(l2);
+    logo2.style.transform = `scale(${0.8 + 0.2 * l2})`;
+    // 끝 페이드
+    document.getElementById('fade').style.opacity = String(prog(t, T.duration - 0.6, 0.6));
+    return true;
+  }
+  window.render = render;
+  render(0);
+  // 브라우저에서 직접 열면 자동 재생(미리보기용)
+  if (!navigator.webdriver) { const s = performance.now(); (function loop(){ render(((performance.now()-s)/1000) % T.duration); requestAnimationFrame(loop); })(); }
+</script>
+</body>
+</html>
