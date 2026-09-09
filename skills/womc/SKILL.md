@@ -27,7 +27,7 @@ description: 프로젝트 폴더에 womc 기본 하네스(CLAUDE.md · .claude/s
 1. 체크포인트 커밋을 남긴다(이 커밋이 있어 아래 지우기를 묻지 않는다).
 2. 기존 하네스 전부를 읽는다: `CLAUDE.md`, `.claude/rules/`, `.claude/skills/`, `.claude/agents/`, `.claude/settings.json`, `PLAN.md`, `TASKS.md`, `docs/CHANGELOG.md`, `AGENTS.md` 등.
 3. 남길 것은 **코드로 알 수 없는 사실**뿐이다.
-   - 사용자가 적은 프로젝트 사실·지킬 것·끝난 조건·확인 명령 → 새 `CLAUDE.md` 「브리핑」으로.
+   - 사용자가 적은 프로젝트 사실·지킬 것·끝난 조건·확인 명령 → 새 `CLAUDE.md` 「브리핑」으로. 이때도 브리핑 기준(「이 줄이 없으면 다음 작업이 달라지나」)을 적용해, 의향·계획·사정·진행 기록은 옮기지 않고 지운다.
    - 특정 경로에만 걸리는 제약 → `.claude/rules/<이름>.md` 에 `paths` 를 붙여서.
    - 사용자가 직접 만든 스킬·훅·MCP 설정 → 그대로 둔다.
    - `AGENTS.md` 가 있으면 새 `CLAUDE.md` 첫 줄에 `@AGENTS.md` 로 불러온다.
