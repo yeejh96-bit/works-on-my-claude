@@ -1,9 +1,4 @@
 {
-  "statusLine": {
-    "type": "command",
-    "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
-    "refreshInterval": 10
-  },
   "permissions": {
     "allow": [
       "Bash(ls:*)",
@@ -73,16 +68,6 @@
       "Write",
       "NotebookEdit"
     ],
-    "ask": [
-      "Bash(git push:*)",
-      "Bash(git reset --hard:*)",
-      "Bash(rm:*)",
-      "Bash(mv:*)",
-      "PowerShell(git push:*)",
-      "PowerShell(git reset --hard:*)",
-      "PowerShell(Remove-Item:*)",
-      "PowerShell(Move-Item:*)"
-    ],
     "deny": [
       "Read(**/.env)",
       "Read(**/.env.local)",
@@ -92,6 +77,32 @@
       "Read(**/.env.test)",
       "Read(**/.env.staging)",
       "Edit(**/.env)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "PowerShell(git push:*)",
+      "PowerShell(git reset --hard:*)",
+      "PowerShell(Remove-Item:*)",
+      "PowerShell(Move-Item:*)"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
+    "refreshInterval": 10
+  },
+  "extraKnownMarketplaces": {
+    "works-on-my-claude": {
+      "source": {
+        "source": "github",
+        "repo": "yeejh96-bit/works-on-my-claude"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "womc@works-on-my-claude": true
   }
 }
