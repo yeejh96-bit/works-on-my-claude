@@ -3,7 +3,7 @@ name: womc
 description: 프로젝트 폴더에 womc 기본 하네스(CLAUDE.md · .claude/settings.json · 상태줄)를 깔거나 v4 철학에 맞게 다시 짠다. 세션 시작 훅이 「세팅 없음」「구버전」을 알리면 사용자에게 묻지 않고 이 스킬을 부른다. 사용자가 /womc 를 직접 쳐도 같은 절차다.
 ---
 
-<!-- womc:skeleton-version=4.7.0 -->
+<!-- womc:skeleton-version=4.7.1 -->
 
 # womc 세팅
 
@@ -52,7 +52,7 @@ description: 프로젝트 폴더에 womc 기본 하네스(CLAUDE.md · .claude/s
 ### 1) `CLAUDE.md`
 ```markdown
 # 작업 규칙
-<!-- womc:skeleton-version=4.7.0 -->
+<!-- womc:skeleton-version=4.7.1 -->
 
 이 파일은 매 세션 자동으로 읽힌다. 「작업 규칙」은 womc 가 관리하고 「브리핑」은 모델이 채운다. 전체 200줄을 넘기지 않는다.
 
@@ -107,6 +107,7 @@ description: 프로젝트 폴더에 womc 기본 하네스(CLAUDE.md · .claude/s
 - allow: 파일 수정·조회·git·실행 명령을 **구체 항목으로** 적는다(`Bash(*)` 같은 넓은 규칙은 auto mode 가 무시한다).
 - ask: 되돌릴 수 없는 것만 — `git push` · `git reset --hard` · `rm` · `mv`.
 - deny: `.env` 류 읽기·수정(`.env.example` 은 예외).
+- 아래 블록의 `${CLAUDE_PROJECT_DIR}` 는 변수 그대로 적는다. 스킬을 읽을 때 그 자리가 절대경로로 펼쳐져 보일 수 있으니, 보이는 대로 옮기지 마라.
 ```json
 {
   "statusLine": {
