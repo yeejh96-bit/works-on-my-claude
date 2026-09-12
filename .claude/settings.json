@@ -94,6 +94,9 @@
     "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/statusline.js\"",
     "refreshInterval": 10
   },
+  "enabledPlugins": {
+    "womc@works-on-my-claude": true
+  },
   "extraKnownMarketplaces": {
     "works-on-my-claude": {
       "source": {
@@ -101,8 +104,5 @@
         "repo": "yeejh96-bit/works-on-my-claude"
       }
     }
-  },
-  "enabledPlugins": {
-    "womc@works-on-my-claude": true
   }
 }
