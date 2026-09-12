@@ -1,4 +1,4 @@
-# works-on-my-claude v4.8.0
+# works-on-my-claude v4.9.0
 
 코딩을 몰라도 무엇을 원하는지만 말하면 Claude Code 가 나머지를 맡게 만드는 **얇은 기본 하네스**를 프로젝트에 깐다. 설치하면 끝이다. `/womc` 를 칠 일도 거의 없다.
 
@@ -30,10 +30,12 @@
 
 ## 플러그인 안에 있는 것
 ```
-skills/womc/SKILL.md       세팅·다시 짜기 절차 + 정본(CLAUDE.md · settings.json · .gitignore)
+skills/womc/SKILL.md       세팅·갱신·다시 짜기 절차
+templates/CLAUDE.md        골격 정본 — 작업 규칙(브리핑은 프로젝트가 채운다)
+templates/settings.json    권한·상태줄 정본
+templates/statusline.js    상태줄
 hooks/hooks.json           세션 시작 훅
 scripts/womc-check.js      세팅 유무·버전 검사
-templates/statusline.js    상태줄
 scripts/bump-version.py    버전 한 번에 올리기(개발용)
 ```
 서브에이전트·절차 스킬은 주지 않는다. Claude Code 내장 에이전트로 충분하다.

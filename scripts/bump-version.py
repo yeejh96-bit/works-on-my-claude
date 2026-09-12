@@ -8,7 +8,7 @@
 고치는 곳:
 1) .claude-plugin/plugin.json 의 "version"
 2) README.md 첫 줄 제목 끝의 vX.Y.Z
-3) womc:skeleton-version=X.Y.Z 표식 전부 (skills/womc/SKILL.md · CLAUDE.md)
+3) womc:skeleton-version=X.Y.Z 표식 전부 (skills/womc/SKILL.md · templates/CLAUDE.md · CLAUDE.md)
    — 개수를 세지 않고 정규식으로 전부 바꾼다.
 
 --dry-run 을 주면 무엇을 바꿀지 보여주기만 하고 파일은 건드리지 않는다.
@@ -40,6 +40,7 @@ def save(path: Path, text: str) -> None:
 
 VERSION_MARKER_FILES = [
     "skills/womc/SKILL.md",
+    "templates/CLAUDE.md",
     "CLAUDE.md",
 ]
 
