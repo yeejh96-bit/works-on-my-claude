@@ -1,14 +1,16 @@
 ---
 name: korean-skill-names-work
-description: 스킬 폴더·name 을 한글로 지어도 Claude Code 가 정상 인식한다(2026-09-12 실측)
-metadata: 
+description: 한글 스킬 이름은 되지만 womc 골격에 강제 규칙으로 넣지 않기로 했다(2026-09-12)
+metadata:
   node_type: memory
-  type: reference
+  type: feedback
   originSessionId: 25f9d924-518d-436e-9591-af9b20c82615
-  modified: 2026-09-12T06:42:40.472Z
+  modified: 2026-09-12T06:47:39.153Z
 ---
 
-`.claude/skills/테스트-한글이름/SKILL.md` 처럼 폴더 이름과 frontmatter `name:` 을 한글로 지어도 세션 스킬 목록에 정상으로 뜬다. ASCII 대조군과 나란히 확인했다.
+기술적으로는 된다: `.claude/skills/테스트-한글이름/SKILL.md` 처럼 폴더 이름과 frontmatter `name:` 을 한글로 지으면 스킬 목록에도 뜨고 `Skill` 도구 호출도 성공한다(ASCII 대조군과 나란히 실측).
 
-**Why:** 한글 이름이 안 될까 봐 영어 이름으로 우회할 이유가 없다.
-**How to apply:** 이 프로젝트에서 스킬을 만들 때 이름을 한글로 지어도 된다. 다만 슬래시로 부를 때 한글 입력이 필요하니, 자주 직접 치는 스킬은 영어가 편할 수 있다.
+그런데 이걸 womc 골격 규칙으로 넣었다가 사용자가 곧바로 접었다. 「스킬 이름을 한글로 짓는다」 + 「다시 짜기 때 기존 스킬 이름도 한글로 바꾼다」 두 줄을 넣고 4.4.0 으로 올렸던 것을 전부 되돌렸다.
+
+**Why:** 되는 것과 규칙으로 강제할 것은 다르다. 이름을 한글로 바꾸면 그 이름을 부르던 곳까지 따라 고쳐야 하고, 슬래시로 직접 칠 때 한글 입력이 걸린다.
+**How to apply:** womc 골격에 스킬 이름 언어를 강제하는 줄을 다시 넣지 않는다. 이름은 그때그때 모델이 정한다. 사용자가 먼저 다시 꺼내지 않는 한 이 안을 제안하지 않는다. [[rejected-ideas-dont-go-in-rules]]
